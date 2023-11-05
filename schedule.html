@@ -18,6 +18,7 @@
         padding: 5px;
         border: 1px solid #ccc;
         cursor: pointer;
+        word-break: break-all;
       }
       .task-item.done {
         background-color: #c7f1b1;
@@ -70,7 +71,24 @@
 
       fileInput.addEventListener("change", handleFileUpload);
 
-      window.addEventListener("beforeunload", handleBeforeUnload);
+      window.addEventListener("unload", function (event) {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      });
+
+      window.addEventListener("beforeunload", function () {
+        if (tasks.length > 0) {
+          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
+        }
+      });
+
+      window.addEventListener("load", function () {
+        const savedTasks = localStorage.getItem("tasks");
+
+        if (savedTasks) {
+          tasks = JSON.parse(savedTasks);
+          renderTasks();
+        }
+      });
 
       function addTask() {
         const taskInput = document.getElementById("task");
@@ -123,14 +141,14 @@
             }
 
             taskItem.innerHTML = `
-              <div>${task.category}: ${task.text}</div>
-              <div>
-                  <button onclick="toggleTask(${index})">${
+                    <div>${task.category}: ${task.text}</div>
+                    <div>
+                        <button onclick="toggleTask(${index})">${
               task.done ? "未完成" : "完成"
             }</button>
-                  <button onclick="deleteTask(${index})">刪除</button>
-              </div>
-          `;
+                        <button onclick="deleteTask(${index})">刪除</button>
+                    </div>
+                `;
             taskContainer.appendChild(taskItem);
           }
         });
@@ -180,12 +198,6 @@
         event.target.value = "";
 
         reader.readAsText(file);
-      }
-
-      function handleBeforeUnload(event) {
-        if (tasks.length > 0) {
-          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
-        }
       }
 
       function handleKeyUp(event) {
