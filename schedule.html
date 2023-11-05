@@ -52,12 +52,25 @@
         </select>
         <button onclick="addTask()">新增</button>
       </div>
+      <div>
+        <select id="filterCategory" onchange="renderTasks()">
+          <option value="all">所有類別</option>
+          <option value="未分類">未分類</option>
+          <option value="PJ24">PJ24</option>
+          <option value="PJ25">PJ25</option>
+          <option value="PJ26">PJ26</option>
+          <option value="PJ27">PJ27</option>
+          <option value="PJ28">PJ28</option>
+          <option value="PJ29">PJ29</option>
+        </select>
+      </div>
       <div id="task-container">
         <!-- 工作項目將在這裡動態顯示 -->
       </div>
       <div>
         <button onclick="saveTasksToFile()">存檔</button>
         <input type="file" id="fileInput" accept=".json" />
+        <button onclick="clearTasks()">清空</button>
       </div>
     </div>
 
@@ -113,6 +126,11 @@
         renderTasks();
       }
 
+      function clearTasks() {
+        tasks = [];
+        renderTasks();
+      }
+
       function toggleTask(index) {
         tasks[index].done = !tasks[index].done;
         renderTasks();
@@ -126,14 +144,19 @@
       function renderTasks() {
         taskContainer.innerHTML = "";
 
+        const filterCategory = document.getElementById("filterCategory").value;
+
         tasks.forEach((task, index) => {
           if (task.type === "separator") {
             // 顯示分隔線
             const separator = document.createElement("hr");
             separator.classList.add("separator");
             taskContainer.appendChild(separator);
-          } else {
-            // 顯示工作項目
+          } else if (
+            filterCategory === "all" ||
+            task.category === filterCategory
+          ) {
+            // 顯示工作項目，根據過濾類別顯示
             const taskItem = document.createElement("div");
             taskItem.classList.add("task-item");
             if (task.done) {
