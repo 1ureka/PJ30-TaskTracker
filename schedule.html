@@ -22,6 +22,12 @@
       .task-item.done {
         background-color: #c7f1b1;
       }
+      .separator {
+        border-top: 1px solid #ccc;
+        margin: 10px 0;
+        padding: 0;
+        cursor: default;
+      }
     </style>
   </head>
   <body>
@@ -72,16 +78,21 @@
         const taskText = taskInput.value.trim();
         const category = categorySelect.value;
 
-        if (taskText !== "") {
+        if (taskText === "--") {
+          // 添加分隔線
+          tasks.push({ type: "separator" });
+        } else if (taskText !== "") {
+          // 添加工作
           const task = {
             text: taskText,
             category: category, // 使用選擇的工作種類
             done: false,
           };
           tasks.push(task);
-          taskInput.value = "";
-          renderTasks();
         }
+
+        taskInput.value = "";
+        renderTasks();
       }
 
       function toggleTask(index) {
@@ -98,22 +109,30 @@
         taskContainer.innerHTML = "";
 
         tasks.forEach((task, index) => {
-          const taskItem = document.createElement("div");
-          taskItem.classList.add("task-item");
-          if (task.done) {
-            taskItem.classList.add("done");
-          }
+          if (task.type === "separator") {
+            // 顯示分隔線
+            const separator = document.createElement("hr");
+            separator.classList.add("separator");
+            taskContainer.appendChild(separator);
+          } else {
+            // 顯示工作項目
+            const taskItem = document.createElement("div");
+            taskItem.classList.add("task-item");
+            if (task.done) {
+              taskItem.classList.add("done");
+            }
 
-          taskItem.innerHTML = `
-            <div>${task.category}: ${task.text}</div>
-            <div>
-                <button onclick="toggleTask(${index})">${
-            task.done ? "未完成" : "完成"
-          }</button>
-                <button onclick="deleteTask(${index})">刪除</button>
-            </div>
-        `;
-          taskContainer.appendChild(taskItem);
+            taskItem.innerHTML = `
+              <div>${task.category}: ${task.text}</div>
+              <div>
+                  <button onclick="toggleTask(${index})">${
+              task.done ? "未完成" : "完成"
+            }</button>
+                  <button onclick="deleteTask(${index})">刪除</button>
+              </div>
+          `;
+            taskContainer.appendChild(taskItem);
+          }
         });
 
         // 使用 SortableJS 使工作清單可拖動
