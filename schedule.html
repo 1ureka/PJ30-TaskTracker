@@ -76,6 +76,15 @@
 
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- 概念是圍繞在tasks這個陣列，該陣列包含task物件或分割線物件
+    可以對tasks物件做各種事，包含：
+    1. addTask(): 在最底部新增新的task或分割線物件
+    2. clearTasks(): 清空tasks陣列
+    3. toggleTask(index): 切換該task的工作狀態
+    4. deleteTask(index): 從tasks中刪除該task
+    5. renderTasks(): 將tasks陣列根據過濾器渲染在畫面上
+    6. saveTasksToFile(): 將tasks陣列轉為JSON並下載
+    7. handleFileUpload(): 從上傳的JSON轉成tasks陣列 -->
     <script>
       let tasks = [];
 
