@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <title>工作清單</title>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .task-list {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .task-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+      }
+      .task-item.done {
+        background-color: #c7f1b1;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>工作清單</h1>
+    <div class="task-list">
+      <div>
+        <input
+          type="text"
+          id="task"
+          placeholder="新增工作"
+          onkeyup="handleKeyUp(event)"
+        />
+        <select id="category">
+          <option value="未分類">未分類</option>
+          <option value="PJ24">PJ24</option>
+          <option value="PJ25">PJ25</option>
+          <option value="PJ26">PJ26</option>
+          <option value="PJ27">PJ27</option>
+          <option value="PJ28">PJ28</option>
+          <option value="PJ29">PJ29</option>
+        </select>
+        <button onclick="addTask()">新增</button>
+      </div>
+      <div id="task-container">
+        <!-- 工作項目將在這裡動態顯示 -->
+      </div>
+      <div>
+        <button onclick="saveTasksToFile()">存檔</button>
+        <input type="file" id="fileInput" accept=".json" />
+      </div>
+    </div>
+
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+      let tasks = [];
+
+      const taskContainer = document.getElementById("task-container");
+      const fileInput = document.getElementById("fileInput");
+
+      fileInput.addEventListener("change", handleFileUpload);
+
+      window.addEventListener("beforeunload", handleBeforeUnload);
+
+      function addTask() {
+        const taskInput = document.getElementById("task");
+        const categorySelect = document.getElementById("category");
+        const taskText = taskInput.value.trim();
+        const category = categorySelect.value;
+
+        if (taskText !== "") {
+          const task = {
+            text: taskText,
+            category: category, // 使用選擇的工作種類
+            done: false,
+          };
+          tasks.push(task);
+          taskInput.value = "";
+          renderTasks();
+        }
+      }
+
+      function toggleTask(index) {
+        tasks[index].done = !tasks[index].done;
+        renderTasks();
+      }
+
+      function deleteTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+      }
+
+      function renderTasks() {
+        taskContainer.innerHTML = "";
+
+        tasks.forEach((task, index) => {
+          const taskItem = document.createElement("div");
+          taskItem.classList.add("task-item");
+          if (task.done) {
+            taskItem.classList.add("done");
+          }
+
+          taskItem.innerHTML = `
+            <div>${task.category}: ${task.text}</div>
+            <div>
+                <button onclick="toggleTask(${index})">${
+            task.done ? "未完成" : "完成"
+          }</button>
+                <button onclick="deleteTask(${index})">刪除</button>
+            </div>
+        `;
+          taskContainer.appendChild(taskItem);
+        });
+
+        // 使用 SortableJS 使工作清單可拖動
+        new Sortable(taskContainer, {
+          animation: 150,
+          onEnd: handleDragEnd,
+        });
+      }
+
+      function saveTasksToFile() {
+        const jsonData = JSON.stringify(tasks, null, 2);
+        const blob = new Blob([jsonData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "tasks.json";
+        a.click();
+
+        URL.revokeObjectURL(url);
+      }
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          try {
+            const data = JSON.parse(e.target.result);
+
+            // 檢查每個工作是否有 'category' 屬性，如果沒有，設置為 '未分類'
+            tasks = data.map((task) => {
+              if (!task.category) {
+                task.category = "未分類";
+              }
+              return task;
+            });
+
+            renderTasks();
+          } catch (error) {
+            alert("錯誤：JSON 解析失敗。");
+          }
+        };
+
+        event.target.value = "";
+
+        reader.readAsText(file);
+      }
+
+      function handleBeforeUnload(event) {
+        if (tasks.length > 0) {
+          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
+        }
+      }
+
+      function handleKeyUp(event) {
+        if (event.key === "Enter") {
+          addTask();
+        }
+      }
+
+      function handleDragEnd(event) {
+        const { oldIndex, newIndex } = event;
+        const movedItem = tasks[oldIndex];
+
+        // 複製拖動元素對應的 tasks 物件並插入新的位置
+        tasks.splice(oldIndex, 1);
+        tasks.splice(newIndex, 0, movedItem);
+
+        renderTasks();
+      }
+    </script>
+  </body>
+</html>
