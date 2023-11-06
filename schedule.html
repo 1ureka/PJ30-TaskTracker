@@ -88,8 +88,7 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
-    <!-- 還要增加清空按鈕、新增按鈕偵測器(由於addtask大改，因此也得補上缺失邏輯) 
-    再加上filter-category change偵測器，並且編寫它所需函數(要注意在有filter時，存檔的JSON是否會缺失)-->
+    <!-- 再加上filter-category change偵測器，並且編寫它所需函數(要注意在有filter時，存檔的JSON是否會缺失)-->
     <script>
       function readInput() {
         const taskText = $("#task-input").val();
@@ -234,6 +233,20 @@
         $("#clear").on("click", clearTasks);
 
         // 篩選工作相關
+        $("#filter-category").change(function () {
+          const category = $(this).val();
+
+          // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
+          $("#task-container .task-item").hide();
+
+          // 然後使用 forEach 遍歷並顯示
+          $("#task-container .task-item").each(function () {
+            const taskItem = $(this);
+            if (category === "all" || taskItem.data("category") === category) {
+              taskItem.show();
+            }
+          });
+        });
 
         // 存檔工作相關
         $("#save").on("click", function () {
