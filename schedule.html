@@ -101,7 +101,7 @@
         if (taskText === "--") {
           // 添加分隔线
           const separator = $("<hr>").addClass("separator");
-          $("#taskContainer").append(separator);
+          $("#task-container").append(separator);
           // 添加工作
         } else if (taskText !== "") {
           const taskItem = $("<div>")
@@ -127,7 +127,7 @@
             .text("刪除")
             .appendTo(buttonContainer);
 
-          $("#taskContainer").append(taskItem);
+          $("#task-container").append(taskItem);
         }
       }
 
