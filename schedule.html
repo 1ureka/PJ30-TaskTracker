@@ -20,15 +20,6 @@
         cursor: pointer;
         word-break: break-all;
       }
-      .task-item.done {
-        background-color: #c7f1b1;
-      }
-      .separator {
-        border-top: 1px solid #ccc;
-        margin: 10px 0;
-        padding: 0;
-        cursor: default;
-      }
     </style>
   </head>
   <!-- 之後結構改為
@@ -88,12 +79,17 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
-    <!-- 再加上filter-category change偵測器，並且編寫它所需函數(要注意在有filter時，存檔的JSON是否會缺失)-->
+    <!-- 分割線目前還無法刪除(沒有它的刪除按鈕)
+      再加上filter-category change偵測器，並且編寫它所需函數(要注意在有filter時，存檔的JSON是否會缺失)-->
     <script>
       function readInput() {
         const taskText = $("#task-input").val();
         const isDone = "false";
         const category = $("#category").val();
+
+        // 讀取完成後清空輸入
+        $("#task-input").val("");
+
         return { taskText, isDone, category };
       }
 
@@ -136,7 +132,7 @@
       }
 
       function toggleTask(taskItem) {
-        const button = taskItem.find(".task-delete");
+        const button = taskItem.find(".task-toggle");
         const isDone = taskItem.data("done") === "true";
         taskItem.data("done", isDone ? "false" : "true");
         button.text(isDone ? "未完成" : "完成");
@@ -146,9 +142,26 @@
         taskItem.remove();
       }
 
+      function filterTasks(category) {
+        // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
+        $("#task-container .task-item").hide();
+
+        // 然後使用 forEach 遍歷並顯示
+        $("#task-container .task-item").each(function () {
+          const taskItem = $(this);
+          if (category === "all" || taskItem.data("category") === category) {
+            taskItem.show();
+          }
+        });
+      }
+
       function domToJSON() {
-        const tasks = $(".task-item")
+        const tasks = $("#task-container")
+          .children()
           .map(function () {
+            if ($(this).is("hr")) {
+              return { type: "separator" };
+            }
             return {
               text: $(this).data("text"),
               category: $(this).data("category"),
@@ -188,7 +201,7 @@
         // 遍歷 JSON 數據中的每個任務物件
         tasks.forEach((task) => {
           // 從任務物件獲取必要資訊
-          const taskText = task.text;
+          const taskText = task.text || "--";
           const isDone = task.done === "true"; // 將字串轉為布爾
           const category = task.category;
 
@@ -198,12 +211,24 @@
       }
     </script>
     <script>
+      $(window).on("load", function () {
+        const savedTasks = localStorage.getItem("tasks");
+
+        if (savedTasks) jsonToDOM(savedTasks);
+      });
+
+      $(window).on("unload", function () {
+        localStorage.setItem("tasks", domToJSON());
+      });
+    </script>
+    <script>
       // 事件偵測註冊
       $(document).ready(function () {
         // 使清單可拖動
         new Sortable($("#task-container").get()[0], {
           animation: 150,
         });
+
         // 新增工作相關
         $("#add").on("click", function () {
           const { taskText, isDone, category } = readInput();
@@ -235,17 +260,7 @@
         // 篩選工作相關
         $("#filter-category").change(function () {
           const category = $(this).val();
-
-          // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
-          $("#task-container .task-item").hide();
-
-          // 然後使用 forEach 遍歷並顯示
-          $("#task-container .task-item").each(function () {
-            const taskItem = $(this);
-            if (category === "all" || taskItem.data("category") === category) {
-              taskItem.show();
-            }
-          });
+          filterTasks(category);
         });
 
         // 存檔工作相關
@@ -275,19 +290,9 @@
         });
 
         // 開啟/關閉頁面相關
-        $(window).on("unload", function () {
-          localStorage.setItem("tasks", domToJSON());
-        });
-
-        $(window).on("load", function () {
-          const savedTasks = localStorage.getItem("tasks");
-
-          if (savedTasks) jsonToDOM(savedTasks);
-        });
-
         $(window).on("beforeunload", function (e) {
           if ($("#task-container .task-item").length > 0) {
-            e.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
+            return "未保存的資料將會遺失，確定要離開頁面嗎？";
           }
         });
       });
