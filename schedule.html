@@ -35,13 +35,14 @@
   最上方是stick! head包含各種文字按鈕，懸停後會出現下拉選單，下拉選單懸停時也不會縮回: 
   新增: 下拉選單包含新增工作或分割線
   刪除: 按下後清單左邊出現X，可以刪除工作或分割線
+  清空: 刪除所有工作
   篩選: 下拉選單包含各種類別
   存檔: 提供json下載
   讀取: 打開檔案瀏覽器，並供使用者上傳json
   搜尋: 直接包含搜尋符號和搜尋框
   再來是上方底下空白
   再來是工作清單，清單左右有空白，內容置左，
-  每個元素有類別標記框、修改按鈕、勾勾按鈕 -->
+  每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)、勾勾按鈕 -->
   <body>
     <h1>工作清單</h1>
     <div class="task-list">
@@ -87,31 +88,15 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
-    <!-- 要再加上jqready 另外還有document(因為是動態元素)偵測taskItem的按鈕偵測器
-    並將toggleTask、deleteTask等等放入
-    還要增加清空按鈕、新增按鈕偵測器(由於addtask大改，因此也得補上缺失邏輯) 
+    <!-- 還要增加清空按鈕、新增按鈕偵測器(由於addtask大改，因此也得補上缺失邏輯) 
     再加上filter-category change偵測器，並且編寫它所需函數(要注意在有filter時，存檔的JSON是否會缺失)-->
     <script>
-      const taskContainer = document.getElementById("task-container");
-
-      // 須研究是否可直接用JQ物件輸入
-      new Sortable(taskContainer, {
-        animation: 150,
-      });
-
       function readInput() {
         const taskText = $("#task-input").val();
         const isDone = "false";
         const category = $("#category").val();
         return { taskText, isDone, category };
       }
-
-      $("#task-input").on("keyup", function (event) {
-        if (event.key === "Enter") {
-          const { taskText, isDone, category } = readInput();
-          addTask(taskText, isDone, category);
-        }
-      });
 
       function addTask(taskText, isDone, category) {
         if (taskText === "--") {
@@ -151,20 +136,17 @@
         $("#task-container").empty();
       }
 
-      // 之後改成輸入task，並將該button屬於哪個task的邏輯寫至事件偵測
-      function toggleTask(button) {
-        const taskItem = $(button).closest(".task-item");
+      function toggleTask(taskItem) {
+        const button = taskItem.find(".task-delete");
         const isDone = taskItem.data("done") === "true";
         taskItem.data("done", isDone ? "false" : "true");
         button.text(isDone ? "未完成" : "完成");
       }
 
-      function deleteTask(button) {
-        const taskItem = $(button).closest(".task-item");
+      function deleteTask(taskItem) {
         taskItem.remove();
       }
 
-      // 之後返回一個json 下載json的功能分離
       function domToJSON() {
         const tasks = $(".task-item")
           .map(function () {
@@ -177,6 +159,10 @@
           .get();
 
         const jsonData = JSON.stringify(tasks, null, 2);
+        return jsonData;
+      }
+
+      function downloadJSON(jsonData) {
         const blob = new Blob([jsonData], { type: "application/json" });
         const url = URL.createObjectURL(blob);
 
@@ -192,10 +178,6 @@
         URL.revokeObjectURL(url);
         a.remove();
       }
-
-      window.addEventListener("unload", function (event) {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-      });
 
       function jsonToDOM(json) {
         // 轉成物件
@@ -215,36 +197,86 @@
           addTask(taskText, isDone, category);
         });
       }
+    </script>
+    <script>
+      // 事件偵測註冊
+      $(document).ready(function () {
+        // 使清單可拖動
+        new Sortable($("#task-container").get()[0], {
+          animation: 150,
+        });
+        // 新增工作相關
+        $("#add").on("click", function () {
+          const { taskText, isDone, category } = readInput();
+          addTask(taskText, isDone, category);
+        });
 
-      $("#file-input").on("change", function () {
-        const file = this.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-          try {
-            jsonToDOM(e.target.result);
-          } catch (error) {
-            alert("錯誤：JSON 解析失敗。");
+        $("#task-input").on("keyup", function (e) {
+          if (e.key === "Enter") {
+            const { taskText, isDone, category } = readInput();
+            addTask(taskText, isDone, category);
           }
-        };
+        });
 
-        // 清空文件输入元素的值，以便允许相同文件的變化
-        $("#file-input").val("");
+        // 刪除工作相關(動態)
+        $(document).on("click", ".task-delete", function () {
+          const taskItem = $(this).closest(".task-item");
+          deleteTask(taskItem);
+        });
 
-        // 開始讀取所選文件的内容
-        reader.readAsText(file);
-      });
+        // 切換工作狀態相關(動態)
+        $(document).on("click", ".task-toggle", function () {
+          const taskItem = $(this).closest(".task-item");
+          toggleTask(taskItem);
+        });
 
-      $(window).on("load", function () {
-        const savedTasks = localStorage.getItem("tasks");
+        // 清空工作相關
+        $("#clear").on("click", clearTasks);
 
-        if (savedTasks) jsonToDOM(savedTasks);
-      });
+        // 篩選工作相關
 
-      $(window).on("beforeunload", function (event) {
-        if ($("#task-container .task-item").length > 0) {
-          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
-        }
+        // 存檔工作相關
+        $("#save").on("click", function () {
+          const jsonData = domToJSON();
+          downloadJSON(jsonData);
+        });
+
+        // 上傳工作相關
+        $("#file-input").on("change", function () {
+          const file = this.files[0];
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            try {
+              jsonToDOM(e.target.result);
+            } catch (error) {
+              alert("錯誤：JSON 解析失敗。");
+            }
+          };
+
+          // 清空文件输入元素的值，以便允许相同文件的變化
+          $("#file-input").val("");
+
+          // 開始讀取所選文件的内容
+          reader.readAsText(file);
+        });
+
+        // 開啟/關閉頁面相關
+        $(window).on("unload", function () {
+          localStorage.setItem("tasks", domToJSON());
+        });
+
+        $(window).on("load", function () {
+          const savedTasks = localStorage.getItem("tasks");
+
+          if (savedTasks) jsonToDOM(savedTasks);
+        });
+
+        $(window).on("beforeunload", function (e) {
+          if ($("#task-container .task-item").length > 0) {
+            e.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
+          }
+        });
       });
     </script>
   </body>
