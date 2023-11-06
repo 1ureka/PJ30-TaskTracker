@@ -84,7 +84,7 @@
     <script>
       function readInput() {
         const taskText = $("#task-input").val();
-        const isDone = "false";
+        const isDone = false;
         const category = $("#category").val();
 
         // 讀取完成後清空輸入
@@ -202,7 +202,7 @@
         tasks.forEach((task) => {
           // 從任務物件獲取必要資訊
           const taskText = task.text || "--";
-          const isDone = task.done === "true"; // 將字串轉為布爾
+          const isDone = task.done;
           const category = task.category;
 
           // 調用 addTask 函數來在畫面增加任務項
