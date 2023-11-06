@@ -3,64 +3,175 @@
   <head>
     <title>工作清單</title>
     <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        margin: 0;
+        font-family: "Noto Sans TC", sans-serif;
+        color: white;
+        background-color: hsl(210, 15%, 7.5%);
       }
+
+      input,
+      select,
+      button,
+      textarea {
+        font-family: "Noto Sans TC", sans-serif;
+        color: white;
+      }
+
+      input[type="text"],
+      select,
+      textarea {
+        background-color: hsla(200, 0%, 10%, 0.5);
+        border-radius: 10px;
+        padding: 5px;
+        border-width: 0;
+        box-shadow: inset 0px 0px 12px rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+      }
+
+      button {
+        background-color: hsla(200, 0%, 20%, 0.9);
+        border-radius: 10px;
+        border-width: 0;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        padding: 5px;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      #header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: hsl(200, 0%, 15%);
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        z-index: 5;
+      }
+
+      h1 {
+        position: absolute;
+        left: 20px;
+        display: flex;
+        justify-content: center;
+        font-size: 36px;
+      }
+
+      #search-container {
+        position: relative;
+        display: flex;
+      }
+
+      #search {
+        margin-right: 10px;
+      }
+
+      #filter-container {
+        position: absolute;
+        right: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #filter-container label {
+        margin-right: 10px;
+      }
+
+      #left-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 20%;
+        padding: 35px;
+        padding-top: 135px;
+        display: flex;
+        flex-direction: column;
+        background-color: hsla(200, 0%, 15%, 0.5);
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+      }
+
+      #task-input-container {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #task-input {
+        width: 100%;
+        margin-bottom: 10px;
+        resize: vertical;
+      }
+
+      #category,
+      #add {
+        margin-right: 10px;
+        margin-bottom: 10px;
+      }
+
       .task-list {
-        max-width: 400px;
-        margin: 0 auto;
+        position: fixed;
+        top: 100px;
+        left: 25%;
+        padding: 35px;
+        max-width: 60%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
       }
+
       .task-item {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 5px;
         padding: 5px;
         border: 1px solid #ccc;
         cursor: pointer;
-        word-break: break-all;
       }
     </style>
   </head>
   <!-- 之後UI改為
-  最上方是stick head(即使滑動清單也會保持同個位置)包含各種外觀為文字的按鈕，
-  懸停後會出現下拉選單，懸停在下拉選單時不會縮回，直到滑鼠移開: 
-  新增: 下拉選單包含新增工作或分割線
-  刪除: 按下後清單左邊出現X，可以刪除工作或分割線
-  清空: 刪除所有工作
-  篩選: 下拉選單包含各種類別
-  存檔: 提供json下載
-  讀取: 打開檔案瀏覽器，並供使用者上傳json
-  搜尋: 直接包含搜尋符號和搜尋框(可以透過enter鍵觸發)
-  刪除、清空、存檔、讀取都集中到下方row，用圖示代替
   清空前加上中間pop出警告(看要用gsap還是alert)先問一次
   taskItem類別用方框框住，置於左側，字體可以根據類別有不同顏色
   看要不要給個icon
+  將textarea的高度預設到最下方(比喻)
+  將右側工作列寬度補滿
 
-  再來是上方底下空白以確保在滑到最上方時清單與Head有些距離
-
-  再來是工作清單，清單左右有空白，內容置左，
   每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)、勾勾按鈕 
-
   最下方同樣留有空白
   -->
   <body>
-    <h1>工作清單</h1>
-    <div class="task-list">
-      <div>
-        <input type="text" id="task-input" placeholder="新增工作" />
-        <select id="category">
-          <option value="未分類">未分類</option>
-          <option value="PJ24">PJ24</option>
-          <option value="PJ25">PJ25</option>
-          <option value="PJ26">PJ26</option>
-          <option value="PJ27">PJ27</option>
-          <option value="PJ28">PJ28</option>
-          <option value="PJ29">PJ29</option>
-        </select>
-        <button id="add">新增</button>
+    <div id="header">
+      <h1>工作清單</h1>
+      <div id="search-container">
+        <button id="search">搜尋</button>
+        <input type="text" id="search-input" placeholder="搜尋" />
       </div>
-      <div>
+      <div id="filter-container">
+        <label for="filter-category">篩選</label>
         <select id="filter-category">
           <option value="all">所有類別</option>
           <option value="未分類">未分類</option>
@@ -72,23 +183,32 @@
           <option value="PJ29">PJ29</option>
         </select>
       </div>
+    </div>
+    <div id="left-panel">
+      <div id="task-input-container">
+        <textarea id="task-input" placeholder="新增工作"></textarea>
+        <select id="category">
+          <option value="未分類">未分類</option>
+          <option value="PJ24">PJ24</option>
+          <option value="PJ25">PJ25</option>
+          <option value="PJ26">PJ26</option>
+          <option value="PJ27">PJ27</option>
+          <option value="PJ28">PJ28</option>
+          <option value="PJ29">PJ29</option>
+        </select>
+        <button id="add">新增</button>
+      </div>
+      <button id="delete">刪除</button>
+      <button id="clear">清空</button>
+      <button id="save">存檔</button>
+      <input type="file" id="file-input" accept=".json" />
+    </div>
+    <div class="task-list">
       <div id="task-container">
         <!-- 工作項目將在這裡動態顯示 -->
       </div>
-      <div>
-        <button id="save">存檔</button>
-        <input type="file" id="file-input" accept=".json" />
-        <button id="clear">清空</button>
-      </div>
     </div>
 
-    <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script
-      src="https://code.jquery.com/jquery-3.7.1.min.js"
-      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-      crossorigin="anonymous"
-    ></script>
     <!-- 分割線目前還無法刪除(沒有它的刪除按鈕) -->
     <script>
       function readInput() {
