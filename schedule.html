@@ -31,6 +31,15 @@
       }
     </style>
   </head>
+  <!-- 之後結構改為
+  最上方是stick! head包含各種文字按鈕，懸停後會出現下拉選單，下拉選單懸停時也不會縮回: 
+  新增: 下拉選單包含新增工作或分割線
+  刪除: 按下後清單左邊出現X，可以刪除工作或分割線
+  篩選: 下拉選單包含各種類別
+  搜尋: 直接包含搜尋符號和搜尋框
+  再來是上方底下空白
+  再來是工作清單，清單左右有空白，內容置左，
+  每個元素有類別標記框、修改按鈕、勾勾按鈕 -->
   <body>
     <h1>工作清單</h1>
     <div class="task-list">
@@ -88,15 +97,23 @@
     <script>
       const taskContainer = document.getElementById("task-container");
 
-      $(window).on("beforeunload", function (event) {
-        if ($("#task-container .task-item").length > 0) {
-          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
-        }
-      });
-
       // 須研究是否可直接用JQ物件輸入
       new Sortable(taskContainer, {
         animation: 150,
+      });
+
+      function readInput() {
+        const taskText = $("#task-input").val();
+        const isDone = "false";
+        const category = $("#category").val();
+        return { taskText, isDone, category };
+      }
+
+      $("#task-input").on("keyup", function (event) {
+        if (event.key === "Enter") {
+          const { taskText, isDone, category } = readInput();
+          addTask(taskText, isDone, category);
+        }
       });
 
       function addTask(taskText, isDone, category) {
@@ -194,11 +211,11 @@
         tasks.forEach((task) => {
           // 從任務物件獲取必要資訊
           const taskText = task.text;
-          const done = task.done === "true"; // 將字串轉為布爾
+          const isDone = task.done === "true"; // 將字串轉為布爾
           const category = task.category;
 
           // 調用 addTask 函數來在畫面增加任務項
-          addTask(taskText, done, category);
+          addTask(taskText, isDone, category);
         });
       }
 
@@ -227,12 +244,11 @@
         if (savedTasks) jsonToDOM(savedTasks);
       });
 
-      // 之後改為直接用JQ註冊事件
-      function handleKeyUp(event) {
-        if (event.key === "Enter") {
-          addTask();
+      $(window).on("beforeunload", function (event) {
+        if ($("#task-container .task-item").length > 0) {
+          event.returnValue = "未保存的資料將會遺失，確定要離開頁面嗎？";
         }
-      }
+      });
     </script>
   </body>
 </html>
