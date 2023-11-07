@@ -88,7 +88,7 @@
         background-color: hsl(200, 0%, 15%);
         border-radius: 0 0 10px 10px;
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
-        z-index: 5;
+        z-index: 10;
       }
 
       h1 {
@@ -134,6 +134,7 @@
         align-items: center;
         background-color: hsla(200, 0%, 15%, 0.5);
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        z-index: 5;
       }
 
       #left-panel-top {
@@ -161,6 +162,14 @@
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
+      }
+
+      #delete-done {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+        cursor: pointer;
+        padding: 10px;
       }
 
       #file-input {
@@ -233,7 +242,7 @@
       }
 
       .separator > .task-delete {
-        left: -59px;
+        left: -58px;
       }
 
       .task-category {
@@ -344,6 +353,7 @@
       </div>
       <div id="left-panel-bottom">
         <button id="delete">刪除</button>
+        <button id="delete-done">完成</button>
         <button id="clear">清空</button>
         <button id="save">存檔</button>
         <button id="upload">上傳</button>
@@ -660,13 +670,50 @@
       CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
 
       $(document).ready(function () {
-        const tl = gsap
-          .timeline({ defaults: { duration: 0.3, ease: "set1" } })
-          .to(".task-item, .separator", { left: 60 })
-          .to(".task-delete", { autoAlpha: 1 }, "<0.1");
+        // init
+        gsap.set("#delete-done", { autoAlpha: 0 });
+
+        //
+        // 有關進出刪除狀態動畫
+        let isDeleting = false;
+        const enterDeleting = () => {
+          isDeleting = true;
+          gsap
+            .timeline({
+              defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
+            })
+            .to(".task-item, .separator", { left: 60 })
+            .to(".task-delete", { autoAlpha: 1 }, "<0.1")
+            .to("#delete-done", { autoAlpha: 1 }, "<");
+        };
+        const exitDeleting = () => {
+          isDeleting = false;
+          gsap
+            .timeline({
+              defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
+            })
+            .to("#delete-done", { autoAlpha: 0 })
+            .to(".task-delete", { autoAlpha: 0 }, "<")
+            .to(".task-item, .separator", { left: 0 }, "<0.1");
+        };
 
         $("#delete").on("click", function () {
-          tl.play();
+          if (isDeleting) {
+            exitDeleting();
+          } else {
+            enterDeleting();
+          }
+        });
+
+        $("#delete-done").on("click", function () {
+          exitDeleting();
+        });
+
+        $(document).on("contextmenu", function (e) {
+          if (isDeleting) {
+            e.preventDefault();
+            exitDeleting();
+          }
         });
       });
     </script>
