@@ -152,10 +152,15 @@
 
       #left-panel-bottom {
         display: flex;
+        width: 100%;
         flex-wrap: wrap;
         flex-direction: row;
-        justify-content: center;
         align-items: center;
+        justify-content: space-between;
+      }
+
+      #file-input {
+        display: none;
       }
 
       #task-container {
@@ -199,7 +204,7 @@
         align-items: baseline;
       }
 
-      .task-btn-container {
+      .task-function-container {
         align-items: center;
       }
 
@@ -273,8 +278,10 @@
   lable-container:div (clip-path) > lable:lable
   增加可以複製task-item內文的複製按鈕
   雙擊可以編輯內文，記得編輯完成放回屬性
+  下方四按鈕圖示可用GIF做動畫，比如懸停時垃圾桶打開再關閉、清空往四處飛再從中間出現球並分裂回來
+  整理注釋
 
-  每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)、勾勾按鈕 
+  每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)
   最下方同樣留有空白
   -->
   <body>
@@ -316,6 +323,7 @@
         <button id="delete">刪除</button>
         <button id="clear">清空</button>
         <button id="save">存檔</button>
+        <button id="upload">上傳</button>
         <input type="file" id="file-input" accept=".json" />
       </div>
     </div>
@@ -338,69 +346,88 @@
 
       function addTask(taskText, status, category) {
         if (taskText === "--") {
-          // 添加分隔线
-          const separator = $("<hr>").addClass("separator");
-          $("#task-container").append(separator);
-          // 添加工作
+          addSeparator();
         } else if (taskText !== "") {
-          const taskItem = $("<div>")
-            .addClass("task-item")
-            .data("text", taskText)
-            .data("status", status)
-            .data("category", category);
-
-          $("<button>").addClass("task-delete").text("刪除").appendTo(taskItem);
-
-          const contentContainer = $("<div>")
-            .addClass("task-content")
-            .appendTo(taskItem);
-
-          $("<div>")
-            .addClass("task-category")
-            .text(`${category}`)
-            .appendTo(contentContainer);
-
-          $("<p>")
-            .addClass("task-text")
-            .text(`${taskText}`)
-            .appendTo(contentContainer);
-
-          const buttonContainer = $("<div>")
-            .addClass("task-btn-container")
-            .appendTo(taskItem);
-
-          // 之後改成img
-          $("<div>").addClass("task-copy-text").appendTo(buttonContainer);
-
-          const statusContainer = $("<div>")
-            .addClass("task-status-container")
-            .appendTo(buttonContainer);
-
-          const colorMap = {
-            U: "#bbb",
-            S: "#92e9ff",
-            O: "#8ce197",
-            F: "#ea81af",
-          };
-
-          $("<div>")
-            .addClass("task-status-display")
-            .text(status)
-            .css("background-color", colorMap[status])
-            .appendTo(statusContainer);
-
-          const statusOptions = $("<select>")
-            .addClass("task-status-options")
-            .appendTo(statusContainer);
-
-          $("<option>").val("U").text("未完成").appendTo(statusOptions);
-          $("<option>").val("S").text("跳過").appendTo(statusOptions);
-          $("<option>").val("O").text("完成").appendTo(statusOptions);
-          $("<option>").val("F").text("失敗").appendTo(statusOptions);
-
+          const taskItem = createTaskItem(taskText, status, category);
           $("#task-container").append(taskItem);
         }
       }
+
+      function addSeparator() {
+        const separator = $("<hr>").addClass("separator");
+        $("#task-container").append(separator);
+      }
+
+      function createTaskItem(taskText, status, category) {
+        const taskItem = $("<div>")
+          .addClass("task-item")
+          .data("text", taskText)
+          .data("status", status)
+          .data("category", category);
+
+        taskItem
+          .addDeleteButton()
+          .addContent(taskText, category)
+          .addTaskFunctions(status);
+
+        return taskItem;
+      }
+
+      $.fn.addDeleteButton = function () {
+        $("<button>").addClass("task-delete").text("刪除").appendTo(this);
+        return this;
+      };
+
+      $.fn.addContent = function (taskText, category) {
+        const contentContainer = $("<div>")
+          .addClass("task-content")
+          .appendTo(this);
+
+        $("<div>")
+          .addClass("task-category")
+          .text(`${category}`)
+          .appendTo(contentContainer);
+        $("<p>")
+          .addClass("task-text")
+          .text(`${taskText}`)
+          .appendTo(contentContainer);
+
+        return this;
+      };
+
+      $.fn.addTaskFunctions = function (status) {
+        const functionContainer = $("<div>")
+          .addClass("task-function-container")
+          .appendTo(this);
+
+        $("<div>").addClass("task-copy-text").appendTo(functionContainer);
+
+        const statusContainer = $("<div>")
+          .addClass("task-status-container")
+          .appendTo(functionContainer);
+        const colorMap = {
+          U: "#bbb",
+          S: "#92e9ff",
+          O: "#8ce197",
+          F: "#ea81af",
+        };
+
+        $("<div>")
+          .addClass("task-status-display")
+          .text(status)
+          .css("background-color", colorMap[status])
+          .appendTo(statusContainer);
+
+        const statusOptions = $("<select>")
+          .addClass("task-status-options")
+          .appendTo(statusContainer);
+        $("<option>").val("U").text("未完成").appendTo(statusOptions);
+        $("<option>").val("S").text("跳過").appendTo(statusOptions);
+        $("<option>").val("O").text("完成").appendTo(statusOptions);
+        $("<option>").val("F").text("失敗").appendTo(statusOptions);
+
+        return this;
+      };
 
       function clearTasks() {
         $("#task-container").empty();
@@ -554,6 +581,10 @@
         });
 
         // 上傳工作相關
+        $("#upload").on("click", function () {
+          $("#file-input").click();
+        });
+
         $("#file-input").on("change", function () {
           const file = this.files[0];
           const reader = new FileReader();
