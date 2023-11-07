@@ -150,24 +150,56 @@
         margin-bottom: 10px;
       }
 
-      .task-list {
+      #task-container {
         position: absolute;
         top: 100px;
         left: 20%;
         padding: 2.5%;
+        width: 75%;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .separator {
+        width: 100%;
       }
 
       .task-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        min-width: 50%;
+        max-width: fit-content;
         margin-bottom: 5px;
         padding: 5px;
         border: 1px solid #ccc;
         cursor: pointer;
+      }
+
+      .task-item > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .task-delete {
+        position: absolute;
+      }
+
+      .task-category {
+        padding: 5px;
+        margin-right: 10px;
+        margin-left: 10px;
+        border-radius: 10px;
+        background-color: hsla(200, 0%, 15%, 0.5);
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        text-align: center;
+      }
+
+      .task-text {
+        margin: 1em;
       }
     </style>
   </head>
@@ -177,6 +209,10 @@
   看要不要給個icon
   將textarea的高度預設到最下方(比喻)
   將右側工作列寬度補滿
+  左側面板下方按鈕懸停時，上方有lable跑出
+  架構是btn-container > lable-container:div + btn:img
+  lable-container:div (clip-path) > lable:lable
+  增加可以複製task-item內文的複製按鈕
 
   每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)、勾勾按鈕 
   最下方同樣留有空白
@@ -221,10 +257,8 @@
       <button id="save">存檔</button>
       <input type="file" id="file-input" accept=".json" />
     </div>
-    <div class="task-list">
-      <div id="task-container">
-        <!-- 工作項目將在這裡動態顯示 -->
-      </div>
+    <div id="task-container">
+      <!-- 工作項目將在這裡動態顯示 -->
     </div>
 
     <!-- 分割線目前還無法刪除(沒有它的刪除按鈕) -->
@@ -253,12 +287,23 @@
             .data("done", isDone ? "true" : "false")
             .data("category", category);
 
-          $("<div>")
-            .addClass("task-content")
-            .text(`${category}: ${taskText}`)
-            .appendTo(taskItem);
+          $("<button>").addClass("task-delete").text("刪除").appendTo(taskItem);
 
-          const buttonContainer = $("<div>").appendTo(taskItem);
+          const contentContainer = $("<div>").appendTo(taskItem);
+
+          $("<div>")
+            .addClass("task-category")
+            .text(`${category}`)
+            .appendTo(contentContainer);
+
+          $("<p>")
+            .addClass("task-text")
+            .text(`${taskText}`)
+            .appendTo(contentContainer);
+
+          const buttonContainer = $("<div>")
+            .css("width", "90px")
+            .appendTo(taskItem);
 
           $("<button>")
             .addClass("task-toggle")
@@ -266,8 +311,8 @@
             .appendTo(buttonContainer);
 
           $("<button>")
-            .addClass("task-delete")
-            .text("刪除")
+            .addClass("task-copy-text")
+            .text("複製")
             .appendTo(buttonContainer);
 
           $("#task-container").append(taskItem);
