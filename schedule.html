@@ -16,6 +16,9 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
     <style>
       body {
         margin: 0;
@@ -23,6 +26,7 @@
         color: white;
         background-color: hsl(210, 15%, 7.5%);
         overflow-y: scroll;
+        overflow-x: hidden;
       }
 
       ::-webkit-scrollbar {
@@ -175,14 +179,27 @@
       }
 
       .separator {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
         width: 100%;
         cursor: grab;
+        position: relative;
+        /* 來自hr */
+        unicode-bidi: isolate;
+        margin-block-start: 0.5em;
+        margin-block-end: 0.5em;
+        margin-inline-start: auto;
+        margin-inline-end: auto;
+        border-style: solid;
+        border-width: thin;
       }
 
       .task-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
         min-width: 50%;
         max-width: fit-content;
         margin-top: 5px;
@@ -210,6 +227,13 @@
 
       .task-delete {
         position: absolute;
+        left: -60px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .separator > .task-delete {
+        left: -59px;
       }
 
       .task-category {
@@ -282,7 +306,6 @@
   整理注釋
 
   每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)
-  最下方同樣留有空白
   -->
   <body>
     <div id="header">
@@ -331,7 +354,6 @@
       <!-- 工作項目將在這裡動態顯示 -->
     </div>
 
-    <!-- 分割線目前還無法刪除(沒有它的刪除按鈕) -->
     <script>
       function readInput() {
         const taskText = $("#task-input").val();
@@ -354,7 +376,10 @@
       }
 
       function addSeparator() {
-        const separator = $("<hr>").addClass("separator");
+        const separator = $("<div>").addClass("separator");
+
+        separator.addDeleteButton();
+
         $("#task-container").append(separator);
       }
 
@@ -374,7 +399,11 @@
       }
 
       $.fn.addDeleteButton = function () {
-        $("<button>").addClass("task-delete").text("刪除").appendTo(this);
+        const btn = $("<button>")
+          .addClass("task-delete")
+          .text("X")
+          .appendTo(this);
+        gsap.set(btn, { autoAlpha: 0 });
         return this;
       };
 
@@ -555,7 +584,17 @@
         // 刪除工作相關(動態)
         $(document).on("click", ".task-delete", function () {
           const taskItem = $(this).closest(".task-item");
-          deleteTask(taskItem);
+          const separator = $(this).closest(".separator");
+
+          if (taskItem.length > 0) {
+            deleteTask(taskItem);
+            console.log("刪除工作");
+          } else if (separator.length > 0) {
+            deleteTask(separator);
+            console.log("刪除分割線");
+          } else {
+            console.log("找不到刪除物件");
+          }
         });
 
         // 切換工作狀態相關(動態)
@@ -609,6 +648,25 @@
           if ($("#task-container .task-item").length > 0) {
             return "未保存的資料將會遺失，確定要離開頁面嗎？";
           }
+        });
+      });
+    </script>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.registerPlugin(CustomEase);
+
+      CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
+
+      $(document).ready(function () {
+        const tl = gsap
+          .timeline({ defaults: { duration: 0.3, ease: "set1" } })
+          .to(".task-item, .separator", { left: 60 })
+          .to(".task-delete", { autoAlpha: 1 }, "<0.1");
+
+        $("#delete").on("click", function () {
+          tl.play();
         });
       });
     </script>
