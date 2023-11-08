@@ -395,15 +395,18 @@
         } else if (taskText !== "") {
           const taskItem = createTaskItem(taskText, status, category);
           $("#task-container").append(taskItem);
+          taskItem.show(500);
         }
       }
 
       function addSeparator() {
         const separator = $("<div>").addClass("separator");
 
+        separator.hide();
         separator.addDeleteButton();
 
         $("#task-container").append(separator);
+        separator.show(500);
       }
 
       function createTaskItem(taskText, status, category) {
@@ -412,6 +415,8 @@
           .data("text", taskText)
           .data("status", status)
           .data("category", category);
+
+        taskItem.hide();
 
         taskItem
           .addDeleteButton()
@@ -501,18 +506,18 @@
       }
 
       function deleteTask(taskItem) {
-        taskItem.remove();
+        taskItem.hide(500, () => taskItem.remove());
       }
 
       function filterTasks(category) {
         // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
-        $("#task-container .task-item").hide();
+        $("#task-container .task-item").hide(500);
 
         // 然後使用 forEach 遍歷並顯示
         $("#task-container .task-item").each(function () {
           const taskItem = $(this);
           if (category === "all" || taskItem.data("category") === category) {
-            taskItem.show();
+            taskItem.show(500);
           }
         });
       }
