@@ -16,6 +16,9 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
     <style>
       body {
         margin: 0;
@@ -23,6 +26,7 @@
         color: white;
         background-color: hsl(210, 15%, 7.5%);
         overflow-y: scroll;
+        overflow-x: hidden;
       }
 
       ::-webkit-scrollbar {
@@ -84,7 +88,7 @@
         background-color: hsl(200, 0%, 15%);
         border-radius: 0 0 10px 10px;
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
-        z-index: 5;
+        z-index: 10;
       }
 
       h1 {
@@ -102,6 +106,10 @@
 
       #search {
         margin-right: 10px;
+      }
+
+      #search-input {
+        width: 20em;
       }
 
       #filter-container {
@@ -126,11 +134,14 @@
         padding-top: 135px;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
         background-color: hsla(200, 0%, 15%, 0.5);
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        z-index: 5;
       }
 
-      #task-input-container {
+      #left-panel-top {
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
@@ -140,46 +151,174 @@
 
       #task-input {
         width: 100%;
-        margin-bottom: 10px;
         resize: vertical;
       }
 
       #category,
       #add {
-        margin-right: 10px;
-        margin-bottom: 10px;
+        margin: 10px;
       }
 
-      .task-list {
+      #left-panel-bottom {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      #delete-done {
+        position: fixed;
+        right: 25px;
+        bottom: 25px;
+        cursor: pointer;
+        padding: 10px;
+      }
+
+      #file-input {
+        display: none;
+      }
+
+      #task-container {
         position: absolute;
         top: 100px;
         left: 20%;
         padding: 2.5%;
+        width: 75%;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+      }
+
+      .separator {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        cursor: grab;
+        position: relative;
+        /* 來自hr */
+        unicode-bidi: isolate;
+        margin-block-start: 0.5em;
+        margin-block-end: 0.5em;
+        margin-inline-start: auto;
+        margin-inline-end: auto;
+        border-style: solid;
+        border-width: 1px;
       }
 
       .task-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+        min-width: 50%;
+        max-width: fit-content;
+        margin-top: 5px;
         margin-bottom: 5px;
+        background-color: hsla(200, 0%, 15%, 0.5);
+        border-radius: 10px;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        cursor: grab;
+      }
+
+      .task-item > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .task-content {
+        align-items: baseline;
+      }
+
+      .task-function-container {
+        align-items: center;
+      }
+
+      .task-delete {
+        position: absolute;
+        left: -60px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .separator > .task-delete {
+        left: -61px;
+      }
+
+      .task-category {
         padding: 5px;
-        border: 1px solid #ccc;
+        margin-right: 10px;
+        margin-left: 10px;
+        border-radius: 10px;
+        background-color: hsla(200, 0%, 15%, 0.5);
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        text-align: center;
+        min-width: 3em;
+      }
+
+      .task-text {
+        margin: 1em;
+      }
+
+      .task-copy-text {
+        margin: 5px;
+        width: 40px;
+        height: 40px;
+        background-color: hsla(200, 0%, 15%, 1);
+      }
+
+      .task-status-container {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        margin: 5px;
+        margin-right: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .task-status-display {
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .task-status-options {
+        width: 85%;
+        height: 85%;
+        border-radius: 10px;
+        padding: 0;
+        margin: 0;
+        position: absolute;
         cursor: pointer;
+        z-index: 1;
       }
     </style>
   </head>
   <!-- 之後UI改為
   清空前加上中間pop出警告(看要用gsap還是alert)先問一次
-  taskItem類別用方框框住，置於左側，字體可以根據類別有不同顏色
+  taskItem的類別用方框框住，置於左側，字體可以根據類別有不同顏色
   看要不要給個icon
-  將textarea的高度預設到最下方(比喻)
-  將右側工作列寬度補滿
+  左側面板下方按鈕懸停時，上方有lable跑出
+  架構是btn-container > lable-container:div + btn:img
+  lable-container:div (clip-path) > lable:lable
+  增加可以複製task-item內文的複製按鈕
+  雙擊可以編輯內文，記得編輯完成放回屬性
+  下方四按鈕圖示可用GIF做動畫，比如懸停時垃圾桶打開再關閉、清空往四處飛再從中間出現球並分裂回來
+  整理注釋
 
-  每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)、勾勾按鈕 
-  最下方同樣留有空白
+  每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)
   -->
   <body>
     <div id="header">
@@ -203,7 +342,7 @@
       </div>
     </div>
     <div id="left-panel">
-      <div id="task-input-container">
+      <div id="left-panel-top">
         <textarea id="task-input" placeholder="新增工作"></textarea>
         <select id="category">
           <option value="未分類">未分類</option>
@@ -216,73 +355,140 @@
         </select>
         <button id="add">新增</button>
       </div>
-      <button id="delete">刪除</button>
-      <button id="clear">清空</button>
-      <button id="save">存檔</button>
-      <input type="file" id="file-input" accept=".json" />
-    </div>
-    <div class="task-list">
-      <div id="task-container">
-        <!-- 工作項目將在這裡動態顯示 -->
+      <div id="left-panel-bottom">
+        <button id="delete">刪除</button>
+        <button id="delete-done">完成</button>
+        <button id="clear">清空</button>
+        <button id="save">存檔</button>
+        <button id="upload">上傳</button>
+        <input type="file" id="file-input" accept=".json" />
       </div>
     </div>
+    <div id="task-container">
+      <!-- 工作項目將在這裡動態顯示 -->
+    </div>
 
-    <!-- 分割線目前還無法刪除(沒有它的刪除按鈕) -->
     <script>
       function readInput() {
         const taskText = $("#task-input").val();
-        const isDone = false;
+        const status = "U";
         const category = $("#category").val();
 
         // 讀取完成後清空輸入
         $("#task-input").val("");
 
-        return { taskText, isDone, category };
+        return { taskText, status, category };
       }
 
-      function addTask(taskText, isDone, category) {
+      function addTask(taskText, status, category) {
         if (taskText === "--") {
-          // 添加分隔线
-          const separator = $("<hr>").addClass("separator");
-          $("#task-container").append(separator);
-          // 添加工作
+          addSeparator();
         } else if (taskText !== "") {
-          const taskItem = $("<div>")
-            .addClass("task-item")
-            .data("text", taskText)
-            .data("done", isDone ? "true" : "false")
-            .data("category", category);
-
-          $("<div>")
-            .addClass("task-content")
-            .text(`${category}: ${taskText}`)
-            .appendTo(taskItem);
-
-          const buttonContainer = $("<div>").appendTo(taskItem);
-
-          $("<button>")
-            .addClass("task-toggle")
-            .text(isDone ? "完成" : "未完成")
-            .appendTo(buttonContainer);
-
-          $("<button>")
-            .addClass("task-delete")
-            .text("刪除")
-            .appendTo(buttonContainer);
-
+          const taskItem = createTaskItem(taskText, status, category);
           $("#task-container").append(taskItem);
         }
       }
+
+      function addSeparator() {
+        const separator = $("<div>").addClass("separator");
+
+        separator.addDeleteButton();
+
+        $("#task-container").append(separator);
+      }
+
+      function createTaskItem(taskText, status, category) {
+        const taskItem = $("<div>")
+          .addClass("task-item")
+          .data("text", taskText)
+          .data("status", status)
+          .data("category", category);
+
+        taskItem
+          .addDeleteButton()
+          .addContent(taskText, category)
+          .addTaskFunctions(status);
+
+        return taskItem;
+      }
+
+      $.fn.addDeleteButton = function () {
+        const btn = $("<button>")
+          .addClass("task-delete")
+          .text("X")
+          .appendTo(this);
+        gsap.set(btn, { autoAlpha: 0 });
+        return this;
+      };
+
+      $.fn.addContent = function (taskText, category) {
+        const contentContainer = $("<div>")
+          .addClass("task-content")
+          .appendTo(this);
+
+        $("<div>")
+          .addClass("task-category")
+          .text(`${category}`)
+          .appendTo(contentContainer);
+        $("<p>")
+          .addClass("task-text")
+          .text(`${taskText}`)
+          .appendTo(contentContainer);
+
+        return this;
+      };
+
+      $.fn.addTaskFunctions = function (status) {
+        const functionContainer = $("<div>")
+          .addClass("task-function-container")
+          .appendTo(this);
+
+        $("<div>").addClass("task-copy-text").appendTo(functionContainer);
+
+        const statusContainer = $("<div>")
+          .addClass("task-status-container")
+          .appendTo(functionContainer);
+        const colorMap = {
+          U: "#bbb",
+          S: "#92e9ff",
+          O: "#8ce197",
+          F: "#ea81af",
+        };
+
+        $("<div>")
+          .addClass("task-status-display")
+          .text(status)
+          .css("background-color", colorMap[status])
+          .appendTo(statusContainer);
+
+        const statusOptions = $("<select>")
+          .addClass("task-status-options")
+          .appendTo(statusContainer);
+        $("<option>").val("U").text("未完成").appendTo(statusOptions);
+        $("<option>").val("S").text("跳過").appendTo(statusOptions);
+        $("<option>").val("O").text("完成").appendTo(statusOptions);
+        $("<option>").val("F").text("失敗").appendTo(statusOptions);
+
+        return this;
+      };
 
       function clearTasks() {
         $("#task-container").empty();
       }
 
-      function toggleTask(taskItem) {
-        const button = taskItem.find(".task-toggle");
-        const isDone = taskItem.data("done") === "true";
-        taskItem.data("done", isDone ? "false" : "true");
-        button.text(isDone ? "未完成" : "完成");
+      function toggleTask(taskItem, value) {
+        const statusDisplay = taskItem.find(".task-status-display");
+        taskItem.data("status", value);
+
+        const colorMap = {
+          U: "#ccc",
+          S: "#92e9ff",
+          O: "#8ce197",
+          F: "#ea81af",
+        };
+
+        statusDisplay.text(value);
+        statusDisplay.css("background-color", colorMap[value]);
       }
 
       function deleteTask(taskItem) {
@@ -312,7 +518,7 @@
             return {
               text: $(this).data("text"),
               category: $(this).data("category"),
-              done: $(this).data("done") === "true",
+              status: $(this).data("status"),
             };
           })
           .get();
@@ -349,11 +555,11 @@
         tasks.forEach((task) => {
           // 從任務物件獲取必要資訊
           const taskText = task.text || "--";
-          const isDone = task.done;
+          const status = task.status;
           const category = task.category;
 
           // 調用 addTask 函數來在畫面增加任務項
-          addTask(taskText, isDone, category);
+          addTask(taskText, status, category);
         });
       }
     </script>
@@ -378,27 +584,38 @@
 
         // 新增工作相關
         $("#add").on("click", function () {
-          const { taskText, isDone, category } = readInput();
-          addTask(taskText, isDone, category);
+          const { taskText, status, category } = readInput();
+          addTask(taskText, status, category);
         });
 
         $("#task-input").on("keyup", function (e) {
           if (e.key === "Enter") {
-            const { taskText, isDone, category } = readInput();
-            addTask(taskText, isDone, category);
+            const { taskText, status, category } = readInput();
+            addTask(taskText, status, category);
           }
         });
 
         // 刪除工作相關(動態)
         $(document).on("click", ".task-delete", function () {
           const taskItem = $(this).closest(".task-item");
-          deleteTask(taskItem);
+          const separator = $(this).closest(".separator");
+
+          if (taskItem.length > 0) {
+            deleteTask(taskItem);
+            console.log("刪除工作");
+          } else if (separator.length > 0) {
+            deleteTask(separator);
+            console.log("刪除分割線");
+          } else {
+            console.log("找不到刪除物件");
+          }
         });
 
         // 切換工作狀態相關(動態)
-        $(document).on("click", ".task-toggle", function () {
+        $(document).on("change", ".task-status-options", function () {
           const taskItem = $(this).closest(".task-item");
-          toggleTask(taskItem);
+          const value = $(this).val();
+          toggleTask(taskItem, value);
         });
 
         // 清空工作相關
@@ -417,6 +634,10 @@
         });
 
         // 上傳工作相關
+        $("#upload").on("click", function () {
+          $("#file-input").click();
+        });
+
         $("#file-input").on("change", function () {
           const file = this.files[0];
           const reader = new FileReader();
@@ -440,6 +661,62 @@
         $(window).on("beforeunload", function (e) {
           if ($("#task-container .task-item").length > 0) {
             return "未保存的資料將會遺失，確定要離開頁面嗎？";
+          }
+        });
+      });
+    </script>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.registerPlugin(CustomEase);
+
+      CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
+
+      $(document).ready(function () {
+        // init
+        gsap.set("#delete-done", { autoAlpha: 0 });
+
+        //
+        // 有關進出刪除狀態動畫
+        let isDeleting = false;
+        const enterDeleting = () => {
+          isDeleting = true;
+          gsap
+            .timeline({
+              defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
+            })
+            .to(".task-item, .separator", { left: 60 })
+            .to(".task-delete", { autoAlpha: 1 }, "<0.1")
+            .to("#delete-done", { autoAlpha: 1 }, "<");
+        };
+        const exitDeleting = () => {
+          isDeleting = false;
+          gsap
+            .timeline({
+              defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
+            })
+            .to("#delete-done", { autoAlpha: 0 })
+            .to(".task-delete", { autoAlpha: 0 }, "<")
+            .to(".task-item, .separator", { left: 0 }, "<0.1");
+        };
+
+        $("#delete").on("click", function () {
+          if (isDeleting) {
+            exitDeleting();
+          } else {
+            enterDeleting();
+          }
+        });
+
+        $("#delete-done").on("click", function () {
+          exitDeleting();
+        });
+
+        $(document).on("contextmenu", function (e) {
+          if (isDeleting) {
+            e.preventDefault();
+            exitDeleting();
           }
         });
       });
