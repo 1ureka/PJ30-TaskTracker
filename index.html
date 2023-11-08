@@ -12,6 +12,7 @@
     />
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -132,11 +133,23 @@
       }
 
       #search {
+        width: 40px;
+        height: 40px;
         margin-right: 10px;
       }
 
       #search-input {
         width: 20em;
+      }
+
+      #search-clear {
+        display: none;
+        width: 40px;
+        height: 40px;
+        background-color: aliceblue;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-left: 10px;
       }
 
       #filter-container {
@@ -156,9 +169,9 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 15%;
-        padding: 2.5%;
-        padding-top: 135px;
+        width: 240px;
+        padding: 10px;
+        padding-top: 130px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -179,6 +192,7 @@
       #task-input {
         width: 100%;
         resize: vertical;
+        min-height: 10em;
       }
 
       #category,
@@ -219,10 +233,10 @@
 
       #task-container {
         position: absolute;
+        width: auto;
         top: 100px;
-        left: 20%;
-        padding: 2.5%;
-        width: 75%;
+        left: 260px;
+        padding: 15px;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -364,8 +378,9 @@
       <img id="favicon" src="icons/favicon.png" />
       <h1>Task Tracker</h1>
       <div id="search-container">
-        <button id="search">搜尋</button>
+        <img src="icons/search.png" id="search" />
         <input type="text" id="search-input" placeholder="搜尋" />
+        <div id="search-clear"></div>
       </div>
       <div id="filter-container">
         <label for="filter-category">篩選</label>
@@ -583,14 +598,40 @@
         taskItem.hide(500, () => taskItem.remove());
       }
 
-      function filterTasks(category) {
-        // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
-        $("#task-container .task-item").hide(500);
+      function searchTasks(text) {
+        const options = { shouldSort: false, keys: ["text"] };
 
-        // 然後使用 forEach 遍歷並顯示
+        list = JSON.parse(domToJSON());
+        const fuse = new Fuse(list, options);
+        const result = fuse.search(text);
+
+        const searchResult = [];
+        result.forEach((item) => {
+          searchResult.push(JSON.stringify(item.item));
+        });
+
+        return searchResult;
+      }
+
+      function filterTasks(category, searchResult) {
         $("#task-container .task-item").each(function () {
           const taskItem = $(this);
-          if (category === "all" || taskItem.data("category") === category) {
+          const task = JSON.stringify({
+            text: taskItem.data("text"),
+            category: taskItem.data("category"),
+            status: taskItem.data("status"),
+          });
+          const isShow =
+            (category === "all" && searchResult === "all") ||
+            (taskItem.data("category") === category &&
+              searchResult.includes(task)) ||
+            (taskItem.data("category") === category &&
+              searchResult === "all") ||
+            (category === "all" && searchResult.includes(task));
+
+          if (!isShow) {
+            taskItem.hide(500);
+          } else {
             taskItem.show(500);
           }
         });
@@ -716,10 +757,32 @@
         // 清空工作相關
         $("#cleared-check").on("click", clearTasks);
 
-        // 篩選工作相關
+        // 搜尋/篩選功能相關
+        $("#search-input").keyup(function () {
+          const category = $("#filter-category").val();
+          const text = $("#search-input").val();
+          const searchResult = text ? searchTasks(text) : "all";
+          if (text) {
+            $("#search-clear").show(500);
+          } else {
+            $("#search-clear").hide(500);
+          }
+          filterTasks(category, searchResult);
+        });
+
+        $("#search-clear").click(function () {
+          $("#search-input").val("");
+          const category = $("#filter-category").val();
+          const searchResult = "all";
+          $("#search-clear").hide(500);
+          filterTasks(category, searchResult);
+        });
+
         $("#filter-category").change(function () {
-          const category = $(this).val();
-          filterTasks(category);
+          const category = $("#filter-category").val();
+          const text = $("#search-input").val();
+          const searchResult = text ? searchTasks(text) : "all";
+          filterTasks(category, searchResult);
         });
 
         // 存檔工作相關
@@ -816,6 +879,7 @@
           }
         });
 
+        // 彈出清空確認視窗
         let isCheckClear = false;
         const enterCheckClear = gsap.to("#cleared", {
           paused: true,
@@ -826,24 +890,24 @@
 
         $("#clear").on("click", function () {
           isCheckClear = true;
-          enterCheckClear.play();
+          enterCheckClear.timeScale(2).play();
         });
 
         $("#cleared-cancel").on("click", function () {
           isCheckClear = false;
-          enterCheckClear.reverse();
+          enterCheckClear.timeScale(1).reverse();
         });
 
         $("#cleared-check").on("click", function () {
           isCheckClear = false;
-          enterCheckClear.reverse();
+          enterCheckClear.timeScale(1).reverse();
         });
 
         // 滑鼠右鍵
         $(document).on("contextmenu", function (e) {
           if (isCheckClear) {
             e.preventDefault();
-            enterCheckClear.reverse();
+            enterCheckClear.timeScale(1).reverse();
           }
         });
       });
