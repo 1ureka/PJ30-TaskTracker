@@ -77,6 +77,20 @@
         font-size: 20px;
       }
 
+      .pop-up {
+        opacity: 0;
+        visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        padding: 10px;
+        background-color: #333;
+        border-radius: 10px;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+        z-index: 5;
+      }
+
       #header {
         position: fixed;
         top: 0;
@@ -275,7 +289,7 @@
         margin: 5px;
         width: 40px;
         height: 40px;
-        background-color: hsla(200, 0%, 15%, 1);
+        cursor: pointer;
       }
 
       .task-status-container {
@@ -376,6 +390,7 @@
     <div id="task-container">
       <!-- 工作項目將在這裡動態顯示 -->
     </div>
+    <div class="pop-up" id="copied">已複製內文</div>
 
     <script>
       function readInput() {
@@ -457,7 +472,10 @@
           .addClass("task-function-container")
           .appendTo(this);
 
-        $("<div>").addClass("task-copy-text").appendTo(functionContainer);
+        $("<img>")
+          .attr("src", "icons/copy.png")
+          .addClass("task-copy-text")
+          .appendTo(functionContainer);
 
         const statusContainer = $("<div>")
           .addClass("task-status-container")
@@ -488,6 +506,26 @@
 
       function clearTasks() {
         $("#task-container").empty();
+      }
+
+      async function copyTaskText(taskItem, mouseX, mouseY) {
+        const textToCopy = taskItem.data("text");
+
+        const scrollLeft = $(document).scrollLeft();
+        const scrollTop = $(document).scrollTop();
+
+        await navigator.clipboard.writeText(textToCopy);
+
+        // top 和 left 分別表示游標相對於元素頂部和左側的偏移
+        gsap.set("#copied", {
+          top: mouseY + scrollTop,
+          left: mouseX + scrollLeft,
+        });
+
+        gsap
+          .timeline({ defaults: { ease: "set1", overwrite: "auto" } })
+          .to("#copied", { ease: "power3.out", duration: 0.5, autoAlpha: 1 })
+          .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 });
       }
 
       function toggleTask(taskItem, value) {
@@ -526,14 +564,15 @@
         const tasks = $("#task-container")
           .children()
           .map(function () {
-            if ($(this).is("hr")) {
+            if ($(this).hasClass("separator")) {
               return { type: "separator" };
+            } else if ($(this).hasClass("task-item")) {
+              return {
+                text: $(this).data("text"),
+                category: $(this).data("category"),
+                status: $(this).data("status"),
+              };
             }
-            return {
-              text: $(this).data("text"),
-              category: $(this).data("category"),
-              status: $(this).data("status"),
-            };
           })
           .get();
 
@@ -630,6 +669,12 @@
           const taskItem = $(this).closest(".task-item");
           const value = $(this).val();
           toggleTask(taskItem, value);
+        });
+
+        // 複製內文(動態)
+        $(document).on("click", ".task-copy-text", function (e) {
+          const taskItem = $(this).closest(".task-item");
+          copyTaskText(taskItem, e.clientX, e.clientY);
         });
 
         // 清空工作相關
