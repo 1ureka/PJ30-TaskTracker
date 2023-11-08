@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
-    <title>工作清單</title>
+    <link rel="icon" type="image/png" href="icons/schedule.png" />
+    <title>Task Tracker</title>
     <meta charset="UTF-8" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -91,9 +92,16 @@
         z-index: 10;
       }
 
-      h1 {
+      #favicon {
         position: absolute;
         left: 20px;
+        width: 80px;
+        height: auto;
+      }
+
+      h1 {
+        position: absolute;
+        left: 110px;
         display: flex;
         justify-content: center;
         font-size: 36px;
@@ -309,7 +317,6 @@
   <!-- 之後UI改為
   清空前加上中間pop出警告(看要用gsap還是alert)先問一次
   taskItem的類別用方框框住，置於左側，字體可以根據類別有不同顏色
-  看要不要給個icon
   左側面板下方按鈕懸停時，上方有lable跑出
   架構是btn-container > lable-container:div + btn:img
   lable-container:div (clip-path) > lable:lable
@@ -317,12 +324,14 @@
   雙擊可以編輯內文，記得編輯完成放回屬性
   下方四按鈕圖示可用GIF做動畫，比如懸停時垃圾桶打開再關閉、清空往四處飛再從中間出現球並分裂回來
   整理注釋
+  當切換狀態時，該task背景的顏色會變化，但不是整個，而是從右側或左側會漸變一個相應的顏色
 
   每個元素有類別標記框、修改按鈕(事件註冊記得用event delegation)
   -->
   <body>
     <div id="header">
-      <h1>工作清單</h1>
+      <img id="favicon" src="icons/schedule.png" />
+      <h1>Task Tracker</h1>
       <div id="search-container">
         <button id="search">搜尋</button>
         <input type="text" id="search-input" placeholder="搜尋" />
