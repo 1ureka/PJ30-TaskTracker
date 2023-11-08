@@ -142,6 +142,16 @@
         width: 20em;
       }
 
+      #search-clear {
+        display: none;
+        width: 40px;
+        height: 40px;
+        background-color: aliceblue;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
       #filter-container {
         position: absolute;
         right: 20px;
@@ -182,6 +192,7 @@
       #task-input {
         width: 100%;
         resize: vertical;
+        min-height: 10em;
       }
 
       #category,
@@ -370,6 +381,7 @@
       <div id="search-container">
         <img src="icons/search.png" id="search" />
         <input type="text" id="search-input" placeholder="搜尋" />
+        <div id="search-clear"></div>
       </div>
       <div id="filter-container">
         <label for="filter-category">篩選</label>
@@ -588,7 +600,7 @@
       }
 
       function searchTasks(text) {
-        const options = { shouldSort: false, keys: ["text", "category"] };
+        const options = { shouldSort: false, keys: ["text"] };
 
         list = JSON.parse(domToJSON());
         const fuse = new Fuse(list, options);
@@ -746,15 +758,27 @@
         // 清空工作相關
         $("#cleared-check").on("click", clearTasks);
 
-        // 搜尋功能相關
+        // 搜尋/篩選功能相關
         $("#search-input").keyup(function () {
           const category = $("#filter-category").val();
           const text = $("#search-input").val();
           const searchResult = text ? searchTasks(text) : "all";
+          if (text) {
+            $("#search-clear").show(500);
+          } else {
+            $("#search-clear").hide(500);
+          }
           filterTasks(category, searchResult);
         });
 
-        // 篩選工作相關
+        $("#search-clear").click(function () {
+          $("#search-input").val("");
+          const category = $("#filter-category").val();
+          const searchResult = "all";
+          $("#search-clear").hide(500);
+          filterTasks(category, searchResult);
+        });
+
         $("#filter-category").change(function () {
           const category = $("#filter-category").val();
           const text = $("#search-input").val();
