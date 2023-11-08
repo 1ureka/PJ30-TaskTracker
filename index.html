@@ -133,6 +133,8 @@
       }
 
       #search {
+        width: 40px;
+        height: 40px;
         margin-right: 10px;
       }
 
@@ -349,6 +351,7 @@
     </style>
   </head>
   <!-- 之後UI改為
+  搜尋欄增加清空功能
   taskItem的類別用方框框住，置於左側，字體可以根據類別有不同顏色
   左側面板下方按鈕懸停時，上方有lable跑出
   架構是btn-container > lable-container:div + btn:img
@@ -365,7 +368,7 @@
       <img id="favicon" src="icons/favicon.png" />
       <h1>Task Tracker</h1>
       <div id="search-container">
-        <button id="search">搜尋</button>
+        <img src="icons/search.png" id="search" />
         <input type="text" id="search-input" placeholder="搜尋" />
       </div>
       <div id="filter-container">
@@ -853,6 +856,7 @@
           }
         });
 
+        // 彈出清空確認視窗
         let isCheckClear = false;
         const enterCheckClear = gsap.to("#cleared", {
           paused: true,
@@ -863,24 +867,24 @@
 
         $("#clear").on("click", function () {
           isCheckClear = true;
-          enterCheckClear.play();
+          enterCheckClear.timeScale(2).play();
         });
 
         $("#cleared-cancel").on("click", function () {
           isCheckClear = false;
-          enterCheckClear.reverse();
+          enterCheckClear.timeScale(1).reverse();
         });
 
         $("#cleared-check").on("click", function () {
           isCheckClear = false;
-          enterCheckClear.reverse();
+          enterCheckClear.timeScale(1).reverse();
         });
 
         // 滑鼠右鍵
         $(document).on("contextmenu", function (e) {
           if (isCheckClear) {
             e.preventDefault();
-            enterCheckClear.reverse();
+            enterCheckClear.timeScale(1).reverse();
           }
         });
       });
