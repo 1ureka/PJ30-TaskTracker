@@ -12,6 +12,7 @@
     />
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -156,9 +157,9 @@
         left: 0;
         top: 0;
         bottom: 0;
-        width: 15%;
-        padding: 2.5%;
-        padding-top: 135px;
+        width: 240px;
+        padding: 10px;
+        padding-top: 130px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -219,10 +220,10 @@
 
       #task-container {
         position: absolute;
+        width: auto;
         top: 100px;
-        left: 20%;
-        padding: 2.5%;
-        width: 75%;
+        left: 260px;
+        padding: 15px;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -583,14 +584,40 @@
         taskItem.hide(500, () => taskItem.remove());
       }
 
-      function filterTasks(category) {
-        // 將 #task-container 的所有子元素 ($(".task-item")) 隱藏起來
-        $("#task-container .task-item").hide(500);
+      function searchTasks(text) {
+        const options = { shouldSort: false, keys: ["text", "category"] };
 
-        // 然後使用 forEach 遍歷並顯示
+        list = JSON.parse(domToJSON());
+        const fuse = new Fuse(list, options);
+        const result = fuse.search(text);
+
+        const searchResult = [];
+        result.forEach((item) => {
+          searchResult.push(JSON.stringify(item.item));
+        });
+
+        return searchResult;
+      }
+
+      function filterTasks(category, searchResult) {
         $("#task-container .task-item").each(function () {
           const taskItem = $(this);
-          if (category === "all" || taskItem.data("category") === category) {
+          const task = JSON.stringify({
+            text: taskItem.data("text"),
+            category: taskItem.data("category"),
+            status: taskItem.data("status"),
+          });
+          const isShow =
+            (category === "all" && searchResult === "all") ||
+            (taskItem.data("category") === category &&
+              searchResult.includes(task)) ||
+            (taskItem.data("category") === category &&
+              searchResult === "all") ||
+            (category === "all" && searchResult.includes(task));
+
+          if (!isShow) {
+            taskItem.hide(500);
+          } else {
             taskItem.show(500);
           }
         });
@@ -716,10 +743,20 @@
         // 清空工作相關
         $("#cleared-check").on("click", clearTasks);
 
+        // 搜尋功能相關
+        $("#search-input").keyup(function () {
+          const category = $("#filter-category").val();
+          const text = $("#search-input").val();
+          const searchResult = text ? searchTasks(text) : "all";
+          filterTasks(category, searchResult);
+        });
+
         // 篩選工作相關
         $("#filter-category").change(function () {
-          const category = $(this).val();
-          filterTasks(category);
+          const category = $("#filter-category").val();
+          const text = $("#search-input").val();
+          const searchResult = text ? searchTasks(text) : "all";
+          filterTasks(category, searchResult);
         });
 
         // 存檔工作相關
