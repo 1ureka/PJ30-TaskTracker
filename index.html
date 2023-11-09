@@ -83,6 +83,13 @@
         font-size: 20px;
       }
 
+      p.editing {
+        outline: 1px solid #ffffff;
+        outline-offset: 10px;
+        border-radius: 1px;
+        cursor: text;
+      }
+
       .pop-up {
         opacity: 0;
         visibility: hidden;
@@ -362,16 +369,15 @@
     </style>
   </head>
   <!-- 之後UI改為
+  回到頂部按鈕，回到底部按鈕(第一次出現未完成狀態的工作位置)
+  新增工作可以選擇頂部、底部、目前位置
   taskItem的類別用方框框住，置於左側，字體可以根據類別有不同顏色
   左側面板下方按鈕懸停時，上方有lable跑出
   架構是btn-container > lable-container:div + btn:img
   lable-container:div (clip-path) > lable:lable
-  雙擊可以編輯內文，記得編輯完成放回屬性
   下方四按鈕圖示可用GIF做動畫，比如懸停時垃圾桶打開再關閉、清空往四處飛再從中間出現球並分裂回來
-  整理注釋
+  分割檔案、整理注釋
   當切換狀態時，該task背景的顏色會變化，但不是整個，而是從右側或左側會漸變一個相應的顏色
-
-  每個元素有修改按鈕(事件註冊記得用event delegation)
   -->
   <body>
     <div id="header">
@@ -752,6 +758,25 @@
         $(document).on("click", ".task-copy-text", function (e) {
           const taskItem = $(this).closest(".task-item");
           copyTaskText(taskItem, e.clientX, e.clientY);
+        });
+
+        // 編輯內文(動態)
+        $(document).on("dblclick", ".task-text", function (e) {
+          const taskItem = $(this).closest(".task-item");
+          $(this).attr("contenteditable", true).addClass("editing").focus();
+        });
+
+        $(document).on("keyup", ".task-text", function (e) {
+          const taskItem = $(this).closest(".task-item");
+          const text = $(this).text();
+          taskItem.data("text", text);
+        });
+
+        $(document).on("blur", ".task-text", function (e) {
+          const taskItem = $(this).closest(".task-item");
+          $(this).attr("contenteditable", false).removeClass("editing");
+          const text = $(this).text();
+          taskItem.data("text", text);
         });
 
         // 清空工作相關
