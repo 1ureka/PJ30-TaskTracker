@@ -21,87 +21,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+    <!-- 樣式表 -->
+    <link rel="stylesheet" href="css/global.css" />
     <style>
-      body {
-        margin: 0;
-        font-family: "Noto Sans TC", sans-serif;
-        color: white;
-        background-color: hsl(210, 15%, 7.5%);
-        overflow-y: scroll;
-        overflow-x: hidden;
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      ::-webkit-scrollbar {
-        width: 10px;
-      }
-
-      ::-webkit-scrollbar-track {
-        opacity: 0;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: hsla(200, 0%, 50%, 0.5);
-        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
-        border-radius: 5px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: hsla(200, 0%, 50%, 1);
-      }
-
-      input,
-      select,
-      button,
-      textarea {
-        font-family: "Noto Sans TC", sans-serif;
-        color: white;
-      }
-
-      input[type="text"],
-      select,
-      textarea {
-        background-color: hsla(200, 0%, 10%, 0.5);
-        border-radius: 10px;
-        padding: 5px;
-        border-width: 0;
-        box-shadow: inset 0px 0px 12px rgba(0, 0, 0, 0.5);
-        font-size: 20px;
-      }
-
-      button {
-        background-color: hsla(200, 0%, 20%, 0.9);
-        border-radius: 10px;
-        border-width: 0;
-        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
-        padding: 5px;
-        cursor: pointer;
-        font-size: 20px;
-      }
-
       p.editing {
         outline: 1px solid #ffffff;
         outline-offset: 10px;
         border-radius: 1px;
         cursor: text;
-      }
-
-      .pop-up {
-        opacity: 0;
-        visibility: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        padding: 10px;
-        background-color: #333;
-        border-radius: 10px;
-        box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
-        z-index: 5;
       }
 
       #header {
@@ -625,11 +552,6 @@
           top: mouseY + scrollTop,
           left: mouseX + scrollLeft,
         });
-
-        gsap
-          .timeline({ defaults: { ease: "set1", overwrite: "auto" } })
-          .to("#copied", { ease: "power3.out", duration: 0.5, autoAlpha: 1 })
-          .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 });
       }
 
       function toggleTask(taskItem, value) {
@@ -980,6 +902,21 @@
             e.preventDefault();
             enterCheckClear.timeScale(1).reverse();
           }
+        });
+
+        //
+        // 彈出已複製視窗
+        const enterCopied = gsap
+          .timeline({
+            defaults: { ease: "set1" },
+            paused: true,
+          })
+          .to("#copied", { ease: "power3.out", duration: 0.5, autoAlpha: 1 })
+          .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 })
+          .to("#copied", { top: 0, left: 0, duration: 0.1 });
+
+        $(document).on("click", ".task-copy-container", function (e) {
+          enterCopied.restart();
         });
       });
     </script>
