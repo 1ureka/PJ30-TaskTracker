@@ -149,14 +149,24 @@
         width: 20em;
       }
 
-      #search-clear {
+      #search-erase-container {
+        position: relative;
         display: none;
         width: 40px;
         height: 40px;
-        background-color: aliceblue;
-        border-radius: 10px;
         cursor: pointer;
         margin-left: 10px;
+      }
+
+      #search-erase-line,
+      #search-erase {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
       }
 
       #filter-container {
@@ -315,6 +325,7 @@
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
         text-align: center;
         min-width: 3em;
+        font-weight: bold;
       }
 
       .task-text {
@@ -386,7 +397,10 @@
       <div id="search-container">
         <img src="icons/search.png" id="search" />
         <input type="text" id="search-input" placeholder="搜尋" />
-        <div id="search-clear"></div>
+        <div id="search-erase-container">
+          <img id="search-erase-line" src="icons/erase (line).png" alt="" />
+          <img id="search-erase" src="icons/erase.png" alt="" />
+        </div>
       </div>
       <div id="filter-container">
         <label for="filter-category">篩選</label>
@@ -498,9 +512,22 @@
           .addClass("task-content")
           .appendTo(this);
 
+        const colorMap = {
+          未分類: "#bbb",
+          PJ24: "#ffff7a",
+          PJ25: "#8ce197",
+          PJ26: "#8ce197",
+          PJ27: "#92e9ff",
+          PJ28: "#92e9ff",
+          PJ29: "#ea81af",
+          PJ30: "#ea81af",
+        };
+        console.log(colorMap[category]);
+
         $("<div>")
           .addClass("task-category")
           .text(`${category}`)
+          .css("color", colorMap[category])
           .appendTo(contentContainer);
         $("<p>")
           .addClass("task-text")
@@ -788,18 +815,18 @@
           const text = $("#search-input").val();
           const searchResult = text ? searchTasks(text) : "all";
           if (text) {
-            $("#search-clear").show(500);
+            $("#search-erase-container").show(500);
           } else {
-            $("#search-clear").hide(500);
+            $("#search-erase-container").hide(500);
           }
           filterTasks(category, searchResult);
         });
 
-        $("#search-clear").click(function () {
+        $("#search-erase-container").click(function () {
           $("#search-input").val("");
           const category = $("#filter-category").val();
           const searchResult = "all";
-          $("#search-clear").hide(500);
+          $("#search-erase-container").hide(500);
           filterTasks(category, searchResult);
         });
 
@@ -857,11 +884,9 @@
       CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
 
       $(document).ready(function () {
-        // init
-        gsap.set("#delete-done", { autoAlpha: 0 });
-
         //
         // 有關進出刪除狀態動畫
+        gsap.set("#delete-done", { autoAlpha: 0 });
         let isDeleting = false;
         const enterDeleting = () => {
           isDeleting = true;
@@ -904,6 +929,7 @@
           }
         });
 
+        //
         // 彈出清空確認視窗
         let isCheckClear = false;
         const enterCheckClear = gsap.to("#cleared", {
@@ -934,6 +960,41 @@
             e.preventDefault();
             enterCheckClear.timeScale(1).reverse();
           }
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function () {
+        // 有關懸停/點擊效果
+
+        //
+        // 清空搜索欄按鈕
+        gsap.set("#search-erase", { x: 10 });
+        const EraserMove = gsap
+          .timeline({
+            defaults: { duration: 0.3, ease: "set1" },
+            paused: true,
+          })
+          .to("#search-erase", { x: -5 });
+        const EraserClick = gsap
+          .timeline({
+            defaults: { duration: 0.05, ease: "set1" },
+            paused: true,
+          })
+          .to("#search-erase-container", { scale: 0.5, yoyo: true, repeat: 1 });
+
+        $("#search-erase-container").hover(
+          function () {
+            EraserMove.play();
+          },
+          function () {
+            EraserMove.reverse();
+          }
+        );
+
+        $("#search-erase-container").on("click", function () {
+          EraserClick.restart();
+          console.log("hi");
         });
       });
     </script>
