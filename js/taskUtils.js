@@ -77,47 +77,13 @@ $.fn.addDeleteButton = function () {
 };
 
 /**
- * 設定類別字顏色
- * @param {string} category
- * @returns {JQuery}
- */
-$.fn.setCategoryColor = function (category) {
-  const colorMap = {
-    未分類: "#bbb",
-    PJ24: "#ffff7a",
-    PJ25: "#8ce197",
-    PJ26: "#8ce197",
-    PJ27: "#92e9ff",
-    PJ28: "#92e9ff",
-    PJ29: "#ea81af",
-    PJ30: "#ea81af",
-  };
-
-  return this.css("background-color", colorMap[category]).css("color", "black");
-};
-
-/**
- * 添加內容到元素中。
+ * 添加內容(類別、內文)到元素中。
  * @param {string} taskText - 任務文本
  * @param {string} category - 任務類別
  * @returns {JQuery}
  */
 $.fn.addContent = function (taskText, category) {
   const contentContainer = $("<div>").addClass("task-content").appendTo(this);
-
-  const categoryContainer = $("<div>")
-    .addClass("task-category-container")
-    .appendTo(contentContainer);
-
-  $("<div>")
-    .addClass("task-category")
-    .text(`${category}`)
-    .setCategoryColor(category)
-    .appendTo(categoryContainer);
-
-  const categorySelect = $("<select>")
-    .addClass("task-category-select")
-    .appendTo(categoryContainer);
 
   const categories = [
     "未分類",
@@ -129,6 +95,34 @@ $.fn.addContent = function (taskText, category) {
     "PJ29",
     "PJ30",
   ];
+
+  const categoryContainer = $("<div>")
+    .addClass("task-category-container")
+    .appendTo(contentContainer);
+
+  const categoryDisplayContainer = $("<div>")
+    .addClass("task-category-display-container")
+    .appendTo(categoryContainer);
+
+  const categoryDisplayElements = {};
+
+  categories.forEach((category) => {
+    const categoryDisplay = $("<div>")
+      .addClass("task-category-display")
+      .addClass(category)
+      .text(`${category}`)
+      .appendTo(categoryDisplayContainer);
+
+    gsap.set(categoryDisplay, { zIndex: 2, y: -41 });
+
+    categoryDisplayElements[category] = categoryDisplay;
+  });
+
+  gsap.set(categoryDisplayElements[category], { zIndex: 3, y: 0 });
+
+  const categorySelect = $("<select>")
+    .addClass("task-category-select")
+    .appendTo(categoryContainer);
 
   categories.forEach((category) => {
     $("<option>").val(category).text(category).appendTo(categorySelect);

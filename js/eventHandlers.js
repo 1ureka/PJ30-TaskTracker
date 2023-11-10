@@ -52,7 +52,6 @@ $(document).ready(function () {
     const taskItem = $(this).closest(".task-item");
     const category = $(this).val();
     taskItem.data("category", category);
-    taskItem.find(".task-category").text(category).setCategoryColor(category);
   });
 
   // 編輯內文(動態)

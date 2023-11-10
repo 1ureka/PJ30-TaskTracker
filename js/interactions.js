@@ -122,4 +122,44 @@ $(document).ready(function () {
         rotate: 0,
       });
   });
+
+  //
+  // 編輯已有工作之類別
+  $(document).on("change", ".task-category-select", function () {
+    const taskItem = $(this).closest(".task-item");
+    const value = $(this).val();
+    const targetElement = taskItem.find(`.task-category-display.${value}`);
+    const otherElements = taskItem
+      .find(".task-category-display")
+      .not(targetElement);
+
+    gsap.to(targetElement, {
+      onStart: () => {
+        gsap.set(otherElements, { zIndex: 2 });
+        gsap.set(targetElement, { zIndex: 3 });
+      },
+      y: 0,
+      onComplete: () => {
+        gsap.set(otherElements, { y: -41 });
+      },
+    });
+  });
+  $(document).on("mouseenter", ".task-category-select", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this).parent().find(".task-category-display-container"), {
+        scale: 1.1,
+      });
+  });
+  $(document).on("mouseleave", ".task-category-select", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this).parent().find(".task-category-display-container"), {
+        scale: 1,
+      });
+  });
 });
