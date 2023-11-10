@@ -77,14 +77,11 @@ $.fn.addDeleteButton = function () {
 };
 
 /**
- * 添加內容到元素中。
- * @param {string} taskText - 任務文本
- * @param {string} category - 任務類別
+ * 設定類別字顏色
+ * @param {string} category
  * @returns {JQuery}
  */
-$.fn.addContent = function (taskText, category) {
-  const contentContainer = $("<div>").addClass("task-content").appendTo(this);
-
+$.fn.setCategoryColor = function (category) {
   const colorMap = {
     未分類: "#bbb",
     PJ24: "#ffff7a",
@@ -95,13 +92,48 @@ $.fn.addContent = function (taskText, category) {
     PJ29: "#ea81af",
     PJ30: "#ea81af",
   };
-  console.log(colorMap[category]);
+
+  return this.css("color", colorMap[category]);
+};
+
+/**
+ * 添加內容到元素中。
+ * @param {string} taskText - 任務文本
+ * @param {string} category - 任務類別
+ * @returns {JQuery}
+ */
+$.fn.addContent = function (taskText, category) {
+  const contentContainer = $("<div>").addClass("task-content").appendTo(this);
+
+  const categoryContainer = $("<div>")
+    .addClass("task-category-container")
+    .appendTo(contentContainer);
 
   $("<div>")
     .addClass("task-category")
     .text(`${category}`)
-    .css("color", colorMap[category])
-    .appendTo(contentContainer);
+    .setCategoryColor(category)
+    .appendTo(categoryContainer);
+
+  const categorySelect = $("<select>")
+    .addClass("task-category-select")
+    .appendTo(categoryContainer);
+
+  const categories = [
+    "未分類",
+    "PJ24",
+    "PJ25",
+    "PJ26",
+    "PJ27",
+    "PJ28",
+    "PJ29",
+    "PJ30",
+  ];
+
+  categories.forEach((category) => {
+    $("<option>").val(category).text(category).appendTo(categorySelect);
+  });
+
   $("<p>").addClass("task-text").text(`${taskText}`).appendTo(contentContainer);
 
   return this;
