@@ -166,18 +166,27 @@ $.fn.addTaskFunctions = function (status) {
   const statusContainer = $("<div>")
     .addClass("task-status-container")
     .appendTo(functionContainer);
-  const colorMap = {
-    U: "#bbb",
-    S: "#92e9ff",
-    O: "#8ce197",
-    F: "#ea81af",
-  };
 
-  $("<div>")
-    .addClass("task-status-display")
-    .text(status)
-    .css("background-color", colorMap[status])
+  const displayContainer = $("<div>")
+    .addClass("task-status-display-container")
     .appendTo(statusContainer);
+
+  const statuses = ["U", "S", "O", "F"];
+  const statusElements = {};
+
+  statuses.forEach((status) => {
+    const statusElement = $("<div>")
+      .addClass("task-status-display")
+      .addClass(status)
+      .text(status)
+      .appendTo(displayContainer);
+
+    gsap.set(statusElement, { zIndex: 2, y: -41 });
+
+    statusElements[status] = statusElement;
+  });
+
+  gsap.set(statusElements[status], { zIndex: 3, y: 0 });
 
   const statusOptions = $("<select>")
     .addClass("task-status-options")
@@ -186,6 +195,8 @@ $.fn.addTaskFunctions = function (status) {
   $("<option>").val("S").text("跳過").appendTo(statusOptions);
   $("<option>").val("O").text("完成").appendTo(statusOptions);
   $("<option>").val("F").text("失敗").appendTo(statusOptions);
+
+  statusOptions.val(status);
 
   return this;
 };
@@ -240,18 +251,7 @@ async function copyTaskText(taskItem, mouseX, mouseY) {
  * @param {string} value - 新的狀態值
  */
 function toggleTask(taskItem, value) {
-  const statusDisplay = taskItem.find(".task-status-display");
   taskItem.data("status", value);
-
-  const colorMap = {
-    U: "#ccc",
-    S: "#92e9ff",
-    O: "#8ce197",
-    F: "#ea81af",
-  };
-
-  statusDisplay.text(value);
-  statusDisplay.css("background-color", colorMap[value]);
 }
 
 /**

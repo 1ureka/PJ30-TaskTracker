@@ -82,4 +82,44 @@ $(document).ready(function () {
         paddingBottom: 0,
       });
   });
+
+  //
+  // 切換工作狀態
+  $(document).on("change", ".task-status-options", function () {
+    const taskItem = $(this).closest(".task-item");
+    const value = $(this).val();
+    const targetElement = taskItem.find(`.task-status-display.${value}`);
+    const otherElements = taskItem
+      .find(".task-status-display")
+      .not(targetElement);
+
+    gsap.to(targetElement, {
+      onStart: () => {
+        gsap.set(otherElements, { zIndex: 2 });
+        gsap.set(targetElement, { zIndex: 3 });
+      },
+      y: 0,
+      onComplete: () => {
+        gsap.set(otherElements, { y: -41 });
+      },
+    });
+  });
+  $(document).on("mouseenter", ".task-status-options", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this).parent().find(".task-status-display-container"), {
+        rotate: 360,
+      });
+  });
+  $(document).on("mouseleave", ".task-status-options", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this).parent().find(".task-status-display-container"), {
+        rotate: 0,
+      });
+  });
 });
