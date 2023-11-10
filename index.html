@@ -27,6 +27,23 @@
     <link rel="stylesheet" href="css/panel.css" />
     <link rel="stylesheet" href="css/taskList.css" />
     <link rel="stylesheet" href="css/popUp.css" />
+    <style>
+      #particle-container {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+      }
+      .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: white;
+        box-shadow: 0px 0px 6px rgba(0, 0, 0, 1);
+        border-radius: 50%;
+      }
+    </style>
   </head>
   <!-- 之後UI改為
   回到頂部按鈕，回到底部按鈕(第一次出現未完成狀態的工作位置)
@@ -95,6 +112,7 @@
       <button type="button" id="cleared-check">確定</button>
       <button type="button" id="cleared-cancel">取消</button>
     </div>
+    <div id="particle-container"></div>
 
     <!-- js文件 (邏輯) -->
     <!-- 全局函數 -->
@@ -109,5 +127,6 @@
     <script src="js/transitions.js"></script>
     <!-- 交互(點擊、懸停)動畫 -->
     <script src="js/interactions.js"></script>
+    <script src="js/clickParticle.js"></script>
   </body>
 </html>

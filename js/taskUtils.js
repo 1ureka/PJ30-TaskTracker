@@ -93,7 +93,7 @@ $.fn.setCategoryColor = function (category) {
     PJ30: "#ea81af",
   };
 
-  return this.css("color", colorMap[category]);
+  return this.css("background-color", colorMap[category]).css("color", "black");
 };
 
 /**
