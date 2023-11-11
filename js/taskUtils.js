@@ -384,3 +384,53 @@ async function jsonToDOM(json) {
     addTask(taskText, status, category);
   });
 }
+
+/**
+ * 初始化年份選擇框，提供選擇範圍為 2020 到當前年份。
+ */
+function initYear() {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear - 2019 },
+    (_, index) => 2020 + index
+  );
+
+  years.forEach((year) => {
+    $("#year").append(`<option value="${year}">${year}</option>`);
+  });
+
+  $("#year").val("2023");
+}
+
+/**
+ * 根據選擇的年份初始化月份選擇框。
+ * @param {string} year - 選擇的年份。
+ */
+function initMonth(year) {
+  $("#month").empty(); // 清空原有的月份選項
+  const selectedYear = parseInt(year);
+  const currentYear = new Date().getFullYear();
+  const endMonth =
+    selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+
+  const months = Array.from({ length: endMonth }, (_, index) =>
+    (index + 1).toString().padStart(2, "0")
+  );
+
+  months.forEach((month) => {
+    $("#month").append(`<option value="${month}">${month}</option>`);
+  });
+
+  $("#month").val(months[months.length - 1]);
+}
+
+/**
+ * 獲取選擇的日期，返回 ISO 8601 格式的日期字符串（僅包含年和月）。
+ * @returns {string} ISO 8601 格式的日期字符串，例如 "2023-11"。
+ */
+function getDate() {
+  const selectedYear = $("#year").val();
+  const selectedMonth = $("#month").val();
+  const isoDate = `${selectedYear}-${selectedMonth}`;
+  return isoDate;
+}

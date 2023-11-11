@@ -1,5 +1,8 @@
 // 事件偵測註冊
 $(document).ready(function () {
+  initYear(); // 初始化年份
+  initMonth($("#year").val()); // 初始化月份
+
   // 使清單可拖動
   new Sortable($("#task-container").get()[0], {
     animation: 150,
@@ -132,6 +135,17 @@ $(document).ready(function () {
 
     // 開始讀取所選文件的内容
     reader.readAsText(file);
+  });
+
+  // 監聽年份選擇改變事件
+  $("#year").on("change", function () {
+    initMonth($(this).val()); // 根據年份初始化月份
+    console.log(getDate());
+  });
+
+  // 監聽月份選擇改變事件
+  $("#month").on("change", function () {
+    console.log(getDate());
   });
 
   // 開啟/關閉頁面相關
