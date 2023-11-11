@@ -156,7 +156,13 @@ $(document).ready(function () {
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
     console.log(`讀取: ${tasksToUpdate}`);
-    if (tasksToUpdate) jsonToDOM(tasksToUpdate);
+
+    if (tasksToUpdate) {
+      jsonToDOM(tasksToUpdate);
+    } else {
+      clearTasks();
+    }
+
     localStorage.setItem("date", getDate());
   });
 
@@ -170,7 +176,13 @@ $(document).ready(function () {
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
     console.log(`讀取: ${tasksToUpdate}`);
-    if (tasksToUpdate) jsonToDOM(tasksToUpdate);
+
+    if (tasksToUpdate) {
+      jsonToDOM(tasksToUpdate);
+    } else {
+      clearTasks();
+    }
+
     localStorage.setItem("date", getDate());
   });
 
