@@ -216,11 +216,10 @@ $.fn.addTaskFunctions = function (status) {
 function clearTasks() {
   return new Promise((resolve, reject) => {
     const callback = function () {
-      $("#task-container").children().remove();
+      $(this).remove();
       setTimeout(() => {
         resolve();
       }, 100);
-      console.log("clear container");
     };
     if ($("#task-container").children().length > 0) {
       $("#task-container").children().hide(500, callback);
@@ -342,6 +341,20 @@ function domToJSON() {
 }
 
 /**
+ * 將任務清單(JSON字串)放入當前所在的日期分類
+ * @param {string} jsonData - 要存入的任務清單
+ * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
+ * @returns {string} - 新的存檔JSON
+ */
+function jsonToSave(jsonData, date) {
+  const saveTasks = localStorage.getItem("tasks")
+    ? JSON.parse(localStorage.getItem("tasks"))
+    : {};
+  saveTasks[date] = JSON.parse(jsonData);
+  return JSON.stringify(saveTasks, null, 2);
+}
+
+/**
  * 下載包含任務訊息的JSON文件。
  * @param {string} jsonData - 包含任務訊息的JSON字串
  */
@@ -363,10 +376,28 @@ function downloadJSON(jsonData) {
 }
 
 /**
+ * 根據存檔json，提取出指定時間分類的清單
+ * @param {string} json - 存檔json
+ * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
+ * @returns {string | null} - 清單json
+ */
+function saveToJSON(json, date) {
+  if (!json) return null;
+  const save = JSON.parse(json);
+  const tasks = JSON.stringify(save[date]);
+  return tasks;
+}
+
+/**
  * 將JSON字串轉換為DOM元素以顯示任務列表。
  * @param {string} json - 包含任務訊息的JSON字串
  */
 async function jsonToDOM(json) {
+  // 若輸入json沒有資料，直接退出
+  if (!json) {
+    console.log("jsonToDOM: 該清單無資料");
+    return;
+  }
   // 轉成物件
   const tasks = JSON.parse(json);
 
@@ -386,9 +417,9 @@ async function jsonToDOM(json) {
 }
 
 /**
- * 初始化年份選擇框，提供選擇範圍為 2020 到當前年份。
+ * 創建年選擇框，提供選擇範圍為 2020 到當前年份。
  */
-function initYear() {
+function createYearSelect() {
   const currentYear = new Date().getFullYear();
   const years = Array.from(
     { length: currentYear - 2019 },
@@ -398,15 +429,13 @@ function initYear() {
   years.forEach((year) => {
     $("#year").append(`<option value="${year}">${year}</option>`);
   });
-
-  $("#year").val("2023");
 }
 
 /**
  * 根據選擇的年份初始化月份選擇框。
  * @param {string} year - 選擇的年份。
  */
-function initMonth(year) {
+function createMonthSelect(year) {
   $("#month").empty(); // 清空原有的月份選項
   const selectedYear = parseInt(year);
   const currentYear = new Date().getFullYear();
@@ -420,8 +449,30 @@ function initMonth(year) {
   months.forEach((month) => {
     $("#month").append(`<option value="${month}">${month}</option>`);
   });
+}
 
-  $("#month").val(months[months.length - 1]);
+/**
+ * 初始化年份選擇
+ */
+function initYear() {
+  const currentYear = new Date().getFullYear();
+  if (formatLocalStorageDate()) {
+    $("#year").val(formatLocalStorageDate().year);
+  } else {
+    $("#year").val(currentYear.toString());
+  }
+}
+
+/**
+ * 初始化月份選擇
+ */
+function initMonth() {
+  const endMonth = new Date().getMonth() + 1;
+  if (formatLocalStorageDate()) {
+    $("#month").val(formatLocalStorageDate().month);
+  } else {
+    $("#month").val(endMonth);
+  }
 }
 
 /**
@@ -433,4 +484,16 @@ function getDate() {
   const selectedMonth = $("#month").val();
   const isoDate = `${selectedYear}-${selectedMonth}`;
   return isoDate;
+}
+
+/**
+ * 格式化瀏覽器紀錄之時間資訊，若無則回傳null
+ * @returns {{year: string; month: string;} | null}
+ */
+function formatLocalStorageDate() {
+  if (!localStorage.getItem("date")) return null;
+
+  const dateString = localStorage.getItem("date");
+  const [year, month] = dateString.split("-");
+  return { year, month };
 }

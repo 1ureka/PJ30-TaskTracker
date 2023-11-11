@@ -1,7 +1,10 @@
 // 事件偵測註冊
 $(document).ready(function () {
+  createYearSelect();
   initYear(); // 初始化年份
-  initMonth($("#year").val()); // 初始化月份
+
+  createMonthSelect($("#year").val());
+  initMonth(); // 初始化月份
 
   // 使清單可拖動
   new Sortable($("#task-container").get()[0], {
@@ -110,7 +113,8 @@ $(document).ready(function () {
   // 存檔工作相關
   $("#save").on("click", function () {
     const jsonData = domToJSON();
-    downloadJSON(jsonData);
+    const save = jsonToSave(jsonData, getDate());
+    downloadJSON(save);
   });
 
   // 上傳工作相關
@@ -124,7 +128,9 @@ $(document).ready(function () {
 
     reader.onload = function (e) {
       try {
-        jsonToDOM(e.target.result);
+        localStorage.setItem("tasks", e.target.result);
+        const save = saveToJSON(e.target.result, getDate());
+        jsonToDOM(save);
       } catch (error) {
         alert("錯誤：JSON 解析失敗。");
       }
@@ -138,14 +144,38 @@ $(document).ready(function () {
   });
 
   // 監聽年份選擇改變事件
-  $("#year").on("change", function () {
-    initMonth($(this).val()); // 根據年份初始化月份
-    console.log(getDate());
+  $("#year").on("change", async function () {
+    // 根據年份初始化月份
+    createMonthSelect($(this).val());
+
+    // 存檔
+    const tasksToSave = domToJSON();
+    const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
+    localStorage.setItem("tasks", save);
+
+    // 清空
+    await clearTasks();
+
+    // 讀取
+    const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
+    if (tasksToSave) jsonToDOM(tasksToUpdate);
+    localStorage.setItem("date", getDate());
   });
 
   // 監聽月份選擇改變事件
-  $("#month").on("change", function () {
-    console.log(getDate());
+  $("#month").on("change", async function () {
+    // 存檔
+    const tasksToSave = domToJSON();
+    const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
+    localStorage.setItem("tasks", save);
+
+    // 清空
+    await clearTasks();
+
+    // 讀取
+    const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
+    if (tasksToSave) jsonToDOM(tasksToUpdate);
+    localStorage.setItem("date", getDate());
   });
 
   // 開啟/關閉頁面相關
