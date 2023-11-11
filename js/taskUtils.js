@@ -395,6 +395,7 @@ function saveToJSON(json, date) {
 async function jsonToDOM(json) {
   // 若輸入json沒有資料，直接退出
   if (!json) {
+    await clearTasks();
     console.log("jsonToDOM: 該清單無資料");
     return;
   }

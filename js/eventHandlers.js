@@ -144,7 +144,7 @@ $(document).ready(function () {
   });
 
   // 監聽年份選擇改變事件
-  $("#year").on("change", async function () {
+  $("#year").on("change", function () {
     // 根據年份初始化月份
     createMonthSelect($(this).val());
 
@@ -153,28 +153,24 @@ $(document).ready(function () {
     const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
     localStorage.setItem("tasks", save);
 
-    // 清空
-    await clearTasks();
-
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
-    if (tasksToSave) jsonToDOM(tasksToUpdate);
+    console.log(`讀取: ${tasksToUpdate}`);
+    if (tasksToUpdate) jsonToDOM(tasksToUpdate);
     localStorage.setItem("date", getDate());
   });
 
   // 監聽月份選擇改變事件
-  $("#month").on("change", async function () {
+  $("#month").on("change", function () {
     // 存檔
     const tasksToSave = domToJSON();
     const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
     localStorage.setItem("tasks", save);
 
-    // 清空
-    await clearTasks();
-
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
-    if (tasksToSave) jsonToDOM(tasksToUpdate);
+    console.log(`讀取: ${tasksToUpdate}`);
+    if (tasksToUpdate) jsonToDOM(tasksToUpdate);
     localStorage.setItem("date", getDate());
   });
 
