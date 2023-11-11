@@ -37,7 +37,7 @@ $(document).ready(function () {
       .timeline({
         defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
       })
-      .to($(this), { scale: 0.5, yoyo: true, repeat: 1 });
+      .to($(this), { scale: 0.7, yoyo: true, repeat: 1 });
   });
   $(document).on("mouseenter", ".task-copy-container", function () {
     gsap
@@ -68,8 +68,8 @@ $(document).ready(function () {
         defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
-        paddingTop: 10,
-        paddingBottom: 10,
+        paddingTop: "1.5em",
+        paddingBottom: "1.5em",
       });
   });
   $(document).on("mouseleave", ".task-item", function () {
@@ -78,8 +78,8 @@ $(document).ready(function () {
         defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
-        paddingTop: 0,
-        paddingBottom: 0,
+        paddingTop: "1em",
+        paddingBottom: "1em",
       });
   });
 

@@ -128,6 +128,8 @@ $.fn.addContent = function (taskText, category) {
     $("<option>").val(category).text(category).appendTo(categorySelect);
   });
 
+  categorySelect.val(category);
+
   $("<p>").addClass("task-text").text(`${taskText}`).appendTo(contentContainer);
 
   return this;
