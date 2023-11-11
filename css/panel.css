@@ -34,6 +34,23 @@
   margin: 10px;
 }
 
+#add-label-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  clip-path: inset(0);
+}
+
+#add-label-red {
+  position: absolute;
+}
+
+#add-label-white {
+  position: relative;
+}
+
 #left-panel-bottom {
   display: flex;
   width: 100%;

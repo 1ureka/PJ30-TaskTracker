@@ -162,4 +162,34 @@ $(document).ready(function () {
         scale: 1,
       });
   });
+
+  //
+  // 新增按鈕
+  gsap.set("#add-label-red", { y: -40 });
+  const addClick = gsap
+    .timeline({
+      defaults: { duration: 0.1, ease: "set1" },
+      paused: true,
+    })
+    .to("#add", { scale: 0.7, yoyo: true, repeat: 1 });
+  const addHover = gsap
+    .timeline({
+      defaults: { duration: 0.1, ease: "set1" },
+      paused: true,
+    })
+    .to("#add-label-white", { y: 40 })
+    .to("#add-label-red", { y: 0 }, "<")
+    .to("#add", { scale: 1.1 }, "<");
+
+  $("#add").hover(
+    function () {
+      addHover.play();
+    },
+    function () {
+      addHover.reverse();
+    }
+  );
+  $("#add").on("click", function () {
+    addClick.restart();
+  });
 });

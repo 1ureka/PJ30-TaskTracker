@@ -58,3 +58,11 @@ button {
   cursor: pointer;
   font-size: 20px;
 }
+
+.red {
+  color: #ea81af;
+}
+
+.white {
+  color: white;
+}
