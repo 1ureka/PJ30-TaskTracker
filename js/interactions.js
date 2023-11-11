@@ -192,4 +192,34 @@ $(document).ready(function () {
   $("#add").on("click", function () {
     addClick.restart();
   });
+
+  //
+  // 刪除按鈕(個別)
+  $(document).on("click", ".task-delete-inner", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this).parent().children(), { scale: 0.7, yoyo: true, repeat: 1 });
+  });
+  $(document).on("mouseenter", ".task-delete-inner", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this), {
+        transformOrigin: "17px center",
+        rotate: 270,
+      });
+  });
+  $(document).on("mouseleave", ".task-delete-inner", function () {
+    gsap
+      .timeline({
+        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+      })
+      .to($(this), {
+        transformOrigin: "17px center",
+        rotate: 0,
+      });
+  });
 });

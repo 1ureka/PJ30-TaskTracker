@@ -71,8 +71,20 @@ function createTaskItem(taskText, status, category) {
  * @returns {JQuery}
  */
 $.fn.addDeleteButton = function () {
-  const btn = $("<button>").addClass("task-delete").text("X").appendTo(this);
-  gsap.set(btn, { autoAlpha: 0 });
+  const frame = $("<img>")
+    .addClass("task-delete")
+    .addClass("task-delete-frame")
+    .attr("src", "icons/delete (frame).png")
+    .appendTo(this);
+  const inner = $("<img>")
+    .addClass("task-delete")
+    .addClass("task-delete-inner")
+    .attr("src", "icons/delete (inner).png")
+    .appendTo(this);
+
+  gsap.set(frame, { autoAlpha: 0 });
+  gsap.set(inner, { autoAlpha: 0 });
+
   return this;
 };
 
