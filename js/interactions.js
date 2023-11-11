@@ -164,6 +164,57 @@ $(document).ready(function () {
   });
 
   //
+  // 日期選單
+  const calendarImgInners = $("#calendar-img-container")
+    .children()
+    .not($("#calendar-img-frame"));
+  gsap.set(calendarImgInners, {
+    autoAlpha: 0,
+  });
+  const dateHover1 = gsap
+    .timeline({
+      defaults: { duration: 0.15, ease: "set1" },
+      paused: true,
+    })
+    .to("#date-select-container", {
+      paddingTop: 10,
+      paddingBottom: 10,
+    });
+
+  const dateHover2 = gsap
+    .timeline({
+      defaults: { duration: 0.15, ease: "set1" },
+      paused: true,
+    })
+    .to(
+      calendarImgInners,
+      {
+        stagger: 0.1,
+        autoAlpha: 1,
+      },
+      "<"
+    )
+    .to(
+      calendarImgInners,
+      {
+        stagger: 0.1,
+        autoAlpha: 0,
+      },
+      "<0.3"
+    );
+
+  $("#date-select-container").hover(
+    function () {
+      dateHover1.play();
+      dateHover2.play();
+    },
+    function () {
+      dateHover1.reverse();
+      dateHover2.reverse();
+    }
+  );
+
+  //
   // 新增按鈕
   gsap.set("#add-label-red", { y: -40 });
   const addClick = gsap
