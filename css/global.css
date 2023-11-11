@@ -49,6 +49,10 @@ textarea {
   font-size: 20px;
 }
 
+select {
+  cursor: pointer;
+}
+
 button {
   background-color: hsla(200, 0%, 20%, 0.9);
   border-radius: 10px;
