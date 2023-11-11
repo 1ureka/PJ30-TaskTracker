@@ -65,7 +65,7 @@ $(document).ready(function () {
   $(document).on("mouseover", ".task-item", function () {
     gsap
       .timeline({
-        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
+        defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
         paddingTop: "1.5em",
@@ -75,7 +75,7 @@ $(document).ready(function () {
   $(document).on("mouseleave", ".task-item", function () {
     gsap
       .timeline({
-        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
+        defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
         paddingTop: "1em",
