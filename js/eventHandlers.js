@@ -30,13 +30,6 @@ $(document).ready(function () {
     addTask(taskText, status, category);
   });
 
-  $("#task-input").on("keyup", function (e) {
-    if (e.key === "Enter") {
-      const { taskText, status, category } = readInput();
-      addTask(taskText, status, category);
-    }
-  });
-
   //
   // 工作欄選單
   // 編輯工作#1
@@ -91,14 +84,22 @@ $(document).ready(function () {
 
   $(document).on("keyup", ".task-text", function (e) {
     const taskItem = $(this).closest(".task-item");
-    const text = $(this).text();
+    const text = $(this)
+      .html()
+      .replace(/<\/+div>/g, "")
+      .replace(/<div><br>/g, "<br>")
+      .replace(/<div>|<br>/g, "\n");
     taskItem.data("text", text);
   });
 
   $(document).on("blur", ".task-text", function (e) {
     const taskItem = $(this).closest(".task-item");
     $(this).attr("contenteditable", false).removeClass("editing");
-    const text = $(this).text();
+    const text = $(this)
+      .html()
+      .replace(/<\/+div>/g, "")
+      .replace(/<div><br>/g, "<br>")
+      .replace(/<div>|<br>/g, "\n");
     taskItem.data("text", text);
   });
 
