@@ -33,10 +33,29 @@ h1 {
   display: flex;
 }
 
-#search {
+#search-img-container {
+  position: relative;
   width: 40px;
   height: 40px;
   margin-right: 10px;
+}
+#search {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+#search-clip-path {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  clip-path: circle(10px at 16.5px 17px);
+  pointer-events: none;
+}
+.search-inner {
+  position: absolute;
+  width: 12%;
+  height: 150%;
+  background-color: #ffff7a;
 }
 
 #search-input {

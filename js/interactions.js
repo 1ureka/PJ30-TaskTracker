@@ -2,6 +2,35 @@ $(document).ready(function () {
   // 有關懸停/點擊效果
 
   //
+  // 搜尋欄
+  gsap.set(".search-inner", { rotate: 5, x: -10 });
+  gsap.set($(".search-inner").eq(0), { x: -0 });
+  const serachImgHover1 = gsap
+    .timeline({ defaults: { ease: "set1", duration: 0.6 }, paused: true })
+    .to(".search-inner", {
+      x: "+=40",
+      rotate: 20,
+    });
+  const serachImgHover2 = gsap
+    .timeline({ defaults: { ease: "set1", duration: 0.3 }, paused: true })
+    .to("#search-img-container", {
+      scale: 1.1,
+      rotate: "+=15",
+      transformOrigin: "16.5px 17px",
+    });
+
+  $("#search-container").hover(
+    function () {
+      serachImgHover1.play();
+      serachImgHover2.play();
+    },
+    function () {
+      serachImgHover1.reverse();
+      serachImgHover2.reverse();
+    }
+  );
+
+  //
   // 清空搜索欄按鈕
   gsap.set("#search-erase", { x: 10 });
   const EraserMove = gsap
