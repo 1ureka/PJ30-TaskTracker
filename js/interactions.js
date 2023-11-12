@@ -2,7 +2,7 @@ $(document).ready(function () {
   // 有關懸停/點擊效果
 
   //
-  // 搜尋欄
+  // 搜尋符號(放大鏡)
   gsap.set(".search-inner", { rotate: 5, x: -10 });
   gsap.set($(".search-inner").eq(0), { x: -0 });
   const serachImgHover1 = gsap
