@@ -432,6 +432,42 @@ async function jsonToDOM(json) {
 }
 
 /**
+ * 更新目前所在清單
+ * @param {string} saveDate - 要存入的日期，ISO 8601 格式的日期字符串
+ * @param {string} loadDate - 要讀取的日期，ISO 8601 格式的日期字符串
+ */
+function changeDOM(saveDate, loadDate) {
+  // 存檔
+  const tasksToSave = domToJSON();
+  const save = jsonToSave(tasksToSave, saveDate);
+  localStorage.setItem("tasks", save);
+
+  // 清空搜索與篩選
+  $("#search-input").val("");
+  $("#search-erase-container").hide(500);
+  $("#filter-category").val("all");
+
+  // 讀取
+  const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), loadDate);
+
+  if (tasksToUpdate) {
+    jsonToDOM(tasksToUpdate);
+  } else {
+    clearTasks();
+  }
+
+  // 更新所在日期
+  localStorage.setItem("date", loadDate);
+}
+
+//
+//
+//
+// 以下為與時間相關函數
+//
+//
+//
+/**
  * 創建年選擇框，提供選擇範圍為 2020 到當前年份。
  */
 function createYearSelect() {

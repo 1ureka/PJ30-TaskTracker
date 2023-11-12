@@ -187,52 +187,12 @@ $(document).ready(function () {
     // 根據年份初始化月份
     createMonthSelect($(this).val());
 
-    // 存檔
-    const tasksToSave = domToJSON();
-    const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
-    localStorage.setItem("tasks", save);
-
-    // 清空搜索與篩選
-    $("#search-input").val("");
-    $("#search-erase-container").hide(500);
-    $("#filter-category").val("all");
-
-    // 讀取
-    const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
-    console.log(`讀取: ${tasksToUpdate}`);
-
-    if (tasksToUpdate) {
-      jsonToDOM(tasksToUpdate);
-    } else {
-      clearTasks();
-    }
-
-    localStorage.setItem("date", getDate());
+    changeDOM(localStorage.getItem("date"), getDate());
   });
 
   // 監聽月份選擇改變事件
   $("#month").on("change", function () {
-    // 存檔
-    const tasksToSave = domToJSON();
-    const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
-    localStorage.setItem("tasks", save);
-
-    // 清空搜索與篩選
-    $("#search-input").val("");
-    $("#search-erase-container").hide(500);
-    $("#filter-category").val("all");
-
-    // 讀取
-    const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
-    console.log(`讀取: ${tasksToUpdate}`);
-
-    if (tasksToUpdate) {
-      jsonToDOM(tasksToUpdate);
-    } else {
-      clearTasks();
-    }
-
-    localStorage.setItem("date", getDate());
+    changeDOM(localStorage.getItem("date"), getDate());
   });
 
   //
