@@ -1,17 +1,30 @@
-// 事件偵測註冊
 $(document).ready(function () {
+  //
+  //
+  // 初始化時間選擇
+  //
+  //
   createYearSelect();
   initYear(); // 初始化年份
 
   createMonthSelect($("#year").val());
   initMonth(); // 初始化月份
 
+  //
+  //
   // 使清單可拖動
+  //
+  //
   new Sortable($("#task-container").get()[0], {
     animation: 150,
   });
 
-  // 新增工作相關
+  //
+  // 左側選單上方
+  // 新增工作
+  //
+  //
+  // 新增按鈕
   $("#add").on("click", function () {
     const { taskText, status, category } = readInput();
     addTask(taskText, status, category);
@@ -24,7 +37,12 @@ $(document).ready(function () {
     }
   });
 
-  // 刪除工作相關(動態)
+  //
+  // 工作欄選單
+  // 編輯工作#1
+  //
+  //
+  // 刪除按鈕(動態) (流程在觸發過場至刪除頁面後)
   $(document).on("click", ".task-delete", function () {
     const taskItem = $(this).closest(".task-item");
     const separator = $(this).closest(".separator");
@@ -40,7 +58,7 @@ $(document).ready(function () {
     }
   });
 
-  // 切換工作狀態相關(動態)
+  // 切換狀態(動態)
   $(document).on("change", ".task-status-options", function () {
     const taskItem = $(this).closest(".task-item");
     const value = $(this).val();
@@ -53,6 +71,11 @@ $(document).ready(function () {
     copyTaskText(taskItem, e.clientX, e.clientY);
   });
 
+  //
+  // 工作欄編輯
+  // 編輯工作#2
+  //
+  //
   // 編輯類別(動態)
   $(document).on("change", ".task-category-select", function (e) {
     const taskItem = $(this).closest(".task-item");
@@ -79,45 +102,22 @@ $(document).ready(function () {
     taskItem.data("text", text);
   });
 
-  // 清空工作相關
+  //
+  // 左側選單下方
+  // 清單操作
+  //
+  //
+  // 清空按鈕
   $("#cleared-check").on("click", clearTasks);
 
-  // 搜尋/篩選功能相關
-  $("#search-input").keyup(function () {
-    const category = $("#filter-category").val();
-    const text = $("#search-input").val();
-    const searchResult = text ? searchTasks(text) : "all";
-    if (text) {
-      $("#search-erase-container").show(500);
-    } else {
-      $("#search-erase-container").hide(500);
-    }
-    filterTasks(category, searchResult);
-  });
-
-  $("#search-erase-container").click(function () {
-    $("#search-input").val("");
-    const category = $("#filter-category").val();
-    const searchResult = "all";
-    $("#search-erase-container").hide(500);
-    filterTasks(category, searchResult);
-  });
-
-  $("#filter-category").change(function () {
-    const category = $("#filter-category").val();
-    const text = $("#search-input").val();
-    const searchResult = text ? searchTasks(text) : "all";
-    filterTasks(category, searchResult);
-  });
-
-  // 存檔工作相關
+  // 存檔按鈕
   $("#save").on("click", function () {
     const jsonData = domToJSON();
     const save = jsonToSave(jsonData, getDate());
     downloadJSON(save);
   });
 
-  // 上傳工作相關
+  // 上傳按鈕
   $("#upload").on("click", function () {
     $("#file-input").click();
   });
@@ -143,6 +143,45 @@ $(document).ready(function () {
     reader.readAsText(file);
   });
 
+  //
+  // 上方選單
+  // 過濾工作
+  //
+  //
+  // 搜尋/篩選功能
+  $("#search-input").keyup(function () {
+    const category = $("#filter-category").val();
+    const text = $("#search-input").val();
+    const searchResult = text ? searchTasks(text) : "all";
+    if (text) {
+      $("#search-erase-container").show(500);
+    } else {
+      $("#search-erase-container").hide(500);
+    }
+    filterTasks(category, searchResult);
+  });
+
+  $("#filter-category").change(function () {
+    const category = $("#filter-category").val();
+    const text = $("#search-input").val();
+    const searchResult = text ? searchTasks(text) : "all";
+    filterTasks(category, searchResult);
+  });
+
+  // 清空搜索欄按鈕
+  $("#search-erase-container").click(function () {
+    $("#search-input").val("");
+    const category = $("#filter-category").val();
+    const searchResult = "all";
+    $("#search-erase-container").hide(500);
+    filterTasks(category, searchResult);
+  });
+
+  //
+  // 日期選單
+  // 分類工作清單
+  //
+  //
   // 監聽年份選擇改變事件
   $("#year").on("change", function () {
     // 根據年份初始化月份
@@ -186,6 +225,11 @@ $(document).ready(function () {
     localStorage.setItem("date", getDate());
   });
 
+  //
+  //
+  // 其他
+  //
+  //
   // 開啟/關閉頁面相關
   $(window).on("beforeunload", function (e) {
     if ($("#task-container .task-item").length > 0) {

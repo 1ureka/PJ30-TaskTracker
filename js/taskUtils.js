@@ -1,3 +1,10 @@
+//
+//
+//
+// 以下為與DOM有關函數
+//
+//
+//
 /**
  * 讀取輸入並返回任務信息。
  * @returns {{ taskText: string, status: string, category: string }}
@@ -316,6 +323,13 @@ function filterTasks(category, searchResult) {
   });
 }
 
+//
+//
+//
+// 以下為與DOM與json的橋梁或是與DOM無關函數
+//
+//
+//
 /**
  * 將任務項目轉換為JSON字串。
  * @returns {string} - 包含任務訊息的JSON字串
