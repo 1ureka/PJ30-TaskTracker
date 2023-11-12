@@ -192,6 +192,11 @@ $(document).ready(function () {
     const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
     localStorage.setItem("tasks", save);
 
+    // 清空搜索與篩選
+    $("#search-input").val("");
+    $("#search-erase-container").hide(500);
+    $("#filter-category").val("all");
+
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
     console.log(`讀取: ${tasksToUpdate}`);
@@ -211,6 +216,11 @@ $(document).ready(function () {
     const tasksToSave = domToJSON();
     const save = jsonToSave(tasksToSave, localStorage.getItem("date"));
     localStorage.setItem("tasks", save);
+
+    // 清空搜索與篩選
+    $("#search-input").val("");
+    $("#search-erase-container").hide(500);
+    $("#filter-category").val("all");
 
     // 讀取
     const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), getDate());
