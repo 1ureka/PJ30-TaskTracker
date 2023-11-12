@@ -98,3 +98,21 @@
   width: 100%;
   height: 100%;
 }
+
+#version-display {
+  min-width: 265px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  bottom: -10px;
+  left: -10px;
+  padding: 10px 0;
+  border-radius: 0 10px 0 0;
+  background-color: hsl(200, 0%, 15%);
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+}
+
+#version-display > p {
+  margin: 0;
+}
