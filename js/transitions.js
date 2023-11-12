@@ -15,7 +15,7 @@ $(document).ready(function () {
       .timeline({
         defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
       })
-      .to(".task-item, .separator", { left: 60 })
+      .to(".task-item, .separator", { left: 50 })
       .to(".task-delete", { autoAlpha: 1 }, "<0.1")
       .to("#delete-done", { autoAlpha: 1 }, "<");
   };

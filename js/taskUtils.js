@@ -1,3 +1,10 @@
+//
+//
+//
+// 以下為與DOM有關函數
+//
+//
+//
 /**
  * 讀取輸入並返回任務信息。
  * @returns {{ taskText: string, status: string, category: string }}
@@ -71,13 +78,25 @@ function createTaskItem(taskText, status, category) {
  * @returns {JQuery}
  */
 $.fn.addDeleteButton = function () {
-  const btn = $("<button>").addClass("task-delete").text("X").appendTo(this);
-  gsap.set(btn, { autoAlpha: 0 });
+  const frame = $("<img>")
+    .addClass("task-delete")
+    .addClass("task-delete-frame")
+    .attr("src", "icons/delete (frame).png")
+    .appendTo(this);
+  const inner = $("<img>")
+    .addClass("task-delete")
+    .addClass("task-delete-inner")
+    .attr("src", "icons/delete (inner).png")
+    .appendTo(this);
+
+  gsap.set(frame, { autoAlpha: 0 });
+  gsap.set(inner, { autoAlpha: 0 });
+
   return this;
 };
 
 /**
- * 添加內容到元素中。
+ * 添加內容(類別、內文)到元素中。
  * @param {string} taskText - 任務文本
  * @param {string} category - 任務類別
  * @returns {JQuery}
@@ -85,23 +104,51 @@ $.fn.addDeleteButton = function () {
 $.fn.addContent = function (taskText, category) {
   const contentContainer = $("<div>").addClass("task-content").appendTo(this);
 
-  const colorMap = {
-    未分類: "#bbb",
-    PJ24: "#ffff7a",
-    PJ25: "#8ce197",
-    PJ26: "#8ce197",
-    PJ27: "#92e9ff",
-    PJ28: "#92e9ff",
-    PJ29: "#ea81af",
-    PJ30: "#ea81af",
-  };
-  console.log(colorMap[category]);
+  const categories = [
+    "未分類",
+    "PJ24",
+    "PJ25",
+    "PJ26",
+    "PJ27",
+    "PJ28",
+    "PJ29",
+    "PJ30",
+  ];
 
-  $("<div>")
-    .addClass("task-category")
-    .text(`${category}`)
-    .css("color", colorMap[category])
+  const categoryContainer = $("<div>")
+    .addClass("task-category-container")
     .appendTo(contentContainer);
+
+  const categoryDisplayContainer = $("<div>")
+    .addClass("task-category-display-container")
+    .appendTo(categoryContainer);
+
+  const categoryDisplayElements = {};
+
+  categories.forEach((category) => {
+    const categoryDisplay = $("<div>")
+      .addClass("task-category-display")
+      .addClass(category)
+      .text(`${category}`)
+      .appendTo(categoryDisplayContainer);
+
+    gsap.set(categoryDisplay, { zIndex: 2, y: -41 });
+
+    categoryDisplayElements[category] = categoryDisplay;
+  });
+
+  gsap.set(categoryDisplayElements[category], { zIndex: 3, y: 0 });
+
+  const categorySelect = $("<select>")
+    .addClass("task-category-select")
+    .appendTo(categoryContainer);
+
+  categories.forEach((category) => {
+    $("<option>").val(category).text(category).appendTo(categorySelect);
+  });
+
+  categorySelect.val(category);
+
   $("<p>").addClass("task-text").text(`${taskText}`).appendTo(contentContainer);
 
   return this;
@@ -134,18 +181,27 @@ $.fn.addTaskFunctions = function (status) {
   const statusContainer = $("<div>")
     .addClass("task-status-container")
     .appendTo(functionContainer);
-  const colorMap = {
-    U: "#bbb",
-    S: "#92e9ff",
-    O: "#8ce197",
-    F: "#ea81af",
-  };
 
-  $("<div>")
-    .addClass("task-status-display")
-    .text(status)
-    .css("background-color", colorMap[status])
+  const displayContainer = $("<div>")
+    .addClass("task-status-display-container")
     .appendTo(statusContainer);
+
+  const statuses = ["U", "S", "O", "F"];
+  const statusElements = {};
+
+  statuses.forEach((status) => {
+    const statusElement = $("<div>")
+      .addClass("task-status-display")
+      .addClass(status)
+      .text(status)
+      .appendTo(displayContainer);
+
+    gsap.set(statusElement, { zIndex: 2, y: -41 });
+
+    statusElements[status] = statusElement;
+  });
+
+  gsap.set(statusElements[status], { zIndex: 3, y: 0 });
 
   const statusOptions = $("<select>")
     .addClass("task-status-options")
@@ -154,6 +210,8 @@ $.fn.addTaskFunctions = function (status) {
   $("<option>").val("S").text("跳過").appendTo(statusOptions);
   $("<option>").val("O").text("完成").appendTo(statusOptions);
   $("<option>").val("F").text("失敗").appendTo(statusOptions);
+
+  statusOptions.val(status);
 
   return this;
 };
@@ -165,11 +223,10 @@ $.fn.addTaskFunctions = function (status) {
 function clearTasks() {
   return new Promise((resolve, reject) => {
     const callback = function () {
-      $("#task-container").children().remove();
+      $(this).remove();
       setTimeout(() => {
         resolve();
       }, 100);
-      console.log("clear container");
     };
     if ($("#task-container").children().length > 0) {
       $("#task-container").children().hide(500, callback);
@@ -208,18 +265,7 @@ async function copyTaskText(taskItem, mouseX, mouseY) {
  * @param {string} value - 新的狀態值
  */
 function toggleTask(taskItem, value) {
-  const statusDisplay = taskItem.find(".task-status-display");
   taskItem.data("status", value);
-
-  const colorMap = {
-    U: "#ccc",
-    S: "#92e9ff",
-    O: "#8ce197",
-    F: "#ea81af",
-  };
-
-  statusDisplay.text(value);
-  statusDisplay.css("background-color", colorMap[value]);
 }
 
 /**
@@ -277,6 +323,13 @@ function filterTasks(category, searchResult) {
   });
 }
 
+//
+//
+//
+// 以下為與DOM與json的橋梁或是與DOM無關函數
+//
+//
+//
 /**
  * 將任務項目轉換為JSON字串。
  * @returns {string} - 包含任務訊息的JSON字串
@@ -302,6 +355,20 @@ function domToJSON() {
 }
 
 /**
+ * 將任務清單(JSON字串)放入當前所在的日期分類
+ * @param {string} jsonData - 要存入的任務清單
+ * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
+ * @returns {string} - 新的存檔JSON
+ */
+function jsonToSave(jsonData, date) {
+  const saveTasks = localStorage.getItem("tasks")
+    ? JSON.parse(localStorage.getItem("tasks"))
+    : {};
+  saveTasks[date] = JSON.parse(jsonData);
+  return JSON.stringify(saveTasks, null, 2);
+}
+
+/**
  * 下載包含任務訊息的JSON文件。
  * @param {string} jsonData - 包含任務訊息的JSON字串
  */
@@ -323,10 +390,29 @@ function downloadJSON(jsonData) {
 }
 
 /**
+ * 根據存檔json，提取出指定時間分類的清單
+ * @param {string} json - 存檔json
+ * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
+ * @returns {string | null} - 清單json
+ */
+function saveToJSON(json, date) {
+  if (!json) return null;
+  const save = JSON.parse(json);
+  const tasks = JSON.stringify(save[date]);
+  return tasks;
+}
+
+/**
  * 將JSON字串轉換為DOM元素以顯示任務列表。
  * @param {string} json - 包含任務訊息的JSON字串
  */
 async function jsonToDOM(json) {
+  // 若輸入json沒有資料，直接退出
+  if (!json) {
+    await clearTasks();
+    console.log("jsonToDOM: 該清單無資料");
+    return;
+  }
   // 轉成物件
   const tasks = JSON.parse(json);
 
@@ -343,4 +429,122 @@ async function jsonToDOM(json) {
     // 調用 addTask 函數來在畫面增加任務項
     addTask(taskText, status, category);
   });
+}
+
+/**
+ * 更新目前所在清單
+ * @param {string} saveDate - 要存入的日期，ISO 8601 格式的日期字符串
+ * @param {string} loadDate - 要讀取的日期，ISO 8601 格式的日期字符串
+ */
+function changeDOM(saveDate, loadDate) {
+  // 存檔
+  const tasksToSave = domToJSON();
+  const save = jsonToSave(tasksToSave, saveDate);
+  localStorage.setItem("tasks", save);
+
+  // 清空搜索與篩選
+  $("#search-input").val("");
+  $("#search-erase-container").hide(500);
+  $("#filter-category").val("all");
+
+  // 讀取
+  const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), loadDate);
+
+  if (tasksToUpdate) {
+    jsonToDOM(tasksToUpdate);
+  } else {
+    clearTasks();
+  }
+
+  // 更新所在日期
+  localStorage.setItem("date", loadDate);
+}
+
+//
+//
+//
+// 以下為與時間相關函數
+//
+//
+//
+/**
+ * 創建年選擇框，提供選擇範圍為 2020 到當前年份。
+ */
+function createYearSelect() {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear - 2019 },
+    (_, index) => 2020 + index
+  );
+
+  years.forEach((year) => {
+    $("#year").append(`<option value="${year}">${year}</option>`);
+  });
+}
+
+/**
+ * 根據選擇的年份初始化月份選擇框。
+ * @param {string} year - 選擇的年份。
+ */
+function createMonthSelect(year) {
+  $("#month").empty(); // 清空原有的月份選項
+  const selectedYear = parseInt(year);
+  const currentYear = new Date().getFullYear();
+  const endMonth =
+    selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+
+  const months = Array.from({ length: endMonth }, (_, index) =>
+    (index + 1).toString().padStart(2, "0")
+  );
+
+  months.forEach((month) => {
+    $("#month").append(`<option value="${month}">${month}</option>`);
+  });
+}
+
+/**
+ * 初始化年份選擇
+ */
+function initYear() {
+  const currentYear = new Date().getFullYear();
+  if (formatLocalStorageDate()) {
+    $("#year").val(formatLocalStorageDate().year);
+  } else {
+    $("#year").val(currentYear.toString());
+  }
+}
+
+/**
+ * 初始化月份選擇
+ */
+function initMonth() {
+  const endMonth = new Date().getMonth() + 1;
+  if (formatLocalStorageDate()) {
+    $("#month").val(formatLocalStorageDate().month);
+  } else {
+    $("#month").val(endMonth);
+  }
+}
+
+/**
+ * 獲取選擇的日期，返回 ISO 8601 格式的日期字符串（僅包含年和月）。
+ * @returns {string} ISO 8601 格式的日期字符串，例如 "2023-11"。
+ */
+function getDate() {
+  const selectedYear = $("#year").val();
+  const selectedMonth = $("#month").val();
+  const isoDate = `${selectedYear}-${selectedMonth}`;
+  return isoDate;
+}
+
+/**
+ * 格式化瀏覽器紀錄之時間資訊，若無則回傳null
+ * @returns {{year: string; month: string;} | null}
+ */
+function formatLocalStorageDate() {
+  if (!localStorage.getItem("date")) return null;
+
+  const dateString = localStorage.getItem("date");
+  const [year, month] = dateString.split("-");
+  return { year, month };
 }
