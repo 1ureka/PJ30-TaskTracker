@@ -445,7 +445,7 @@ function changeDOM(saveDate, loadDate) {
   // 清空搜索與篩選
   $("#search-input").val("");
   $("#search-erase-container").hide(500);
-  $("#filter-category").val("all");
+  $("#filter-select").val("all");
 
   // 讀取
   const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), loadDate);

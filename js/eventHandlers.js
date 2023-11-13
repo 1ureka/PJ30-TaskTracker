@@ -151,7 +151,7 @@ $(document).ready(function () {
   //
   // 搜尋/篩選功能
   $("#search-input").keyup(function () {
-    const category = $("#filter-category").val();
+    const category = $("#filter-select").val();
     const text = $("#search-input").val();
     const searchResult = text ? searchTasks(text) : "all";
     if (text) {
@@ -162,8 +162,8 @@ $(document).ready(function () {
     filterTasks(category, searchResult);
   });
 
-  $("#filter-category").change(function () {
-    const category = $("#filter-category").val();
+  $("#filter-select").change(function () {
+    const category = $("#filter-select").val();
     const text = $("#search-input").val();
     const searchResult = text ? searchTasks(text) : "all";
     filterTasks(category, searchResult);
@@ -172,7 +172,7 @@ $(document).ready(function () {
   // 清空搜索欄按鈕
   $("#search-erase-container").click(function () {
     $("#search-input").val("");
-    const category = $("#filter-category").val();
+    const category = $("#filter-select").val();
     const searchResult = "all";
     $("#search-erase-container").hide(500);
     filterTasks(category, searchResult);
