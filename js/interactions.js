@@ -2,6 +2,35 @@ $(document).ready(function () {
   // 有關懸停/點擊效果
 
   //
+  // 搜尋符號(放大鏡)
+  gsap.set(".search-inner", { rotate: 5, x: -10 });
+  gsap.set($(".search-inner").eq(0), { x: -0 });
+  const serachImgHover1 = gsap
+    .timeline({ defaults: { ease: "set1", duration: 0.6 }, paused: true })
+    .to(".search-inner", {
+      x: "+=40",
+      rotate: 20,
+    });
+  const serachImgHover2 = gsap
+    .timeline({ defaults: { ease: "set1", duration: 0.3 }, paused: true })
+    .to("#search-img-container", {
+      scale: 1.1,
+      rotate: "+=15",
+      transformOrigin: "16.5px 17px",
+    });
+
+  $("#search-container").hover(
+    function () {
+      serachImgHover1.play();
+      serachImgHover2.play();
+    },
+    function () {
+      serachImgHover1.reverse();
+      serachImgHover2.reverse();
+    }
+  );
+
+  //
   // 清空搜索欄按鈕
   gsap.set("#search-erase", { x: 10 });
   const EraserMove = gsap
@@ -200,17 +229,28 @@ $(document).ready(function () {
         stagger: 0.1,
         autoAlpha: 0,
       },
-      "<0.3"
+      "<0.4"
     );
+
+  const dateHover3 = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to($("#calendar-img-container"), {
+      scale: 1.1,
+    });
 
   $("#date-select-container").hover(
     function () {
       dateHover1.play();
-      dateHover2.play();
+      dateHover2.timeScale(1.5).play();
+      dateHover3.play();
     },
     function () {
       dateHover1.reverse();
-      dateHover2.reverse();
+      dateHover2.timeScale(1.5).reverse();
+      dateHover3.reverse();
     }
   );
 

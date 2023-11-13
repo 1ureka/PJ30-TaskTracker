@@ -23,13 +23,44 @@
   align-items: center;
 }
 
-#task-input {
-  width: 100%;
-  resize: vertical;
-  min-height: 10em;
+#task-input-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 240px;
+  height: 210px;
 }
 
-#category,
+#task-input {
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 240px;
+  height: 210px;
+  resize: none;
+}
+
+#category-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90px;
+  height: 40px;
+}
+
+#category {
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 90px;
+  height: 40px;
+}
+
+#category-container,
 #add {
   margin: 10px;
 }
@@ -97,6 +128,42 @@
   position: absolute;
   width: 100%;
   height: 100%;
+}
+
+#year-select-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 73px;
+  height: 40px;
+}
+
+#month-select-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 40px;
+}
+
+#year {
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 73px;
+  height: 40px;
+}
+
+#month {
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 52px;
+  height: 40px;
 }
 
 #version-display {

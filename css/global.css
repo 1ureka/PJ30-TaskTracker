@@ -41,7 +41,7 @@ textarea {
 input[type="text"],
 select,
 textarea {
-  background-color: hsla(200, 0%, 10%, 0.5);
+  background-color: hsl(200, 0%, 10%);
   border-radius: 10px;
   padding: 5px;
   border-width: 0;

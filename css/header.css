@@ -13,6 +13,11 @@
   z-index: 10;
 }
 
+#header input[type="text"],
+#header select {
+  background-color: hsl(200, 0%, 12.5%);
+}
+
 #favicon {
   position: absolute;
   left: 20px;
@@ -33,14 +38,51 @@ h1 {
   display: flex;
 }
 
-#search {
+#search-img-container {
+  position: relative;
   width: 40px;
   height: 40px;
   margin-right: 10px;
 }
 
-#search-input {
+#search {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+#search-clip-path {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  clip-path: circle(10px at 16.5px 17px);
+  pointer-events: none;
+}
+
+.search-inner {
+  position: absolute;
+  width: 12%;
+  height: 150%;
+  background-color: #ffff7a;
+}
+
+#search-input-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 以下需與input相同 */
+  padding: 5px;
   width: 20em;
+  height: 30px;
+}
+
+#search-input {
+  outline: none;
+  position: absolute;
+  padding: 5px;
+  width: 20em;
+  height: 30px;
 }
 
 #search-erase-container {
@@ -73,4 +115,21 @@ h1 {
 
 #filter-container label {
   margin-right: 10px;
+}
+
+#filter-select-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 110px;
+  height: 40px;
+}
+
+#filter-select {
+  outline: 0;
+  position: absolute;
+  padding: 5px;
+  width: 110px;
+  height: 40px;
 }

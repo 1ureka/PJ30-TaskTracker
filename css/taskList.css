@@ -135,6 +135,8 @@
 }
 
 .task-text {
+  white-space: pre-wrap;
+  text-wrap: pretty;
   margin: 0;
 }
 
