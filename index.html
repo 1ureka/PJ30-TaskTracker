@@ -24,7 +24,8 @@
     <!-- 樣式表 -->
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/header.css" />
-    <link rel="stylesheet" href="css/panel.css" />
+    <link rel="stylesheet" href="css/leftPanel.css" />
+    <link rel="stylesheet" href="css/rightPanel.css" />
     <link rel="stylesheet" href="css/taskList.css" />
     <link rel="stylesheet" href="css/popUp.css" />
     <style>
@@ -139,9 +140,13 @@
         <button id="upload">上傳</button>
         <input type="file" id="file-input" accept=".json" />
         <div id="version-display">
-          <p>版本： @0.1.0</p>
+          <p>版本： @0.1.1</p>
         </div>
       </div>
+    </div>
+    <div id="right-panel-container">
+      <img id="right-panel-btn" src="icons/top (red).png" />
+      <div id="right-panel"></div>
     </div>
     <div id="task-container">
       <!-- 工作項目將在這裡動態顯示 -->

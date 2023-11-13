@@ -313,4 +313,29 @@ $(document).ready(function () {
         rotate: 0,
       });
   });
+
+  //
+  // 右側選單按鈕
+  const rightBtnClick = gsap
+    .timeline({
+      defaults: { duration: 0.05, ease: "set1" },
+      paused: true,
+    })
+    .to("#right-panel-btn", { scale: 0.65, yoyo: true, repeat: 1 });
+  const rightBtnHover = gsap.timeline({
+    defaults: { duration: 0.5, ease: "set1" },
+    paused: true,
+  });
+
+  // $("#right-panel-btn").hover(
+  //   function () {
+  //     rightBtnHover.play();
+  //   },
+  //   function () {
+  //     rightBtnHover.reverse();
+  //   }
+  // );
+  $("#right-panel-btn").on("click", function () {
+    rightBtnClick.restart();
+  });
 });
