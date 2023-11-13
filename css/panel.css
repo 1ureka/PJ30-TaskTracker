@@ -99,6 +99,38 @@
   height: 100%;
 }
 
+#year-select-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 73px;
+  height: 40px;
+}
+
+#month-select-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 52px;
+  height: 40px;
+}
+
+#year {
+  outline: 0;
+  position: absolute;
+  width: 73px;
+  height: 40px;
+}
+
+#month {
+  outline: 0;
+  position: absolute;
+  width: 52px;
+  height: 40px;
+}
+
 #version-display {
   min-width: 265px;
   display: flex;
