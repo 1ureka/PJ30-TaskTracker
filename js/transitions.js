@@ -90,11 +90,54 @@ $(document).ready(function () {
       defaults: { ease: "set1" },
       paused: true,
     })
-    .to("#copied", { ease: "power3.out", duration: 0.5, autoAlpha: 1 })
+    .to("#copied", { ease: "power3.in", duration: 0.5, autoAlpha: 1 })
     .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 })
     .to("#copied", { top: 0, left: 0, duration: 0.1 });
 
   $(document).on("click", ".task-copy-container", function (e) {
     enterCopied.restart();
+  });
+
+  //
+  // 右側選單
+  gsap.set($("#right-panel-container > *"), { autoAlpha: 0 });
+  const rightPanelHover = gsap
+    .timeline({
+      defaults: { duration: 0.5, ease: "set1" },
+      paused: true,
+    })
+    .to($("#right-panel-container > *"), { autoAlpha: 1 });
+
+  $("#right-panel-container").hover(
+    function () {
+      rightPanelHover.play();
+    },
+    function () {
+      if (enterRightPanel.paused() || enterRightPanel.reversed()) {
+        rightPanelHover.reverse();
+      }
+    }
+  );
+
+  gsap.set("#right-panel-container", { y: 230 });
+  const enterRightPanel = gsap
+    .timeline({
+      defaults: { ease: "set1", duration: 0.5 },
+      paused: true,
+    })
+    .to("#right-panel-container", { y: 0 })
+    .to("#right-panel-btn", { y: 55, scaleY: -1 }, "<");
+
+  $("#right-panel-btn").on("click", function () {
+    if (enterRightPanel.paused() || enterRightPanel.reversed()) {
+      enterRightPanel.play();
+    } else {
+      enterRightPanel.reverse();
+    }
+  });
+
+  $("#add").on("click", function () {
+    rightPanelHover.play();
+    enterRightPanel.play();
   });
 });
