@@ -23,10 +23,23 @@
   align-items: center;
 }
 
+#task-input-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 240px;
+  height: 210px;
+}
+
 #task-input {
-  width: 100%;
-  resize: vertical;
-  min-height: 10em;
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 240px;
+  height: 210px;
+  resize: none;
 }
 
 #category,
@@ -100,6 +113,7 @@
 }
 
 #year-select-container {
+  box-sizing: border-box;
   position: relative;
   display: flex;
   justify-content: center;
@@ -109,6 +123,7 @@
 }
 
 #month-select-container {
+  box-sizing: border-box;
   position: relative;
   display: flex;
   justify-content: center;
@@ -118,6 +133,7 @@
 }
 
 #year {
+  box-sizing: border-box;
   outline: 0;
   position: absolute;
   width: 73px;
@@ -125,6 +141,7 @@
 }
 
 #month {
+  box-sizing: border-box;
   outline: 0;
   position: absolute;
   width: 52px;
