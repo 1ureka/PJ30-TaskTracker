@@ -113,6 +113,12 @@ $(document).ready(function () {
       outlineWidth: 2,
       duration: 0.3,
     },
+    {
+      focusSelector: "#category",
+      hoverSelector: "#category",
+      outlineWidth: 2,
+      duration: 0.3,
+    },
   ];
 
   // 循環遍歷陣列

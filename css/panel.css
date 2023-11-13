@@ -42,7 +42,25 @@
   resize: none;
 }
 
-#category,
+#category-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90px;
+  height: 40px;
+}
+
+#category {
+  box-sizing: border-box;
+  outline: 0;
+  position: absolute;
+  width: 90px;
+  height: 40px;
+}
+
+#category-container,
 #add {
   margin: 10px;
 }
