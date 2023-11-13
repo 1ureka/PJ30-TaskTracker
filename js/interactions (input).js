@@ -59,42 +59,77 @@ function createOutlineTimeline(inputElement, outlineWidth, duration) {
     );
 }
 
-$(document).ready(function () {
-  const searchFocus = createOutlineTimeline($("#search-input"), 2, 0.3);
+/**
+ * 綁定自定義外框動畫至事件偵測
+ * @param {JQuery} focusElement - 觸發焦點事件之元素
+ * @param {JQuery} hoverElement - 觸發懸停事件之元素
+ * @param {TimelineMax} timeline - 外框動畫
+ */
+function bindOutlineEvents(focusElement, hoverElement, timeline) {
+  hoverElement.on("mouseover", function () {
+    timeline.play();
+  });
+  hoverElement.on("mouseleave", function () {
+    if (!focusElement.is(":focus")) timeline.reverse();
+  });
+  focusElement.focus(function () {
+    timeline.play();
+  });
+  focusElement.blur(function () {
+    timeline.reverse();
+  });
+}
 
-  $("#search-container").hover(
-    function () {
-      searchFocus.play();
+$(document).ready(function () {
+  // 創建包含物件的陣列
+  const elements = [
+    {
+      focusSelector: "#search-input",
+      hoverSelector: "#search-container",
+      outlineWidth: 2,
+      duration: 0.3,
     },
-    function () {
-      searchFocus.reverse();
+    {
+      focusSelector: "#filter-select",
+      hoverSelector: "#filter-select",
+      outlineWidth: 2,
+      duration: 0.3,
+    },
+    {
+      focusSelector: "#year",
+      hoverSelector: "#year",
+      outlineWidth: 2,
+      duration: 0.3,
+    },
+    {
+      focusSelector: "#month",
+      hoverSelector: "#month",
+      outlineWidth: 2,
+      duration: 0.3,
+    },
+    {
+      focusSelector: "#task-input",
+      hoverSelector: "#task-input",
+      outlineWidth: 2,
+      duration: 0.3,
+    },
+  ];
+
+  // 循環遍歷陣列
+  elements.forEach(
+    ({ focusSelector, hoverSelector, outlineWidth, duration }) => {
+      const focusElement = $(focusSelector);
+      const hoverElement = $(hoverSelector);
+
+      // 創建時間軸
+      const timeline = createOutlineTimeline(
+        focusElement,
+        outlineWidth,
+        duration
+      );
+
+      // 綁定事件
+      bindOutlineEvents(focusElement, hoverElement, timeline);
     }
   );
-
-  const filterFocus = createOutlineTimeline($("#filter-select"), 2, 0.3);
-
-  $("#filter-select").focus(function () {
-    filterFocus.play();
-  });
-  $("#filter-select").blur(function () {
-    filterFocus.reverse();
-  });
-
-  const yearFocus = createOutlineTimeline($("#year"), 2, 0.3);
-
-  $("#year").focus(function () {
-    yearFocus.play();
-  });
-  $("#year").blur(function () {
-    yearFocus.reverse();
-  });
-
-  const monthFocus = createOutlineTimeline($("#month"), 2, 0.3);
-
-  $("#month").focus(function () {
-    monthFocus.play();
-  });
-  $("#month").blur(function () {
-    monthFocus.reverse();
-  });
 });
