@@ -229,17 +229,28 @@ $(document).ready(function () {
         stagger: 0.1,
         autoAlpha: 0,
       },
-      "<0.3"
+      "<0.4"
     );
+
+  const dateHover3 = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to($("#calendar-img-container"), {
+      scale: 1.1,
+    });
 
   $("#date-select-container").hover(
     function () {
       dateHover1.play();
-      dateHover2.play();
+      dateHover2.timeScale(1.5).play();
+      dateHover3.play();
     },
     function () {
       dateHover1.reverse();
-      dateHover2.reverse();
+      dateHover2.timeScale(1.5).reverse();
+      dateHover3.reverse();
     }
   );
 
