@@ -53,12 +53,22 @@ $(document).ready(function () {
   //
   // 彈出清空確認視窗
   let isCheckClear = false;
-  const enterCheckClear = gsap.to("#cleared", {
-    paused: true,
-    duration: 0.5,
-    ease: "set1",
-    autoAlpha: 1,
-  });
+  const enterCheckClear = gsap
+    .timeline({
+      defaults: { ease: "set1", duration: 0.35 },
+      paused: true,
+    })
+    .from("#cleared", {
+      ease: "back.out(2)",
+      scale: 0.1,
+    })
+    .to(
+      "#cleared",
+      {
+        autoAlpha: 1,
+      },
+      "<"
+    );
 
   $("#clear").on("click", function () {
     isCheckClear = true;
@@ -90,7 +100,8 @@ $(document).ready(function () {
       defaults: { ease: "set1" },
       paused: true,
     })
-    .to("#copied", { ease: "power3.in", duration: 0.5, autoAlpha: 1 })
+    .from("#copied", { ease: "back.out(2)", duration: 0.3, scale: 0.1 })
+    .to("#copied", { ease: "power3.out", duration: 0.3, autoAlpha: 1 }, "<")
     .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 })
     .to("#copied", { top: 0, left: 0, duration: 0.1 });
 
