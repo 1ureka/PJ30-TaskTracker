@@ -355,7 +355,7 @@ function filterTasks(category, searchResult) {
  * @returns {string} - 包含任務訊息的JSON字串
  */
 function domToJSON() {
-  const tasks = $("#task-container")
+  const dom = $("#task-container")
     .children()
     .map(function () {
       if ($(this).hasClass("separator")) {
@@ -370,30 +370,30 @@ function domToJSON() {
     })
     .get();
 
-  const jsonData = JSON.stringify(tasks, null, 2);
-  return jsonData;
+  const tasks = JSON.stringify(dom, null, 2);
+  return tasks;
 }
 
 /**
- * 將任務清單(JSON字串)放入當前所在的日期分類
- * @param {string} jsonData - 要存入的任務清單
+ * 將包含任務訊息的JSON字串放入當前所在的日期分類
+ * @param {string} tasks - 包含任務訊息的JSON字串
  * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
- * @returns {string} - 新的存檔JSON
+ * @returns {string} - 包含時間標記的存檔JSON字串
  */
-function jsonToSave(jsonData, date) {
-  const saveTasks = localStorage.getItem("tasks")
+function jsonToSave(tasks, date) {
+  const save = localStorage.getItem("tasks")
     ? JSON.parse(localStorage.getItem("tasks"))
     : {};
-  saveTasks[date] = JSON.parse(jsonData);
-  return JSON.stringify(saveTasks, null, 2);
+  save[date] = JSON.parse(tasks);
+  return JSON.stringify(save, null, 2);
 }
 
 /**
- * 下載包含任務訊息的JSON文件。
- * @param {string} jsonData - 包含任務訊息的JSON字串
+ * 根據輸入的JSON字串下載對應JSON文件。
+ * @param {string} save - 包含時間標記的存檔JSON字串
  */
-function downloadJSON(jsonData) {
-  const blob = new Blob([jsonData], { type: "application/json" });
+function downloadJSON(save) {
+  const blob = new Blob([save], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const a = $("<a>")
@@ -410,37 +410,37 @@ function downloadJSON(jsonData) {
 }
 
 /**
- * 根據存檔json，提取出指定時間分類的清單
- * @param {string} json - 存檔json
+ * 根據包含時間的存檔JSON字串，提取出指定時間分類的包含任務訊息的JSON字串
+ * @param {string} save - 包含時間標記的存檔JSON字串
  * @param {string} date - ISO 8601 格式的日期字符串，例如 "2023-11"。
- * @returns {string | null} - 清單json
+ * @returns {string | null} - 包含任務訊息的JSON字串
  */
-function saveToJSON(json, date) {
-  if (!json) return null;
-  const save = JSON.parse(json);
-  const tasks = JSON.stringify(save[date]);
+function saveToJSON(save, date) {
+  if (!save) return null;
+  const saveObj = JSON.parse(save);
+  const tasks = JSON.stringify(saveObj[date]);
   return tasks;
 }
 
 /**
  * 將JSON字串轉換為DOM元素以顯示任務列表。
- * @param {string} json - 包含任務訊息的JSON字串
+ * @param {string} tasks - 包含任務訊息的JSON字串
  */
-async function jsonToDOM(json) {
+async function jsonToDOM(tasks) {
   // 若輸入json沒有資料，直接退出
-  if (!json) {
+  if (!tasks) {
     await clearTasks();
     console.log("jsonToDOM: 該清單無資料");
     return;
   }
   // 轉成物件
-  const tasks = JSON.parse(json);
+  const tasksArray = JSON.parse(tasks);
 
   // 清空任務容器
   await clearTasks();
 
   // 遍歷 JSON 數據中的每個任務物件
-  tasks.forEach((task) => {
+  tasksArray.forEach((task) => {
     // 從任務物件獲取必要資訊
     const taskText = task.text || "--";
     const status = task.status;
@@ -469,12 +469,7 @@ function changeDOM(saveDate, loadDate) {
 
   // 讀取
   const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), loadDate);
-
-  if (tasksToUpdate) {
-    jsonToDOM(tasksToUpdate);
-  } else {
-    clearTasks();
-  }
+  jsonToDOM(tasksToUpdate) ? tasksToUpdate : clearTasks();
 
   // 更新所在日期
   localStorage.setItem("date", loadDate);
