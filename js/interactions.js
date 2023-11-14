@@ -143,8 +143,8 @@ $(document).ready(function () {
         defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
-        paddingTop: "1.5em",
-        paddingBottom: "1.5em",
+        paddingTop: 30,
+        paddingBottom: 30,
       });
   });
   $(document).on("mouseleave", ".task-item", function () {
@@ -153,8 +153,8 @@ $(document).ready(function () {
         defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
       })
       .to($(this), {
-        paddingTop: "1em",
-        paddingBottom: "1em",
+        paddingTop: 20,
+        paddingBottom: 20,
       });
   });
 

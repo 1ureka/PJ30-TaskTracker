@@ -73,7 +73,7 @@ h1 {
   align-items: center;
   /* 以下需與input相同 */
   padding: 5px;
-  width: 20em;
+  width: 400px;
   height: 30px;
 }
 
@@ -81,7 +81,7 @@ h1 {
   outline: none;
   position: absolute;
   padding: 5px;
-  width: 20em;
+  width: 400px;
   height: 30px;
 }
 
