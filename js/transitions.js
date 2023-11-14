@@ -6,6 +6,29 @@ CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
 
 $(document).ready(function () {
   //
+  //
+  // 使清單可拖動
+  //
+  //
+  new Sortable($("#temp-task-container").get()[0], {
+    group: {
+      name: "shared",
+      put: false,
+    },
+    animation: 150,
+    sort: false,
+    onEnd: () => {
+      if ($("#temp-task-container").children().length === 0) {
+        enterRightPanel.reverse();
+      }
+    },
+  });
+  new Sortable($("#task-container").get()[0], {
+    group: "shared",
+    animation: 150,
+  });
+
+  //
   // 有關進出刪除狀態動畫
   gsap.set("#delete-done", { autoAlpha: 0 });
   let isDeleting = false;
@@ -148,7 +171,9 @@ $(document).ready(function () {
   });
 
   $("#add").on("click", function () {
-    rightPanelHover.play();
-    enterRightPanel.play();
+    if ($("#temp-task-container").children().length !== 0) {
+      rightPanelHover.play();
+      enterRightPanel.play();
+    }
   });
 });

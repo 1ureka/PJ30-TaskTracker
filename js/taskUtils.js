@@ -28,7 +28,9 @@ function readInput() {
  */
 function addTask(taskText, status, category) {
   if (taskText === "--") {
-    addSeparator();
+    const separator = createSeparator();
+    $("#task-container").append(separator);
+    separator.show(500);
   } else if (taskText !== "") {
     const taskItem = createTaskItem(taskText, status, category);
     $("#task-container").append(taskItem);
@@ -37,16 +39,34 @@ function addTask(taskText, status, category) {
 }
 
 /**
- * 添加分隔符到任務容器中。
+ * 添加任務到暫存任務容器中。
+ * @param {string} taskText - 任務文本
+ * @param {string} status - 任務狀態
+ * @param {string} category - 任務類別
  */
-function addSeparator() {
+function addTempTask(taskText, status, category) {
+  if (taskText === "--") {
+    const separator = createSeparator();
+    $("#temp-task-container").append(separator);
+    separator.show(500);
+  } else if (taskText !== "") {
+    const taskItem = createTaskItem(taskText, status, category);
+    $("#temp-task-container").append(taskItem);
+    taskItem.show(500);
+  }
+}
+
+/**
+ * 創建分隔符。
+ * @returns {JQuery}
+ */
+function createSeparator() {
   const separator = $("<div>").addClass("separator");
 
   separator.hide();
   separator.addDeleteButton();
 
-  $("#task-container").append(separator);
-  separator.show(500);
+  return separator;
 }
 
 /**
