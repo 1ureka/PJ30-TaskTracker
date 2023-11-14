@@ -160,9 +160,9 @@ $(document).ready(function () {
       paused: true,
     })
     .to("#right-panel-container", { y: 0 })
-    .to("#right-panel-btn", { y: 55, scaleY: -1 }, "<");
+    .to("#right-panel-img-container", { y: 55, scaleY: -1 }, "<");
 
-  $("#right-panel-btn").on("click", function () {
+  $("#right-panel-img-container").on("click", function () {
     if (enterRightPanel.paused() || enterRightPanel.reversed()) {
       enterRightPanel.play();
     } else {

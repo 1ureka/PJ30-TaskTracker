@@ -321,21 +321,24 @@ $(document).ready(function () {
       defaults: { duration: 0.05, ease: "set1" },
       paused: true,
     })
-    .to("#right-panel-btn", { scale: 0.65, yoyo: true, repeat: 1 });
-  const rightBtnHover = gsap.timeline({
-    defaults: { duration: 0.5, ease: "set1" },
-    paused: true,
-  });
+    .to("#right-panel-img-container", { scale: 0.65, yoyo: true, repeat: 1 });
+  const rightBtnHover = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to("#right-panel-img-arrow", { y: -8 }, "<")
+    .to("#right-panel-img-line", { y: -1.5, scale: 1.25 }, "<0.05");
 
-  // $("#right-panel-btn").hover(
-  //   function () {
-  //     rightBtnHover.play();
-  //   },
-  //   function () {
-  //     rightBtnHover.reverse();
-  //   }
-  // );
-  $("#right-panel-btn").on("click", function () {
+  $("#right-panel-img-container").hover(
+    function () {
+      rightBtnHover.play();
+    },
+    function () {
+      rightBtnHover.reverse();
+    }
+  );
+  $("#right-panel-img-container").on("click", function () {
     rightBtnClick.restart();
   });
 });
