@@ -21,3 +21,37 @@
   flex-direction: row;
   z-index: 99;
 }
+
+#cleared-check-label-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  clip-path: inset(0);
+}
+
+#cleared-check-label-red {
+  position: absolute;
+}
+
+#cleared-check-label-white {
+  position: relative;
+}
+
+#cleared-cancel-label-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  clip-path: inset(0);
+}
+
+#cleared-cancel-label-red {
+  position: absolute;
+}
+
+#cleared-cancel-label-white {
+  position: relative;
+}

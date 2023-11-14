@@ -134,19 +134,35 @@
       </div>
       <div id="left-panel-bottom">
         <button id="delete">刪除</button>
-        <button id="delete-done">完成</button>
+        <button id="delete-done">
+          <div id="delete-done-label-container">
+            <label id="delete-done-label-red" class="red" for="delete-done"
+              >完成</label
+            >
+            <label id="delete-done-label-white" class="white" for="delete-done"
+              >完成</label
+            >
+          </div>
+        </button>
         <button id="clear">清空</button>
         <button id="save">存檔</button>
         <button id="upload">上傳</button>
         <input type="file" id="file-input" accept=".json" />
         <div id="version-display">
-          <p>版本： @0.1.1</p>
+          <p>版本： @0.1.2</p>
         </div>
       </div>
     </div>
     <div id="right-panel-container">
-      <img id="right-panel-btn" src="icons/top (red).png" />
-      <div id="right-panel"></div>
+      <div id="right-panel-img-container">
+        <img id="right-panel-img-arrow" src="icons/top (arrow).png" />
+        <img id="right-panel-img-line" src="icons/top (line).png" />
+      </div>
+      <div id="right-panel">
+        <div id="temp-task-container">
+          <!-- 工作項目將在這裡動態顯示 -->
+        </div>
+      </div>
     </div>
     <div id="task-container">
       <!-- 工作項目將在這裡動態顯示 -->
@@ -154,8 +170,32 @@
     <div class="pop-up" id="copied">已複製內文</div>
     <div class="pop-up" id="cleared">
       <p>確定要清空嗎</p>
-      <button type="button" id="cleared-check">確定</button>
-      <button type="button" id="cleared-cancel">取消</button>
+      <button type="button" id="cleared-check">
+        <div id="cleared-check-label-container">
+          <label id="cleared-check-label-red" class="red" for="cleared-check"
+            >確定</label
+          >
+          <label
+            id="cleared-check-label-white"
+            class="white"
+            for="cleared-check"
+            >確定</label
+          >
+        </div>
+      </button>
+      <button type="button" id="cleared-cancel">
+        <div id="cleared-cancel-label-container">
+          <label id="cleared-cancel-label-red" class="red" for="cleared-cancel"
+            >取消</label
+          >
+          <label
+            id="cleared-cancel-label-white"
+            class="white"
+            for="cleared-cancel"
+            >取消</label
+          >
+        </div>
+      </button>
     </div>
     <div id="particle-container"></div>
 

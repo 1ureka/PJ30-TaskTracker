@@ -93,10 +93,28 @@
 
 #delete-done {
   position: fixed;
-  right: 25px;
-  bottom: 25px;
+  right: 30px;
+  bottom: 30px;
   cursor: pointer;
   padding: 10px;
+  background-color: #333;
+}
+
+#delete-done-label-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  clip-path: inset(0);
+}
+
+#delete-done-label-red {
+  position: absolute;
+}
+
+#delete-done-label-white {
+  position: relative;
 }
 
 #file-input {

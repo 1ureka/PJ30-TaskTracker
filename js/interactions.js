@@ -1,3 +1,49 @@
+/**
+ * 製作文字按鈕時間軸
+ * @param {string} btnElement - 按鈕選擇器id
+ * @param {number} duration - 動畫時間
+ * @returns {{click: TimelineMax, hover: TimelineMax}} - 返回時間軸
+ */
+function createTextBtnTimeline(btnElement, duration) {
+  gsap.set(`#${btnElement}-label-red`, { y: -40 });
+  const click = gsap
+    .timeline({
+      defaults: { duration: duration, ease: "set1" },
+      paused: true,
+    })
+    .to(`#${btnElement}`, { scale: 0.7, yoyo: true, repeat: 1 });
+  const hover = gsap
+    .timeline({
+      defaults: { duration: duration, ease: "set1" },
+      paused: true,
+    })
+    .to(`#${btnElement}-label-white`, { y: 40 })
+    .to(`#${btnElement}-label-red`, { y: 0 }, "<")
+    .to(`#${btnElement}`, { scale: 1.1 }, "<");
+
+  return { click, hover };
+}
+
+/**
+ * 綁定文字按鈕時間軸
+ * @param {string} Trigger - 觸發選擇器id
+ * @param {TimelineMax} hover - 懸停時間軸
+ * @param {TimelineMax} click - 點擊時間軸
+ */
+function bindTextBtnEvents(Trigger, click, hover) {
+  $(`#${Trigger}`).hover(
+    function () {
+      hover.play();
+    },
+    function () {
+      hover.reverse();
+    }
+  );
+  $(`#${Trigger}`).on("click", function () {
+    click.restart();
+  });
+}
+
 $(document).ready(function () {
   // 有關懸停/點擊效果
 
@@ -255,33 +301,36 @@ $(document).ready(function () {
   );
 
   //
-  // 新增按鈕
-  gsap.set("#add-label-red", { y: -40 });
-  const addClick = gsap
-    .timeline({
-      defaults: { duration: 0.1, ease: "set1" },
-      paused: true,
-    })
-    .to("#add", { scale: 0.7, yoyo: true, repeat: 1 });
-  const addHover = gsap
-    .timeline({
-      defaults: { duration: 0.1, ease: "set1" },
-      paused: true,
-    })
-    .to("#add-label-white", { y: 40 })
-    .to("#add-label-red", { y: 0 }, "<")
-    .to("#add", { scale: 1.1 }, "<");
-
-  $("#add").hover(
-    function () {
-      addHover.play();
+  // 所有文字按鈕
+  const TextBtnelements = [
+    {
+      TextBtnId: "add",
+      TriggerId: "add",
+      duration: 0.1,
     },
-    function () {
-      addHover.reverse();
-    }
-  );
-  $("#add").on("click", function () {
-    addClick.restart();
+    {
+      TextBtnId: "delete-done",
+      TriggerId: "delete-done",
+      duration: 0.1,
+    },
+    {
+      TextBtnId: "cleared-check",
+      TriggerId: "cleared-check",
+      duration: 0.1,
+    },
+    {
+      TextBtnId: "cleared-cancel",
+      TriggerId: "cleared-cancel",
+      duration: 0.1,
+    },
+  ];
+
+  TextBtnelements.forEach(({ TextBtnId, TriggerId, duration }) => {
+    // 創建時間軸
+    const timeline = createTextBtnTimeline(TextBtnId, duration);
+
+    // 綁定事件
+    bindTextBtnEvents(TriggerId, timeline.click, timeline.hover);
   });
 
   //
@@ -321,21 +370,24 @@ $(document).ready(function () {
       defaults: { duration: 0.05, ease: "set1" },
       paused: true,
     })
-    .to("#right-panel-btn", { scale: 0.65, yoyo: true, repeat: 1 });
-  const rightBtnHover = gsap.timeline({
-    defaults: { duration: 0.5, ease: "set1" },
-    paused: true,
-  });
+    .to("#right-panel-img-container", { scale: 0.65, yoyo: true, repeat: 1 });
+  const rightBtnHover = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to("#right-panel-img-arrow", { y: -8 }, "<")
+    .to("#right-panel-img-line", { y: -1.5, scale: 1.25 }, "<0.05");
 
-  // $("#right-panel-btn").hover(
-  //   function () {
-  //     rightBtnHover.play();
-  //   },
-  //   function () {
-  //     rightBtnHover.reverse();
-  //   }
-  // );
-  $("#right-panel-btn").on("click", function () {
+  $("#right-panel-img-container").hover(
+    function () {
+      rightBtnHover.play();
+    },
+    function () {
+      rightBtnHover.reverse();
+    }
+  );
+  $("#right-panel-img-container").on("click", function () {
     rightBtnClick.restart();
   });
 });

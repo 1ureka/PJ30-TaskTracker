@@ -11,15 +11,6 @@ $(document).ready(function () {
   initMonth(); // 初始化月份
 
   //
-  //
-  // 使清單可拖動
-  //
-  //
-  new Sortable($("#task-container").get()[0], {
-    animation: 150,
-  });
-
-  //
   // 左側選單上方
   // 新增工作
   //
@@ -27,7 +18,7 @@ $(document).ready(function () {
   // 新增按鈕
   $("#add").on("click", function () {
     const { taskText, status, category } = readInput();
-    addTask(taskText, status, category);
+    addTempTask(taskText, status, category);
   });
 
   //

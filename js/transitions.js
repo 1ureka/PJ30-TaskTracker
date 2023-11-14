@@ -6,9 +6,50 @@ CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
 
 $(document).ready(function () {
   //
+  //
+  // 使清單可拖動
+  //
+  //
+  new Sortable($("#temp-task-container").get()[0], {
+    group: {
+      name: "shared",
+      put: false,
+    },
+    animation: 150,
+    sort: false,
+    onEnd: () => {
+      if ($("#temp-task-container").children().length === 0) {
+        enterRightPanel.reverse();
+      }
+    },
+  });
+  new Sortable($("#task-container").get()[0], {
+    group: "shared",
+    animation: 150,
+  });
+
+  //
   // 有關進出刪除狀態動畫
   gsap.set("#delete-done", { autoAlpha: 0 });
   let isDeleting = false;
+  const popupDeleteDone = gsap
+    .timeline({
+      defaults: { ease: "set1", duration: 0.35 },
+      paused: true,
+    })
+    .from("#delete-done", {
+      ease: "back.out(4.5)",
+      scale: 0.1,
+      duration: 0.5,
+    })
+    .to(
+      "#delete-done",
+      {
+        autoAlpha: 1,
+      },
+      "<"
+    );
+
   const enterDeleting = () => {
     isDeleting = true;
     gsap
@@ -16,8 +57,7 @@ $(document).ready(function () {
         defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
       })
       .to(".task-item, .separator", { left: 50 })
-      .to(".task-delete", { autoAlpha: 1 }, "<0.1")
-      .to("#delete-done", { autoAlpha: 1 }, "<");
+      .to(".task-delete", { autoAlpha: 1 }, "<0.1");
   };
   const exitDeleting = () => {
     isDeleting = false;
@@ -25,20 +65,22 @@ $(document).ready(function () {
       .timeline({
         defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
       })
-      .to("#delete-done", { autoAlpha: 0 })
       .to(".task-delete", { autoAlpha: 0 }, "<")
       .to(".task-item, .separator", { left: 0 }, "<0.1");
   };
 
   $("#delete").on("click", function () {
     if (isDeleting) {
+      popupDeleteDone.reverse();
       exitDeleting();
     } else {
+      popupDeleteDone.play();
       enterDeleting();
     }
   });
 
   $("#delete-done").on("click", function () {
+    popupDeleteDone.reverse();
     exitDeleting();
   });
 
@@ -46,6 +88,7 @@ $(document).ready(function () {
   $(document).on("contextmenu", function (e) {
     if (isDeleting) {
       e.preventDefault();
+      popupDeleteDone.reverse();
       exitDeleting();
     }
   });
@@ -53,12 +96,22 @@ $(document).ready(function () {
   //
   // 彈出清空確認視窗
   let isCheckClear = false;
-  const enterCheckClear = gsap.to("#cleared", {
-    paused: true,
-    duration: 0.5,
-    ease: "set1",
-    autoAlpha: 1,
-  });
+  const enterCheckClear = gsap
+    .timeline({
+      defaults: { ease: "set1", duration: 0.35 },
+      paused: true,
+    })
+    .from("#cleared", {
+      ease: "back.out(2)",
+      scale: 0.1,
+    })
+    .to(
+      "#cleared",
+      {
+        autoAlpha: 1,
+      },
+      "<"
+    );
 
   $("#clear").on("click", function () {
     isCheckClear = true;
@@ -90,7 +143,8 @@ $(document).ready(function () {
       defaults: { ease: "set1" },
       paused: true,
     })
-    .to("#copied", { ease: "power3.in", duration: 0.5, autoAlpha: 1 })
+    .from("#copied", { ease: "back.out(2)", duration: 0.3, scale: 0.1 })
+    .to("#copied", { ease: "power3.out", duration: 0.3, autoAlpha: 1 }, "<")
     .to("#copied", { delay: 0.5, duration: 1, autoAlpha: 0 })
     .to("#copied", { top: 0, left: 0, duration: 0.1 });
 
@@ -126,18 +180,20 @@ $(document).ready(function () {
       paused: true,
     })
     .to("#right-panel-container", { y: 0 })
-    .to("#right-panel-btn", { y: 55, scaleY: -1 }, "<");
+    .to("#right-panel-img-container", { y: 55, scaleY: -1 }, "<");
 
-  $("#right-panel-btn").on("click", function () {
+  $("#right-panel-img-container").on("click", function () {
     if (enterRightPanel.paused() || enterRightPanel.reversed()) {
       enterRightPanel.play();
     } else {
-      enterRightPanel.reverse();
+      enterRightPanel.reverse().then(() => $("#right-panel").scrollTop(0));
     }
   });
 
   $("#add").on("click", function () {
-    rightPanelHover.play();
-    enterRightPanel.play();
+    if ($("#temp-task-container").children().length !== 0) {
+      rightPanelHover.play();
+      enterRightPanel.play();
+    }
   });
 });
