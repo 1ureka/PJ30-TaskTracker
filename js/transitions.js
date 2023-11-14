@@ -166,7 +166,7 @@ $(document).ready(function () {
     if (enterRightPanel.paused() || enterRightPanel.reversed()) {
       enterRightPanel.play();
     } else {
-      enterRightPanel.reverse();
+      enterRightPanel.reverse().then(() => $("#right-panel").scrollTop(0));
     }
   });
 
