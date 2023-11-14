@@ -32,6 +32,24 @@ $(document).ready(function () {
   // 有關進出刪除狀態動畫
   gsap.set("#delete-done", { autoAlpha: 0 });
   let isDeleting = false;
+  const popupDeleteDone = gsap
+    .timeline({
+      defaults: { ease: "set1", duration: 0.35 },
+      paused: true,
+    })
+    .from("#delete-done", {
+      ease: "back.out(4.5)",
+      scale: 0.1,
+      duration: 0.7,
+    })
+    .to(
+      "#delete-done",
+      {
+        autoAlpha: 1,
+      },
+      "<"
+    );
+
   const enterDeleting = () => {
     isDeleting = true;
     gsap
@@ -39,8 +57,7 @@ $(document).ready(function () {
         defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
       })
       .to(".task-item, .separator", { left: 50 })
-      .to(".task-delete", { autoAlpha: 1 }, "<0.1")
-      .to("#delete-done", { autoAlpha: 1 }, "<");
+      .to(".task-delete", { autoAlpha: 1 }, "<0.1");
   };
   const exitDeleting = () => {
     isDeleting = false;
@@ -48,20 +65,22 @@ $(document).ready(function () {
       .timeline({
         defaults: { duration: 0.3, ease: "set1", overwrite: "auto" },
       })
-      .to("#delete-done", { autoAlpha: 0 })
       .to(".task-delete", { autoAlpha: 0 }, "<")
       .to(".task-item, .separator", { left: 0 }, "<0.1");
   };
 
   $("#delete").on("click", function () {
     if (isDeleting) {
+      popupDeleteDone.reverse();
       exitDeleting();
     } else {
+      popupDeleteDone.play();
       enterDeleting();
     }
   });
 
   $("#delete-done").on("click", function () {
+    popupDeleteDone.reverse();
     exitDeleting();
   });
 
@@ -69,6 +88,7 @@ $(document).ready(function () {
   $(document).on("contextmenu", function (e) {
     if (isDeleting) {
       e.preventDefault();
+      popupDeleteDone.reverse();
       exitDeleting();
     }
   });

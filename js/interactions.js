@@ -285,6 +285,27 @@ $(document).ready(function () {
   });
 
   //
+  // 刪除完成按鈕
+  gsap.set("#delete-done-label-red", { y: -40 });
+  const deleteDoneHover = gsap
+    .timeline({
+      defaults: { duration: 0.1, ease: "set1" },
+      paused: true,
+    })
+    .to("#delete-done-label-white", { y: 40 })
+    .to("#delete-done-label-red", { y: 0 }, "<")
+    .to("#delete-done", { scale: 1.1 }, "<");
+
+  $("#delete-done").hover(
+    function () {
+      deleteDoneHover.play();
+    },
+    function () {
+      deleteDoneHover.reverse();
+    }
+  );
+
+  //
   // 刪除按鈕(個別)
   $(document).on("click", ".task-delete-inner", function () {
     gsap
