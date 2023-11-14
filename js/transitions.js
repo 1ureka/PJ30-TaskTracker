@@ -40,7 +40,7 @@ $(document).ready(function () {
     .from("#delete-done", {
       ease: "back.out(4.5)",
       scale: 0.1,
-      duration: 0.7,
+      duration: 0.5,
     })
     .to(
       "#delete-done",

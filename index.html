@@ -170,8 +170,32 @@
     <div class="pop-up" id="copied">已複製內文</div>
     <div class="pop-up" id="cleared">
       <p>確定要清空嗎</p>
-      <button type="button" id="cleared-check">確定</button>
-      <button type="button" id="cleared-cancel">取消</button>
+      <button type="button" id="cleared-check">
+        <div id="cleared-check-label-container">
+          <label id="cleared-check-label-red" class="red" for="cleared-check"
+            >確定</label
+          >
+          <label
+            id="cleared-check-label-white"
+            class="white"
+            for="cleared-check"
+            >確定</label
+          >
+        </div>
+      </button>
+      <button type="button" id="cleared-cancel">
+        <div id="cleared-cancel-label-container">
+          <label id="cleared-cancel-label-red" class="red" for="cleared-cancel"
+            >取消</label
+          >
+          <label
+            id="cleared-cancel-label-white"
+            class="white"
+            for="cleared-cancel"
+            >取消</label
+          >
+        </div>
+      </button>
     </div>
     <div id="particle-container"></div>
 
