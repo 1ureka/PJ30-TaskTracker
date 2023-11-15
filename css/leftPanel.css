@@ -91,6 +91,14 @@
   justify-content: space-between;
 }
 
+#delete,
+#clear,
+#save,
+#upload {
+  width: 115px;
+  margin-bottom: 10px;
+}
+
 #delete-done {
   position: fixed;
   right: 135px;
