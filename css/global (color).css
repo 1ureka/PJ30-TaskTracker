@@ -1,0 +1,53 @@
+body {
+  background-color: hsl(210, 15%, 7.5%);
+}
+
+::-webkit-scrollbar-track {
+  background-color: hsl(210, 15%, 7.5%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(200, 0%, 25%);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(200, 0%, 50%);
+}
+
+input,
+select,
+textarea {
+  background-color: hsl(200, 0%, 10%);
+}
+
+button {
+  background-color: hsl(200, 0%, 20%);
+}
+
+#header {
+  background-color: hsl(200, 0%, 15%);
+}
+
+#header input[type="text"],
+#header select {
+  background-color: hsl(200, 0%, 12.5%);
+}
+
+#version-display {
+  background-color: hsl(200, 0%, 15%);
+}
+
+#left-panel,
+#date-select-container {
+  background-color: hsla(200, 0%, 15%, 0.5);
+}
+
+#right-panel {
+  background-color: hsla(200, 0%, 15%, 0.75);
+}
+
+.task-item {
+  background-color: hsla(200, 0%, 15%, 0.5);
+}
+
+.pop-up {
+  background-color: #333;
+}
