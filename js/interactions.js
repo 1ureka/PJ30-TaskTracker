@@ -390,4 +390,66 @@ $(document).ready(function () {
   $("#right-panel-img-container").on("click", function () {
     rightBtnClick.restart();
   });
+
+  //
+  // 上下按鈕
+  const upBtn = $("#up-btn");
+  const downBtn = $("#down-btn");
+  gsap.set(upBtn, { autoAlpha: 1 });
+  gsap.set(downBtn, { autoAlpha: 1, rotate: 180 });
+  gsap.set(upBtn.find("img")[1], { y: 40 });
+  gsap.set(downBtn.find("img")[1], { y: 40 });
+  const upBtnHover = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to(upBtn.find("img")[0], { y: -40 })
+    .to(upBtn.find("img")[1], { y: 0 }, "<")
+    .to(upBtn, { backgroundColor: "#ea81af" }, "<")
+    .to("#up-img-container", { scale: 1.2 }, "<");
+  const downBtnHover = gsap
+    .timeline({
+      defaults: { duration: 0.3, ease: "set1" },
+      paused: true,
+    })
+    .to(downBtn.find("img")[0], { y: -40 })
+    .to(downBtn.find("img")[1], { y: 0 }, "<")
+    .to(downBtn, { backgroundColor: "#ea81af" }, "<")
+    .to("#down-img-container", { scale: 1.2 }, "<");
+  const upBtnClick = gsap
+    .timeline({
+      defaults: { duration: 0.1, ease: "set1" },
+      paused: true,
+    })
+    .to(upBtn, { scale: 0.6, yoyo: true, repeat: 1 });
+  const downBtnClick = gsap
+    .timeline({
+      defaults: { duration: 0.1, ease: "set1" },
+      paused: true,
+    })
+    .to(downBtn, { scale: 0.6, yoyo: true, repeat: 1 });
+
+  upBtn.hover(
+    function () {
+      upBtnHover.play();
+    },
+    function () {
+      upBtnHover.reverse();
+    }
+  );
+  downBtn.hover(
+    function () {
+      downBtnHover.play();
+    },
+    function () {
+      downBtnHover.reverse();
+    }
+  );
+  upBtn.click(function () {
+    upBtnClick.restart();
+  });
+  downBtn.click(function () {
+    downBtnClick.restart();
+  });
 });
