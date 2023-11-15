@@ -23,6 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
     <!-- 樣式表 -->
     <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/global (color).css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/leftPanel.css" />
     <link rel="stylesheet" href="css/rightPanel.css" />
@@ -149,7 +150,7 @@
         <button id="upload">上傳</button>
         <input type="file" id="file-input" accept=".json" />
         <div id="version-display">
-          <p>版本： @0.1.3</p>
+          <p>版本： @0.1.4</p>
         </div>
       </div>
     </div>
@@ -166,6 +167,20 @@
     </div>
     <div id="task-container">
       <!-- 工作項目將在這裡動態顯示 -->
+    </div>
+    <div id="up-down-btn-container">
+      <div class="pop-up" id="up-btn">
+        <div id="up-img-container">
+          <img src="icons/up (white).png" />
+          <img src="icons/up (dark).png" />
+        </div>
+      </div>
+      <div class="pop-up" id="down-btn">
+        <div id="down-img-container">
+          <img src="icons/up (white).png" />
+          <img src="icons/up (dark).png" />
+        </div>
+      </div>
     </div>
     <div class="pop-up" id="copied">已複製內文</div>
     <div class="pop-up" id="cleared">

@@ -6,7 +6,6 @@
   align-items: center;
   position: fixed;
   padding: 10px;
-  background-color: #333;
   border-radius: 10px;
   box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
   z-index: 5;
@@ -16,10 +15,16 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  width: 140px;
+  width: 160px;
   flex-wrap: wrap;
   flex-direction: row;
   z-index: 99;
+}
+
+#cleared-check,
+#cleared-cancel {
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 #cleared-check-label-container {
@@ -54,4 +59,45 @@
 
 #cleared-cancel-label-white {
   position: relative;
+}
+
+#up-down-btn-container {
+  position: fixed;
+  right: 35px;
+  bottom: 35px;
+  width: 90px;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
+}
+
+#up-btn,
+#down-btn {
+  position: relative;
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#up-img-container,
+#down-img-container {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  clip-path: circle(17.5px at center);
+}
+
+#up-img-container > img,
+#down-img-container > img {
+  position: absolute;
+  width: 30px;
+  height: 30px;
 }
