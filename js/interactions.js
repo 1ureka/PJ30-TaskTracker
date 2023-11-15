@@ -4,17 +4,17 @@
  * @param {number} duration - 動畫時間
  * @returns {{click: TimelineMax, hover: TimelineMax}} - 返回時間軸
  */
-function createTextBtnTimeline(btnElement, duration) {
+function createTextBtnTimeline(btnElement, clickDuration, hoverDuration) {
   gsap.set(`#${btnElement}-label-red`, { y: -40 });
   const click = gsap
     .timeline({
-      defaults: { duration: duration, ease: "set1" },
+      defaults: { duration: clickDuration, ease: "set1" },
       paused: true,
     })
     .to(`#${btnElement}`, { scale: 0.7, yoyo: true, repeat: 1 });
   const hover = gsap
     .timeline({
-      defaults: { duration: duration, ease: "set1" },
+      defaults: { duration: hoverDuration, ease: "set1" },
       paused: true,
     })
     .to(`#${btnElement}-label-white`, { y: 40 })
@@ -301,37 +301,80 @@ $(document).ready(function () {
   );
 
   //
+  // 刪除按鈕
+  const garbageBinCover = $("#garbage-bin-container > img").slice(1);
+  const garbageBinLineLeft = $("#garbage-bin-lines-container > img").slice(
+    0,
+    3
+  );
+  const garbageBinLineRight = $("#garbage-bin-lines-container > img").slice(3);
+
+  gsap.set(garbageBinLineLeft, { x: -20 });
+
+  const garbageBinHover = gsap
+    .timeline({ defaults: { duration: 0.3, ease: "set1" }, paused: true })
+    .to("#garbage-bin-container", { scale: 1.25 })
+    .to(garbageBinCover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
+    .to(garbageBinLineLeft, { x: 0, stagger: -0.1 }, "<")
+    .to(garbageBinLineRight, { x: 20, stagger: -0.1 }, "<");
+
+  $("#delete").hover(
+    function () {
+      garbageBinHover.play();
+    },
+    function () {
+      garbageBinHover.reverse();
+    }
+  );
+
+  //
   // 所有文字按鈕
   const TextBtnelements = [
     {
       TextBtnId: "add",
       TriggerId: "add",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "delete-done",
       TriggerId: "delete-done",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "cleared-check",
       TriggerId: "cleared-check",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "cleared-cancel",
       TriggerId: "cleared-cancel",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
+    },
+    {
+      TextBtnId: "delete",
+      TriggerId: "delete",
+      clickDuration: 0.1,
+      hoverDuration: 0.3,
     },
   ];
 
-  TextBtnelements.forEach(({ TextBtnId, TriggerId, duration }) => {
-    // 創建時間軸
-    const timeline = createTextBtnTimeline(TextBtnId, duration);
+  TextBtnelements.forEach(
+    ({ TextBtnId, TriggerId, clickDuration, hoverDuration }) => {
+      // 創建時間軸
+      const timeline = createTextBtnTimeline(
+        TextBtnId,
+        clickDuration,
+        hoverDuration
+      );
 
-    // 綁定事件
-    bindTextBtnEvents(TriggerId, timeline.click, timeline.hover);
-  });
+      // 綁定事件
+      bindTextBtnEvents(TriggerId, timeline.click, timeline.hover);
+    }
+  );
 
   //
   // 刪除按鈕(個別)

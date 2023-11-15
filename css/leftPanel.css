@@ -94,8 +94,13 @@
 #clear,
 #save,
 #upload {
+  height: 40px;
   width: 115px;
   margin-bottom: 10px;
+  padding: 0;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 #delete {
@@ -112,6 +117,49 @@
 
 #upload {
   border-radius: 5px 5px 10px 5px;
+}
+
+#garbage-bin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+}
+
+#garbage-bin-container img {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+}
+
+#garbage-bin-lines-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  clip-path: inset(0px 0px 0px 25px);
+}
+
+#delete-label-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  clip-path: inset(0);
+}
+
+#delete-label-red {
+  position: absolute;
+}
+
+#delete-label-white {
+  position: relative;
 }
 
 #delete-done {
