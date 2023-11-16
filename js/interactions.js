@@ -81,7 +81,7 @@ $(document).ready(function () {
   gsap.set("#search-erase", { x: 10 });
   const EraserMove = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to("#search-erase", { x: -5 });
@@ -312,7 +312,7 @@ $(document).ready(function () {
   gsap.set(garbageBinLineLeft, { x: -20 });
 
   const garbageBinHover = gsap
-    .timeline({ defaults: { duration: 0.3, ease: "set1" }, paused: true })
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
     .to("#garbage-bin-container", { scale: 1.25 })
     .to(garbageBinCover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
     .to(garbageBinLineLeft, { x: 0, stagger: -0.1 }, "<")
@@ -324,6 +324,28 @@ $(document).ready(function () {
     },
     function () {
       garbageBinHover.reverse();
+    }
+  );
+
+  //
+  // 掃把圖示
+  const broomContainer = $("#broom-img-container ");
+  const broomImg = $("#broom-img-container > img");
+  const broomTrail = $("#broom-img-container > img")[0];
+  gsap.set(broomImg, { rotate: -90 });
+  gsap.set(broomTrail, { x: 22, y: -5 });
+
+  const broomHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to(broomContainer, { scale: 1.25 })
+    .to(broomImg, { rotate: 0 }, "<");
+
+  $("#clear").hover(
+    function () {
+      broomHover.play();
+    },
+    function () {
+      broomHover.reverse();
     }
   );
 
@@ -358,7 +380,13 @@ $(document).ready(function () {
       TextBtnId: "delete",
       TriggerId: "delete",
       clickDuration: 0.1,
-      hoverDuration: 0.3,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "clear",
+      TriggerId: "clear",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
     },
   ];
 
@@ -416,7 +444,7 @@ $(document).ready(function () {
     .to("#right-panel-img-container", { scale: 0.65, yoyo: true, repeat: 1 });
   const rightBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to("#right-panel-img-arrow", { y: -8 }, "<")
@@ -444,7 +472,7 @@ $(document).ready(function () {
   gsap.set(downBtn.find("img")[1], { y: 40 });
   const upBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to(upBtn.find("img")[0], { y: -40 })
@@ -453,7 +481,7 @@ $(document).ready(function () {
     .to("#up-img-container", { scale: 1.2 }, "<");
   const downBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to(downBtn.find("img")[0], { y: -40 })
