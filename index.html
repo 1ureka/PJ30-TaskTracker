@@ -166,8 +166,25 @@
             <label id="clear-label-white" class="white" for="clear">清空</label>
           </div>
         </button>
-        <button id="save">存檔</button>
-        <button id="upload">上傳</button>
+        <button id="save">
+          <div id="save-img-container">
+            <img src="../schedule/icons/save (frame).png" alt="" />
+            <img src="../schedule/icons/save (frame).png" alt="" />
+            <img src="../schedule/icons/save (inner).png" alt="" />
+          </div>
+          <div id="save-label-container">
+            <label id="save-label-red" class="red" for="save">存檔</label>
+            <label id="save-label-white" class="white" for="save">存檔</label>
+          </div>
+        </button>
+        <button id="upload">
+          <div id="upload-label-container">
+            <label id="upload-label-red" class="red" for="upload">上傳</label>
+            <label id="upload-label-white" class="white" for="upload"
+              >上傳</label
+            >
+          </div>
+        </button>
         <input type="file" id="file-input" accept=".json" />
         <div id="version-display">
           <p>版本： @0.1.5</p>

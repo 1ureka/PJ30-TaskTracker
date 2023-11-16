@@ -350,6 +350,36 @@ $(document).ready(function () {
   );
 
   //
+  // 存檔圖示
+  const saveFrame1 = $("#save-img-container > img")[0];
+  const saveFrame2 = $("#save-img-container > img")[1];
+  const saveInner = $("#save-img-container > img")[2];
+  gsap.set(saveFrame2, { y: -40, rotateY: 180 });
+  const saveImgHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to(saveFrame1, { rotateY: 180, y: 40 })
+    .to(saveFrame2, { rotateY: 0, y: 0 }, "<")
+    .to(
+      saveInner,
+      {
+        keyframes: {
+          scale: [1, 0, 1],
+        },
+      },
+      "<"
+    )
+    .to("#save-img-container", { scale: 1.1 }, "<");
+
+  $("#save").hover(
+    function () {
+      saveImgHover.play();
+    },
+    function () {
+      saveImgHover.reverse();
+    }
+  );
+
+  //
   // 所有文字按鈕
   const TextBtnelements = [
     {
@@ -385,6 +415,18 @@ $(document).ready(function () {
     {
       TextBtnId: "clear",
       TriggerId: "clear",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "save",
+      TriggerId: "save",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "upload",
+      TriggerId: "upload",
       clickDuration: 0.1,
       hoverDuration: 0.2,
     },

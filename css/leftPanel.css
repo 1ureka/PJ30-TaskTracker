@@ -119,7 +119,10 @@
   border-radius: 5px 5px 10px 5px;
 }
 
-#garbage-bin-container {
+#garbage-bin-container,
+#broom-img-container,
+#save-img-container,
+#upload-img-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -127,9 +130,13 @@
   cursor: pointer;
   width: 40px;
   height: 40px;
+  clip-path: inset(0);
 }
 
-#garbage-bin-container img {
+#garbage-bin-container img,
+#broom-img-container > img,
+#save-img-container > img,
+#upload-img-container > img {
   position: absolute;
   width: 40px;
   height: 40px;
@@ -145,7 +152,10 @@
   clip-path: inset(0px 0px 0px 25px);
 }
 
-#delete-label-container {
+#delete-label-container,
+#clear-label-container,
+#save-label-container,
+#upload-label-container {
   position: relative;
   display: flex;
   justify-content: center;
@@ -154,44 +164,17 @@
   clip-path: inset(0);
 }
 
-#delete-label-red {
+#delete-label-red,
+#clear-label-red,
+#save-label-red,
+#upload-label-red {
   position: absolute;
 }
 
-#delete-label-white {
-  position: relative;
-}
-
-#broom-img-container {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  clip-path: inset(0);
-}
-
-#broom-img-container > img {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-}
-
-#clear-label-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-  clip-path: inset(0);
-}
-
-#clear-label-red {
-  position: absolute;
-}
-
-#clear-label-white {
+#delete-label-white,
+#clear-label-white,
+#save-label-white,
+#upload-label-white {
   position: relative;
 }
 
