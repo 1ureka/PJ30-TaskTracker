@@ -4,17 +4,17 @@
  * @param {number} duration - 動畫時間
  * @returns {{click: TimelineMax, hover: TimelineMax}} - 返回時間軸
  */
-function createTextBtnTimeline(btnElement, duration) {
+function createTextBtnTimeline(btnElement, clickDuration, hoverDuration) {
   gsap.set(`#${btnElement}-label-red`, { y: -40 });
   const click = gsap
     .timeline({
-      defaults: { duration: duration, ease: "set1" },
+      defaults: { duration: clickDuration, ease: "set1" },
       paused: true,
     })
     .to(`#${btnElement}`, { scale: 0.7, yoyo: true, repeat: 1 });
   const hover = gsap
     .timeline({
-      defaults: { duration: duration, ease: "set1" },
+      defaults: { duration: hoverDuration, ease: "set1" },
       paused: true,
     })
     .to(`#${btnElement}-label-white`, { y: 40 })
@@ -81,7 +81,7 @@ $(document).ready(function () {
   gsap.set("#search-erase", { x: 10 });
   const EraserMove = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to("#search-erase", { x: -5 });
@@ -301,37 +301,150 @@ $(document).ready(function () {
   );
 
   //
+  // 刪除按鈕
+  const garbageBinCover = $("#garbage-bin-container > img").slice(1);
+  const garbageBinLineLeft = $("#garbage-bin-lines-container > img").slice(
+    0,
+    3
+  );
+  const garbageBinLineRight = $("#garbage-bin-lines-container > img").slice(3);
+
+  gsap.set(garbageBinLineLeft, { x: -20 });
+
+  const garbageBinHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to("#garbage-bin-container", { scale: 1.25 })
+    .to(garbageBinCover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
+    .to(garbageBinLineLeft, { x: 0, stagger: -0.067 }, "<")
+    .to(garbageBinLineRight, { x: 20, stagger: -0.067 }, "<");
+
+  $("#delete").hover(
+    function () {
+      garbageBinHover.play();
+    },
+    function () {
+      garbageBinHover.reverse();
+    }
+  );
+
+  //
+  // 掃把圖示
+  const broomContainer = $("#broom-img-container ");
+  const broomImg = $("#broom-img-container > img");
+  const broomTrail = $("#broom-img-container > img")[0];
+  gsap.set(broomImg, { rotate: -90 });
+  gsap.set(broomTrail, { x: 22, y: -5 });
+
+  const broomHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to(broomContainer, { scale: 1.25 })
+    .to(broomImg, { rotate: 0 }, "<");
+
+  $("#clear").hover(
+    function () {
+      broomHover.play();
+    },
+    function () {
+      broomHover.reverse();
+    }
+  );
+
+  //
+  // 存檔圖示
+  const saveFrame1 = $("#save-img-container > img")[0];
+  const saveFrame2 = $("#save-img-container > img")[1];
+  const saveInner = $("#save-img-container > img")[2];
+  gsap.set(saveFrame2, { y: -40, rotateY: 180 });
+  const saveImgHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to(saveFrame1, { rotateY: 180, y: 40 })
+    .to(saveFrame2, { rotateY: 0, y: 0 }, "<")
+    .to(
+      saveInner,
+      {
+        keyframes: {
+          scale: [1, 0, 1],
+        },
+      },
+      "<"
+    )
+    .to("#save-img-container", { scale: 1.1 }, "<");
+
+  $("#save").hover(
+    function () {
+      saveImgHover.play();
+    },
+    function () {
+      saveImgHover.reverse();
+    }
+  );
+
+  //
   // 所有文字按鈕
   const TextBtnelements = [
     {
       TextBtnId: "add",
       TriggerId: "add",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "delete-done",
       TriggerId: "delete-done",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "cleared-check",
       TriggerId: "cleared-check",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
     },
     {
       TextBtnId: "cleared-cancel",
       TriggerId: "cleared-cancel",
-      duration: 0.1,
+      clickDuration: 0.1,
+      hoverDuration: 0.1,
+    },
+    {
+      TextBtnId: "delete",
+      TriggerId: "delete",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "clear",
+      TriggerId: "clear",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "save",
+      TriggerId: "save",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
+    },
+    {
+      TextBtnId: "upload",
+      TriggerId: "upload",
+      clickDuration: 0.1,
+      hoverDuration: 0.2,
     },
   ];
 
-  TextBtnelements.forEach(({ TextBtnId, TriggerId, duration }) => {
-    // 創建時間軸
-    const timeline = createTextBtnTimeline(TextBtnId, duration);
+  TextBtnelements.forEach(
+    ({ TextBtnId, TriggerId, clickDuration, hoverDuration }) => {
+      // 創建時間軸
+      const timeline = createTextBtnTimeline(
+        TextBtnId,
+        clickDuration,
+        hoverDuration
+      );
 
-    // 綁定事件
-    bindTextBtnEvents(TriggerId, timeline.click, timeline.hover);
-  });
+      // 綁定事件
+      bindTextBtnEvents(TriggerId, timeline.click, timeline.hover);
+    }
+  );
 
   //
   // 刪除按鈕(個別)
@@ -373,7 +486,7 @@ $(document).ready(function () {
     .to("#right-panel-img-container", { scale: 0.65, yoyo: true, repeat: 1 });
   const rightBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to("#right-panel-img-arrow", { y: -8 }, "<")
@@ -401,7 +514,7 @@ $(document).ready(function () {
   gsap.set(downBtn.find("img")[1], { y: 40 });
   const upBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to(upBtn.find("img")[0], { y: -40 })
@@ -410,7 +523,7 @@ $(document).ready(function () {
     .to("#up-img-container", { scale: 1.2 }, "<");
   const downBtnHover = gsap
     .timeline({
-      defaults: { duration: 0.3, ease: "set1" },
+      defaults: { duration: 0.2, ease: "set1" },
       paused: true,
     })
     .to(downBtn.find("img")[0], { y: -40 })

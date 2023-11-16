@@ -87,37 +87,37 @@ $(document).ready(function () {
       focusSelector: "#search-input",
       hoverSelector: "#search-container",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
     {
       focusSelector: "#filter-select",
       hoverSelector: "#filter-select",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
     {
       focusSelector: "#year",
       hoverSelector: "#year",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
     {
       focusSelector: "#month",
       hoverSelector: "#month",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
     {
       focusSelector: "#task-input",
       hoverSelector: "#task-input",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
     {
       focusSelector: "#category",
       hoverSelector: "#category",
       outlineWidth: 2,
-      duration: 0.3,
+      duration: 0.2,
     },
   ];
 

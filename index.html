@@ -23,7 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
     <!-- 樣式表 -->
     <link rel="stylesheet" href="css/global.css" />
-    <link rel="stylesheet" href="css/global (color).css" />
+    <link rel="stylesheet" href="css/global (color2).css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/leftPanel.css" />
     <link rel="stylesheet" href="css/rightPanel.css" />
@@ -47,14 +47,6 @@
       }
     </style>
   </head>
-  <!-- 之後UI改為
-  回到頂部按鈕，回到底部按鈕(第一次出現未完成狀態的工作位置)
-  新增工作會到右側暫存欄位，暫存欄位儲存會在json的json[temp]: [task | separator]
-  左側面板下方按鈕懸停時，上方有lable跑出
-  架構是btn-container > lable-container:div + btn:img
-  lable-container:div (clip-path) > lable:lable
-  下方四按鈕圖示做動畫，比如懸停時垃圾桶打開再關閉、清空往四處飛再從中間出現球並分裂回來
-  -->
   <body>
     <div id="header">
       <img id="favicon" src="icons/favicon.png" />
@@ -134,7 +126,26 @@
         </button>
       </div>
       <div id="left-panel-bottom">
-        <button id="delete">刪除</button>
+        <button id="delete">
+          <div id="garbage-bin-container">
+            <img src="../schedule/icons/garbage bin.png" />
+            <img src="../schedule/icons/garbage bin (cover).png" />
+            <div id="garbage-bin-lines-container">
+              <img src="../schedule/icons/garbage bin (line1).png" />
+              <img src="../schedule/icons/garbage bin (line2).png" />
+              <img src="../schedule/icons/garbage bin (line3).png" />
+              <img src="../schedule/icons/garbage bin (line1).png" />
+              <img src="../schedule/icons/garbage bin (line2).png" />
+              <img src="../schedule/icons/garbage bin (line3).png" />
+            </div>
+          </div>
+          <div id="delete-label-container">
+            <label id="delete-label-red" class="red" for="delete">刪除</label>
+            <label id="delete-label-white" class="white" for="delete"
+              >刪除</label
+            >
+          </div>
+        </button>
         <button id="delete-done">
           <div id="delete-done-label-container">
             <label id="delete-done-label-red" class="red" for="delete-done"
@@ -145,12 +156,38 @@
             >
           </div>
         </button>
-        <button id="clear">清空</button>
-        <button id="save">存檔</button>
-        <button id="upload">上傳</button>
+        <button id="clear">
+          <div id="broom-img-container">
+            <img src="icons/broom (trail).png" />
+            <img src="icons/broom.png" />
+          </div>
+          <div id="clear-label-container">
+            <label id="clear-label-red" class="red" for="clear">清空</label>
+            <label id="clear-label-white" class="white" for="clear">清空</label>
+          </div>
+        </button>
+        <button id="save">
+          <div id="save-img-container">
+            <img src="../schedule/icons/save (frame).png" alt="" />
+            <img src="../schedule/icons/save (frame).png" alt="" />
+            <img src="../schedule/icons/save (inner).png" alt="" />
+          </div>
+          <div id="save-label-container">
+            <label id="save-label-red" class="red" for="save">存檔</label>
+            <label id="save-label-white" class="white" for="save">存檔</label>
+          </div>
+        </button>
+        <button id="upload">
+          <div id="upload-label-container">
+            <label id="upload-label-red" class="red" for="upload">上傳</label>
+            <label id="upload-label-white" class="white" for="upload"
+              >上傳</label
+            >
+          </div>
+        </button>
         <input type="file" id="file-input" accept=".json" />
         <div id="version-display">
-          <p>版本： @0.1.4</p>
+          <p>版本： @0.1.5</p>
         </div>
       </div>
     </div>
