@@ -315,8 +315,8 @@ $(document).ready(function () {
     .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
     .to("#garbage-bin-container", { scale: 1.25 })
     .to(garbageBinCover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
-    .to(garbageBinLineLeft, { x: 0, stagger: -0.1 }, "<")
-    .to(garbageBinLineRight, { x: 20, stagger: -0.1 }, "<");
+    .to(garbageBinLineLeft, { x: 0, stagger: -0.067 }, "<")
+    .to(garbageBinLineRight, { x: 20, stagger: -0.067 }, "<");
 
   $("#delete").hover(
     function () {
