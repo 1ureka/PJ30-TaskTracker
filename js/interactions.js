@@ -380,6 +380,37 @@ $(document).ready(function () {
   );
 
   //
+  // 存檔圖示
+  const uploadDot = $("#upload-img-container > img")[1];
+  const uploadArrow1 = $("#upload-img-container > img")[2];
+  const uploadArrow2 = $("#upload-img-container > img")[3];
+  gsap.set(uploadDot, { transformOrigin: "30.6px 30.8px" });
+  gsap.set(uploadArrow2, { y: -40 });
+  const uploadImgHover = gsap
+    .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+    .to(uploadArrow1, { y: 40 })
+    .to(uploadArrow2, { y: 0 }, "<")
+    .to(
+      uploadDot,
+      {
+        keyframes: {
+          scale: [1, 2, 1],
+        },
+      },
+      "<"
+    )
+    .to("#upload-img-container", { scale: 1.25 }, "<");
+
+  $("#upload").hover(
+    function () {
+      uploadImgHover.play();
+    },
+    function () {
+      uploadImgHover.reverse();
+    }
+  );
+
+  //
   // 所有文字按鈕
   const TextBtnelements = [
     {
