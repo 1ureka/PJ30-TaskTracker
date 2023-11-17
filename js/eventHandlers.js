@@ -69,29 +69,36 @@ $(document).ready(function () {
 
   // 編輯內文(動態)
   $(document).on("dblclick", ".task-text", function (e) {
-    const taskItem = $(this).closest(".task-item");
-    $(this).attr("contenteditable", true).addClass("editing").focus();
+    // 創建一個 textarea 元素
+    const textarea = $("<textarea></textarea>")
+      .val($(this).text())
+      .attr("class", $(this).attr("class"))
+      .css("width", $(this).width())
+      .css("height", $(this).height() + 30);
+
+    // 替換 p 元素為 textarea
+    $(this).replaceWith(textarea);
+
+    // 讓 textarea 獲取焦點
+    textarea.focus();
   });
 
   $(document).on("keyup", ".task-text", function (e) {
     const taskItem = $(this).closest(".task-item");
-    const text = $(this)
-      .html()
-      .replace(/<\/+div>/g, "")
-      .replace(/<div><br>/g, "<br>")
-      .replace(/<div>|<br>/g, "\n");
+    const text = $(this).val();
     taskItem.data("text", text);
   });
 
   $(document).on("blur", ".task-text", function (e) {
     const taskItem = $(this).closest(".task-item");
-    $(this).attr("contenteditable", false).removeClass("editing");
-    const text = $(this)
-      .html()
-      .replace(/<\/+div>/g, "")
-      .replace(/<div><br>/g, "<br>")
-      .replace(/<div>|<br>/g, "\n");
+    const text = $(this).val();
     taskItem.data("text", text);
+
+    // 創建一個 p 元素
+    const p = $("<p></p>").text(text).attr("class", $(this).attr("class"));
+
+    // 替換 textarea 元素為 p
+    $(this).replaceWith(p);
   });
 
   //
