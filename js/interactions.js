@@ -385,10 +385,10 @@ $(document).ready(function () {
   const uploadArrow1 = $("#upload-img-container > img")[2];
   const uploadArrow2 = $("#upload-img-container > img")[3];
   gsap.set(uploadDot, { transformOrigin: "30.6px 30.8px" });
-  gsap.set(uploadArrow2, { y: -40 });
+  gsap.set(uploadArrow2, { y: 40 });
   const uploadImgHover = gsap
     .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-    .to(uploadArrow1, { y: 40 })
+    .to(uploadArrow1, { y: -40 })
     .to(uploadArrow2, { y: 0 }, "<")
     .to(
       uploadDot,
