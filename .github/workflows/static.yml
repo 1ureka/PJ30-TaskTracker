@@ -1,4 +1,4 @@
-name: Deploy
+name: push to deploy
 on: 
   workflow_dispatch:
 permissions:
