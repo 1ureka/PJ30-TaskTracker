@@ -1,18 +1,9 @@
-const ruleSet = {
-  "(": ")",
-  "[": "]",
-  "{": "}",
-  "<": ">",
-  '"': '"',
-  "'": "'",
-};
-
 // test: [k'j(b'j)k"506"]
 // 可能的新功能：新增按下tab可以新增4個空格
 // 已知的問題：Crtl+Z無法復原
 class TextEditor {
   /**
-   * 類別的建構子，初始化實例的屬性。
+   * TextEditor類別的建構子，初始化TextEditor實例的屬性。
    * @param {JQuery} element - 用於操作的 jQuery 物件。
    * @param {Object} config - 用於配置的物件。
    * @param {number} config.delay - 操作的節流延遲時間（以毫秒為單位）。
@@ -314,11 +305,35 @@ class TextEditor {
       this.autoDeleteBrackets(ruleSet);
     });
   }
+
+  /**
+   * 清除綁定在該元素的TextEditor實例
+   */
+  destroy() {
+    // 解除事件綁定
+    this.element.off("keydown");
+    this.element.off("keyup");
+
+    // 將實例屬性設置為 null
+    this.element = null;
+    this.selectedText = null;
+    this.deletedText = null;
+    this.delay = null;
+    this.lastTime = null;
+    this.throttle = null;
+  }
 }
 
 $(document).ready(function () {
   // 創建 TextEditor 實例
   const textEditor = new TextEditor($("#task-input"), { delay: 10 });
 
-  textEditor.start(ruleSet);
+  textEditor.start({
+    "(": ")",
+    "[": "]",
+    "{": "}",
+    "<": ">",
+    '"': '"',
+    "'": "'",
+  });
 });
