@@ -115,6 +115,12 @@ $(document).ready(function () {
     const save = jsonToSave(jsonData, getDate());
     downloadJSON(save);
   });
+  Mousetrap.bind("ctrl+s", function () {
+    const jsonData = domToJSON();
+    const save = jsonToSave(jsonData, getDate());
+    downloadJSON(save);
+    return false;
+  });
 
   // 上傳按鈕
   $("#upload").on("click", function () {
