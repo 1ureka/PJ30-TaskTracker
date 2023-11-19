@@ -267,21 +267,52 @@ class TextEditor {
     // 如果沒有要刪除的字符，則中止執行
     if (deletedKeys.length === 0) return;
 
-    // 獲取當前文本
-    let text = this.getText();
-    // 反向遍歷要刪除的字符，找到它們對應的括號，並刪除
+    // 反向遍歷要刪除的字符，找到它們對應的括號的位置
     deletedKeys.reverse().forEach((symbol) => {
       const index = this.findFirstBracket(ruleSet[symbol]);
       // 如果找不到括號的索引，則跳過
       if (index === -1) return;
-      // 刪除括號
-      text = text.slice(0, index) + text.slice(index + 1);
+
+      // 獲取字串並返回刪除後的字串
+      const text =
+        this.getText().slice(0, index) + this.getText().slice(index + 1);
+
+      // 獲取選擇區域在刪除前的起始位置
+      const start = this.getSelectionStart();
+
+      // 將刪除後的字串指派回去，並且移動指標
+      this.setText(text);
+      this.element[0].setSelectionRange(start, start);
+    });
+  }
+
+  /**
+   * 啟動文本編輯器的事件處理。
+   * @param {Object.<string, string>} ruleSet - 一個包含字符對應的括號的物件。
+   */
+  start(ruleSet) {
+    // 綁定 keydown 事件，以獲取選擇區域
+    this.element.on("keydown", () => {
+      this.getSelection();
     });
 
-    // 保持選擇區域在刪除前的起始位置
-    const start = this.getSelectionStart();
-    this.setText(text);
-    this.element[0].setSelectionRange(start, start);
+    // 綁定 keydown 事件，以在 Backspace 鍵時獲取刪除區域
+    this.element.on("keydown", (e) => {
+      if (e.key !== "Backspace") return;
+      this.gstDeletion();
+    });
+
+    // 綁定 keyup 事件，以處理特定字符的自動補全括號
+    this.element.on("keyup", (e) => {
+      if (!(e.key in ruleSet)) return;
+      this.autoCompleteBrackets(ruleSet);
+    });
+
+    // 綁定 keyup 事件，以處理 Backspace 鍵的自動刪除括號
+    this.element.on("keyup", (e) => {
+      if (e.key !== "Backspace") return;
+      this.autoDeleteBrackets(ruleSet);
+    });
   }
 }
 
@@ -289,23 +320,5 @@ $(document).ready(function () {
   // 創建 TextEditor 實例
   const textEditor = new TextEditor($("#task-input"), { delay: 10 });
 
-  // 監聽事件
-  textEditor.element.on("keydown", function (e) {
-    textEditor.getSelection();
-  });
-
-  textEditor.element.on("keydown", function (e) {
-    if (e.key !== "Backspace") return;
-    textEditor.gstDeletion();
-  });
-
-  textEditor.element.on("keyup", function (e) {
-    if (!(e.key in ruleSet)) return;
-    textEditor.autoCompleteBrackets(ruleSet);
-  });
-
-  textEditor.element.on("keyup", function (e) {
-    if (e.key !== "Backspace") return;
-    textEditor.autoDeleteBrackets(ruleSet);
-  });
+  textEditor.start(ruleSet);
 });
