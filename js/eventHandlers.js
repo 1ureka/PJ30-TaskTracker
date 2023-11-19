@@ -68,13 +68,30 @@ $(document).ready(function () {
   });
 
   // 編輯內文(動態)
+  /** @type {TextEditor | null} */
+  let textEditor;
+
   $(document).on("dblclick", ".task-text", function (e) {
+    // 避免重複雙擊事件發生
+    if ($(this).is("textarea")) return;
+
     // 創建一個 textarea 元素
     const textarea = $("<textarea></textarea>")
       .val($(this).text())
       .attr("class", $(this).attr("class"))
       .css("width", $(this).width())
       .css("height", $(this).height() + 30);
+
+    // 為該 textarea 元素新增 TextEditor 實例
+    textEditor = new TextEditor(textarea, { delay: 10 });
+    textEditor.start({
+      "(": ")",
+      "[": "]",
+      "{": "}",
+      "<": ">",
+      '"': '"',
+      "'": "'",
+    });
 
     // 替換 p 元素為 textarea
     $(this).replaceWith(textarea);
@@ -90,6 +107,15 @@ $(document).ready(function () {
   });
 
   $(document).on("blur", ".task-text", function (e) {
+    // 清除 TextEditor 實例
+    console.log(
+      `刪除${textEditor.element
+        .closest(".task-item")
+        .index()}的 TextEditor 實例`
+    );
+    textEditor.destroy();
+    textEditor = null;
+
     const taskItem = $(this).closest(".task-item");
     const text = $(this).val();
     taskItem.data("text", text);
