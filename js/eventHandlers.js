@@ -75,12 +75,6 @@ $(document).ready(function () {
     // 避免重複雙擊事件發生
     if ($(this).is("textarea")) return;
 
-    // 若textEditor變數原本有引用實例，清除該實例引用
-    if (textEditor) {
-      textEditor.destroy();
-      textEditor = null;
-    }
-
     // 創建一個 textarea 元素
     const textarea = $("<textarea></textarea>")
       .val($(this).text())
@@ -113,15 +107,14 @@ $(document).ready(function () {
   });
 
   $(document).on("blur", ".task-text", function (e) {
-    // 只在textEditor目前引用的實例是觸發blur的物件時才刪除，
-    // 避免觸發blur時，textEditor已經透過另一個雙擊事件引用另一個實例了
-    const referenceIndex = textEditor.element.closest(".task-item").index();
-    const currentIndex = $(this).closest(".task-item").index();
-    if (referenceIndex === currentIndex) {
-      console.log("刪除實例");
-      textEditor.destroy();
-      textEditor = null;
-    }
+    // 清除 TextEditor 實例
+    console.log(
+      `刪除${textEditor.element
+        .closest(".task-item")
+        .index()}的 TextEditor 實例`
+    );
+    textEditor.destroy();
+    textEditor = null;
 
     const taskItem = $(this).closest(".task-item");
     const text = $(this).val();
