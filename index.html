@@ -10,6 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap"
       rel="stylesheet"
     />
+    <!-- CDN -->
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.js"></script>
@@ -21,6 +22,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+    <!-- lib -->
+    <script src="lib/mousetrap.min.js"></script>
     <!-- 樣式表 -->
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/global (color2).css" />
@@ -61,7 +64,12 @@
           <img id="search" src="icons/search.png" alt="" />
         </div>
         <div id="search-input-container">
-          <input type="text" id="search-input" placeholder="搜尋" />
+          <input
+            type="text"
+            class="mousetrap"
+            id="search-input"
+            placeholder="搜尋"
+          />
         </div>
         <div id="search-erase-container">
           <img id="search-erase-line" src="icons/erase (line).png" alt="" />
@@ -105,7 +113,11 @@
           </div>
         </div>
         <div id="task-input-container">
-          <textarea id="task-input" placeholder="新增工作"></textarea>
+          <textarea
+            id="task-input"
+            class="mousetrap"
+            placeholder="新增工作"
+          ></textarea>
         </div>
         <div id="category-container">
           <select id="category">
