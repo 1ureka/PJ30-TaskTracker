@@ -1,7 +1,7 @@
 /**
  * 作為整個網頁生命週期的保存狀態的管理
  */
-class SaveConfirmation {
+class SaveStatus {
   constructor() {
     /** @type {string} */
     this.title = document.title;
