@@ -65,3 +65,5 @@ class SaveStatus {
     return this._isChanged;
   }
 }
+
+const saveStatus = new SaveStatus();

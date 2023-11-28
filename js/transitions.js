@@ -26,6 +26,9 @@ $(document).ready(function () {
   new Sortable($("#task-container").get()[0], {
     group: "shared",
     animation: 150,
+    onSort: () => {
+      saveStatus.isChanged = true;
+    },
   });
 
   //
