@@ -1,0 +1,8 @@
+/* all_styles.css */
+@import url("css/color.css");
+@import url("css/global.css");
+@import url("css/header.css");
+@import url("css/leftPanel.css");
+@import url("css/rightPanel.css");
+@import url("css/taskList.css");
+@import url("css/popUp.css");

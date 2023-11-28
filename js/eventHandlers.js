@@ -34,9 +34,11 @@ $(document).ready(function () {
     if (taskItem.length > 0) {
       deleteTask(taskItem);
       console.log("刪除工作");
+      saveStatus.isChanged = true;
     } else if (separator.length > 0) {
       deleteTask(separator);
       console.log("刪除分割線");
+      saveStatus.isChanged = true;
     } else {
       console.log("找不到刪除物件");
     }
@@ -47,6 +49,7 @@ $(document).ready(function () {
     const taskItem = $(this).closest(".task-item");
     const value = $(this).val();
     toggleTask(taskItem, value);
+    saveStatus.isChanged = true;
   });
 
   // 複製內文(動態)
@@ -65,6 +68,7 @@ $(document).ready(function () {
     const taskItem = $(this).closest(".task-item");
     const category = $(this).val();
     taskItem.data("category", category);
+    saveStatus.isChanged = true;
   });
 
   // 編輯內文(動態)
@@ -104,6 +108,7 @@ $(document).ready(function () {
     const taskItem = $(this).closest(".task-item");
     const text = $(this).val();
     taskItem.data("text", text);
+    saveStatus.isChanged = true;
   });
 
   $(document).on("blur", ".task-text", function (e) {
@@ -125,6 +130,7 @@ $(document).ready(function () {
 
     // 替換 textarea 元素為 p
     $(this).replaceWith(p);
+    saveStatus.isChanged = true;
   });
 
   //
@@ -133,18 +139,23 @@ $(document).ready(function () {
   //
   //
   // 清空按鈕
-  $("#cleared-check").on("click", clearTasks);
+  $("#cleared-check").on("click", () => {
+    clearTasks();
+    saveStatus.isChanged = true;
+  });
 
   // 存檔按鈕
   $("#save").on("click", function () {
     const jsonData = domToJSON();
     const save = jsonToSave(jsonData, getDate());
     downloadJSON(save);
+    saveStatus.isChanged = false;
   });
   Mousetrap.bind("ctrl+s", function () {
     const jsonData = domToJSON();
     const save = jsonToSave(jsonData, getDate());
     downloadJSON(save);
+    saveStatus.isChanged = false;
     return false;
   });
 
@@ -162,6 +173,7 @@ $(document).ready(function () {
         localStorage.setItem("tasks", e.target.result);
         const save = saveToJSON(e.target.result, getDate());
         jsonToDOM(save);
+        saveStatus.isChanged = false;
       } catch (error) {
         alert("錯誤：JSON 解析失敗。");
       }
@@ -289,17 +301,6 @@ $(document).ready(function () {
       console.log(
         `按下時高度為${currentTop}，滑動至${targetTop}，容許值為${tolerance}`
       );
-    }
-  });
-  //
-  //
-  // 其他
-  //
-  //
-  // 開啟/關閉頁面相關
-  $(window).on("beforeunload", function (e) {
-    if ($("#task-container .task-item").length > 0) {
-      return "未保存的資料將會遺失，確定要離開頁面嗎？";
     }
   });
 });
