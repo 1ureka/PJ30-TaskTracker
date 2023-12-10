@@ -87,7 +87,7 @@ $(document).ready(function () {
     .to("#search-erase", { x: -5 });
   const EraserClick = gsap
     .timeline({
-      defaults: { duration: 0.05, ease: "set1" },
+      defaults: { duration: 0.1, ease: "set1" },
       paused: true,
     })
     .to("#search-erase-container", { scale: 0.5, yoyo: true, repeat: 1 });

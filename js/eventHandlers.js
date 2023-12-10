@@ -212,12 +212,14 @@ $(document).ready(function () {
   });
 
   // 清空搜索欄按鈕
-  $("#search-erase-container").click(function () {
+  $("#search-erase-container").click(async () => {
     $("#search-input").val("");
     const category = $("#filter-select").val();
     const searchResult = "all";
-    $("#search-erase-container").hide(500);
     filterTasks(category, searchResult);
+
+    await delay(100); // 點擊動畫時間
+    $("#search-erase-container").hide(500);
   });
 
   //
