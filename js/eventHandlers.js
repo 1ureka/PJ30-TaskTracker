@@ -212,12 +212,14 @@ $(document).ready(function () {
   });
 
   // 清空搜索欄按鈕
-  $("#search-erase-container").click(function () {
+  $("#search-erase-container").click(async () => {
     $("#search-input").val("");
     const category = $("#filter-select").val();
     const searchResult = "all";
-    $("#search-erase-container").hide(500);
     filterTasks(category, searchResult);
+
+    await delay(100); // 點擊動畫時間
+    $("#search-erase-container").hide(500);
   });
 
   //
@@ -253,10 +255,10 @@ $(document).ready(function () {
     if (index === -1) {
       // 若index === -1，代表沒有找到目標工作或是清單為空，則滑動至底部
       const targetTop = tasksContainer.height();
-      $("body, html").animate({ scrollTop: targetTop }, duration);
+      $("#task-container-scroller").animate({ scrollTop: targetTop }, duration);
     } else {
       const tolerance = window.innerHeight / 2.5;
-      const currentTop = $(window).scrollTop();
+      const currentTop = $("#task-container-scroller").scrollTop();
       const taskTop = getTaskTop(index);
 
       // 根據容許值判斷現在畫面是否已在目標工作項目
@@ -266,7 +268,7 @@ $(document).ready(function () {
       const isGoingToBottom = isAtTask || currentTop > taskTop;
       const targetTop = isGoingToBottom ? tasksContainer.height() : taskTop;
 
-      $("body, html").animate({ scrollTop: targetTop }, duration);
+      $("#task-container-scroller").animate({ scrollTop: targetTop }, duration);
 
       console.log(
         `按下時高度為${currentTop}，滑動至${targetTop}，容許值為${tolerance}`
@@ -283,10 +285,10 @@ $(document).ready(function () {
     if (index === -1) {
       // 若index === -1，代表沒有找到目標工作或是清單為空，則滑動至頂部
       const targetTop = 0;
-      $("body, html").animate({ scrollTop: targetTop }, duration);
+      $("#task-container-scroller").animate({ scrollTop: targetTop }, duration);
     } else {
       const tolerance = window.innerHeight / 2.5;
-      const currentTop = $(window).scrollTop();
+      const currentTop = $("#task-container-scroller").scrollTop();
       const taskTop = getTaskTop(index);
 
       // 根據容許值判斷現在畫面是否已在目標工作項目
@@ -296,7 +298,7 @@ $(document).ready(function () {
       const isGoingToBottom = isAtTask || currentTop < taskTop;
       const targetTop = isGoingToBottom ? 0 : taskTop;
 
-      $("body, html").animate({ scrollTop: targetTop }, duration);
+      $("#task-container-scroller").animate({ scrollTop: targetTop }, duration);
 
       console.log(
         `按下時高度為${currentTop}，滑動至${targetTop}，容許值為${tolerance}`

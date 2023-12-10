@@ -1,13 +1,30 @@
-#task-container {
-  position: absolute;
+#task-container-scroller {
+  position: fixed;
   top: 100px;
   left: 260px;
   right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#task-container {
+  position: absolute;
+  width: 100%;
   min-height: 350px;
+  box-sizing: border-box;
   padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+#task-container-scroller::-webkit-scrollbar {
+  width: 10px;
+}
+
+#task-container-scroller::-webkit-scrollbar-thumb {
+  border-radius: 5px;
 }
 
 .separator {
@@ -38,7 +55,10 @@
   margin-bottom: 5px;
   padding: 20px 10px;
   border-radius: 10px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   cursor: grab;
 }
 
@@ -78,12 +98,15 @@
   margin-right: 20px;
   min-width: 70px;
   height: 40px;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 1);
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   border-radius: 10px;
 }
 
 .task-category-display-container {
-  clip-path: inset(0 round 10px);
+  clip-path: inset(1px round 10px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,6 +127,10 @@
   z-index: 2;
   pointer-events: none;
   color: black;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
 }
 
 .task-category-display.未分類 {
@@ -169,12 +196,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 1);
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   border-radius: 10px;
 }
 
 .task-status-display-container {
-  clip-path: inset(0 round 10px);
+  clip-path: inset(1px round 10px);
   width: 100%;
   height: 100%;
   z-index: 2;
@@ -195,6 +225,10 @@
   position: absolute;
   pointer-events: none;
   color: black;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
 }
 
 .task-status-display.U {

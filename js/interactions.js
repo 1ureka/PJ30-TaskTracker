@@ -87,7 +87,7 @@ $(document).ready(function () {
     .to("#search-erase", { x: -5 });
   const EraserClick = gsap
     .timeline({
-      defaults: { duration: 0.05, ease: "set1" },
+      defaults: { duration: 0.1, ease: "set1" },
       paused: true,
     })
     .to("#search-erase-container", { scale: 0.5, yoyo: true, repeat: 1 });
@@ -540,7 +540,8 @@ $(document).ready(function () {
   const upBtn = $("#up-btn");
   const downBtn = $("#down-btn");
   gsap.set(upBtn, { autoAlpha: 1 });
-  gsap.set(downBtn, { autoAlpha: 1, rotate: 180 });
+  gsap.set(downBtn, { autoAlpha: 1 });
+  gsap.set(downBtn.children(), { rotate: 180 });
   gsap.set(upBtn.find("img")[1], { y: 40 });
   gsap.set(downBtn.find("img")[1], { y: 40 });
   const upBtnHover = gsap
