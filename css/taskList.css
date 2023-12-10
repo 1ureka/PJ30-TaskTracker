@@ -1,13 +1,30 @@
-#task-container {
-  position: absolute;
+#task-container-scroller {
+  position: fixed;
   top: 100px;
   left: 260px;
   right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#task-container {
+  position: absolute;
+  width: 100%;
   min-height: 350px;
+  box-sizing: border-box;
   padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+#task-container-scroller::-webkit-scrollbar {
+  width: 10px;
+}
+
+#task-container-scroller::-webkit-scrollbar-thumb {
+  border-radius: 5px;
 }
 
 .separator {
