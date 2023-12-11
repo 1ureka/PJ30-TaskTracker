@@ -19,14 +19,6 @@
   align-items: flex-start;
 }
 
-#task-container-scroller::-webkit-scrollbar {
-  width: 10px;
-}
-
-#task-container-scroller::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-}
-
 .separator {
   display: flex;
   justify-content: flex-start;
