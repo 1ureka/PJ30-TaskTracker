@@ -1,9 +1,3 @@
-gsap.registerPlugin(ScrollTrigger);
-
-gsap.registerPlugin(CustomEase);
-
-CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
-
 $(document).ready(function () {
   //
   //
@@ -117,7 +111,7 @@ $(document).ready(function () {
 
   $("#clear").on("click", function () {
     isCheckClear = true;
-    enterCheckClear.timeScale(2).play();
+    enterCheckClear.timeScale(1.5).play();
   });
 
   $("#cleared-cancel").on("click", function () {
