@@ -11,6 +11,18 @@ body {
   overflow: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+
 input,
 select,
 button,
@@ -28,6 +40,7 @@ textarea {
   box-shadow: inset 3px 5px 0px 0px rgba(100, 100, 100, 0.35),
     inset 4px 7px 16px 5px rgba(0, 0, 0, 0.5);
   font-size: 20px;
+  resize: none;
 }
 
 select {
