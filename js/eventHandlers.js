@@ -79,6 +79,8 @@ $(document).ready(function () {
     // 避免重複雙擊事件發生
     if ($(this).is("textarea")) return;
 
+    sortableTaskList.option("disabled", true);
+
     // 創建一個 textarea 元素
     const textarea = $("<textarea></textarea>")
       .val($(this).text())
@@ -102,6 +104,9 @@ $(document).ready(function () {
 
     // 讓 textarea 獲取焦點
     textarea.focus();
+
+    // 給足夠空間編輯
+    textarea.css("width", $("#task-container").width() - 220);
   });
 
   $(document).on("keyup", ".task-text", function (e) {
@@ -131,6 +136,23 @@ $(document).ready(function () {
     // 替換 textarea 元素為 p
     $(this).replaceWith(p);
     saveStatus.isChanged = true;
+
+    sortableTaskList.option("disabled", false);
+  });
+
+  $(document).on("input", ".task-text", function (e) {
+    // this.style.height = "auto"; // 先將高度設為自動以便計算 scrollHeight
+    // this.style.height = this.scrollHeight + "px"; // 設定高度為 scrollHeight
+    const currentHeight = $(this).height();
+
+    gsap.set(this, { ease: "set1", duration: 0.5, height: "auto" });
+    const targetHeight = this.scrollHeight;
+
+    gsap.fromTo(
+      this,
+      { height: currentHeight },
+      { ease: "set1", duration: 0.1, height: targetHeight }
+    );
   });
 
   //

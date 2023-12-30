@@ -4,7 +4,7 @@ $(document).ready(function () {
   // 使清單可拖動
   //
   //
-  new Sortable($("#temp-task-container").get()[0], {
+  sortableTempList = new Sortable($("#temp-task-container").get()[0], {
     group: {
       name: "shared",
       put: false,
@@ -17,7 +17,7 @@ $(document).ready(function () {
       }
     },
   });
-  new Sortable($("#task-container").get()[0], {
+  sortableTaskList = new Sortable($("#task-container").get()[0], {
     group: "shared",
     animation: 150,
     onSort: () => {
