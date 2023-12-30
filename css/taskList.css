@@ -156,6 +156,8 @@
   white-space: pre-wrap;
   text-wrap: pretty;
   margin: 0;
+  transition: width cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s;
+  overflow-y: hidden;
 }
 
 .task-copy-container {
