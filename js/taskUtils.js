@@ -30,11 +30,11 @@ function addTask(taskText, status, category) {
   if (taskText === "--") {
     const separator = createSeparator();
     $("#task-container").append(separator);
-    separator.show(500);
+    separator.fadeIn(500);
   } else if (taskText !== "") {
     const taskItem = createTaskItem(taskText, status, category);
     $("#task-container").append(taskItem);
-    taskItem.show(500);
+    taskItem.fadeIn(500);
   }
 }
 
@@ -241,7 +241,7 @@ $.fn.addTaskFunctions = function (status) {
  * @returns {Promise<void>} - 當清空完成時解析的Promise
  */
 function clearTasks() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const callback = function () {
       $(this).remove();
       setTimeout(() => {
@@ -249,7 +249,7 @@ function clearTasks() {
       }, 100);
     };
     if ($("#task-container").children().length > 0) {
-      $("#task-container").children().hide(500, callback);
+      $("#task-container").children().fadeOut(500, callback);
     } else {
       console.log("skip clear");
       resolve();
@@ -520,7 +520,7 @@ function changeDOM(saveDate, loadDate) {
 
   // 讀取
   const tasksToUpdate = saveToJSON(localStorage.getItem("tasks"), loadDate);
-  jsonToDOM(tasksToUpdate) ? tasksToUpdate : clearTasks();
+  tasksToUpdate ? jsonToDOM(tasksToUpdate) : clearTasks();
 
   // 更新所在日期
   localStorage.setItem("date", loadDate);
