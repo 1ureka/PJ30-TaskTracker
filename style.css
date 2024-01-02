@@ -6,3 +6,7 @@
 @import url("css/rightPanel.css");
 @import url("css/taskList.css");
 @import url("css/popUp.css");
+
+:root {
+  --is-task-list-hovable: 1;
+}

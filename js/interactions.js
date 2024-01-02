@@ -136,29 +136,6 @@ $(document).ready(function () {
   });
 
   //
-  // 工作塊本身
-  $(document).on("mouseover", ".task-item", function () {
-    gsap
-      .timeline({
-        defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
-      })
-      .to($(this), {
-        paddingTop: 30,
-        paddingBottom: 30,
-      });
-  });
-  $(document).on("mouseleave", ".task-item", function () {
-    gsap
-      .timeline({
-        defaults: { duration: 0.15, ease: "set1", overwrite: "auto" },
-      })
-      .to($(this), {
-        paddingTop: 20,
-        paddingBottom: 20,
-      });
-  });
-
-  //
   // 切換工作狀態
   $(document).on("change", ".task-status-options", function () {
     const taskItem = $(this).closest(".task-item");
@@ -182,19 +159,19 @@ $(document).ready(function () {
   $(document).on("mouseenter", ".task-status-options", function () {
     gsap
       .timeline({
-        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
       })
       .to($(this).parent().find(".task-status-display-container"), {
-        rotate: 360,
+        scale: 1.1,
       });
   });
   $(document).on("mouseleave", ".task-status-options", function () {
     gsap
       .timeline({
-        defaults: { duration: 0.4, ease: "set1", overwrite: "auto" },
+        defaults: { duration: 0.1, ease: "set1", overwrite: "auto" },
       })
       .to($(this).parent().find(".task-status-display-container"), {
-        rotate: 0,
+        scale: 1,
       });
   });
 

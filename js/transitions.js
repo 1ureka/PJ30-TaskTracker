@@ -55,6 +55,12 @@ $(document).ready(function () {
   sortableTaskList = new Sortable($("#task-container").get()[0], {
     group: "shared",
     animation: 150,
+    onStart: () => {
+      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
+    },
+    onEnd: () => {
+      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
+    },
     onSort: () => {
       saveStatus.isChanged = true;
     },

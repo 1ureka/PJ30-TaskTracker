@@ -79,7 +79,9 @@ $(document).ready(function () {
     // 避免重複雙擊事件發生
     if ($(this).is("textarea")) return;
 
+    // 停止選單編輯行為
     sortableTaskList.option("disabled", true);
+    document.documentElement.style.setProperty("--is-task-list-hovable", "0");
 
     // 創建一個 textarea 元素
     const textarea = $("<textarea></textarea>")
@@ -137,7 +139,9 @@ $(document).ready(function () {
     $(this).replaceWith(p);
     saveStatus.isChanged = true;
 
+    // 恢復選單編輯行為
     sortableTaskList.option("disabled", false);
+    document.documentElement.style.setProperty("--is-task-list-hovable", "1");
   });
 
   $(document).on("input", ".task-text", function (e) {
