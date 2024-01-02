@@ -539,8 +539,6 @@ $(document).ready(function () {
   // 上下按鈕
   const upBtn = $("#up-btn");
   const downBtn = $("#down-btn");
-  gsap.set(upBtn, { autoAlpha: 1 });
-  gsap.set(downBtn, { autoAlpha: 1 });
   gsap.set(downBtn.children(), { rotate: 180 });
   gsap.set(upBtn.find("img")[1], { y: 40 });
   gsap.set(downBtn.find("img")[1], { y: 40 });
