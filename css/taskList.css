@@ -6,6 +6,9 @@
   bottom: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  /* init */
+  opacity: 0;
+  visibility: hidden;
 }
 
 #task-container {

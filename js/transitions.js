@@ -1,6 +1,41 @@
 $(document).ready(function () {
   //
   //
+  // 開場動畫
+  //
+  //
+  async function opening() {
+    await delay(100);
+
+    const opening = gsap
+      .timeline({
+        defaults: { ease: "set1", duration: 0.75 },
+        paused: true,
+        delay: 0.75,
+      })
+      .to("#header", { y: 0, autoAlpha: 1 })
+      .to("#left-panel", { x: 0, autoAlpha: 1 }, "<37.5%")
+      .fromTo(
+        "#up-btn, #down-btn",
+        { scale: 0.5, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, ease: "back.out(4)", stagger: 0.25 },
+        "<50%"
+      )
+      .to("#task-container-scroller", { autoAlpha: 1, duration: 0.5 }, "<")
+      .fromTo(
+        $("#task-container").children(),
+        { autoAlpha: 0 },
+        { autoAlpha: 1, stagger: { from: "random", amount: 0.5 } },
+        "<"
+      );
+
+    opening.play().then(() => $("#left-panel").css("transform", "")); // 避免子元素position:fixed不作用
+  }
+
+  opening();
+
+  //
+  //
   // 使清單可拖動
   //
   //
