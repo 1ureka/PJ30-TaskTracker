@@ -55,6 +55,16 @@
     rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
     rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   cursor: grab;
+
+  transition: backdrop-filter 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+    filter 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+    scale 0.15s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.task-item:hover {
+  filter: brightness(calc(1 + 0.25 * var(--is-task-list-hovable)));
+  backdrop-filter: brightness(calc(1 + 0.25 * var(--is-task-list-hovable)));
+  scale: calc(1 + 0.02 * var(--is-task-list-hovable));
 }
 
 .task-item > div {
@@ -179,11 +189,6 @@
   right: 0;
   width: 100%;
   height: 100%;
-}
-
-#copied {
-  position: absolute;
-  pointer-events: none;
 }
 
 .task-status-container {
