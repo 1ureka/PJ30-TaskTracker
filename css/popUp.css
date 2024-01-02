@@ -11,6 +11,11 @@
   z-index: 5;
 }
 
+#copied {
+  position: absolute;
+  pointer-events: none;
+}
+
 #cleared {
   display: flex;
   justify-content: space-around;
