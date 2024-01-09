@@ -207,13 +207,59 @@ class CalendarIcon extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
+    this._frame = $("<img>")
+      .attr("src", "icons/calendar (frame).png")
+      .appendTo(container);
+
+    this._inners = Array.from({ length: 6 }, (_, index) =>
+      $("<img>").attr("src", `icons/calendar (inner${index + 1}).png`)
+    );
+
+    this._inners.forEach((inner) => inner.appendTo(container));
+
     return [container];
   }
 
   _createTimeline() {
     const container = this.elements[0];
 
-    return [tl];
+    gsap.set(this._inners, {
+      autoAlpha: 0,
+    });
+
+    const t1 = gsap
+      .timeline({
+        defaults: { duration: 0.15, ease: "set1" },
+        paused: true,
+      })
+      .to(
+        this._inners,
+        {
+          stagger: 0.1,
+          autoAlpha: 1,
+        },
+        "<"
+      )
+      .to(
+        this._inners,
+        {
+          stagger: 0.1,
+          autoAlpha: 0,
+        },
+        "<0.4"
+      )
+      .timeScale(1.5);
+
+    const t2 = gsap
+      .timeline({
+        defaults: { duration: 0.3, ease: "set1" },
+        paused: true,
+      })
+      .to(container, {
+        scale: 1.1,
+      });
+
+    return [t1, t2];
   }
 }
 
