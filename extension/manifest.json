@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "PJ30-TaskTracker Extension",
+  "version": "1.0",
+  "description": "提供給PJ30-TaskTracker的臨時後端",
+  "permissions": ["declarativeNetRequest", "declarativeNetRequestFeedback"],
+  "host_permissions": ["https://*/"],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "0",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://1ureka.github.io/PJ30-TaskTracker/"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
