@@ -1,2 +1,5 @@
 /.github
+_*/
+**/authorization.json
+test/icons
 README.md
