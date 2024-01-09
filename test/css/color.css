@@ -14,7 +14,7 @@ body {
 
 button,
 .pop-up,
-#date-select-container {
+.date-select {
   background-color: hsl(240, 5%, 10%);
 }
 
