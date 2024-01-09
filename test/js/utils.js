@@ -6,3 +6,15 @@
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * 格式化瀏覽器紀錄之時間資訊，若無則回傳null
+ * @returns {{year: string; month: string;} | null}
+ */
+function formatLocalStorageDate() {
+  if (!localStorage.getItem("date")) return null;
+
+  const dateString = localStorage.getItem("date");
+  const [year, month] = dateString.split("-");
+  return { year, month };
+}

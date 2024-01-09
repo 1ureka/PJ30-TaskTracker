@@ -168,6 +168,69 @@ class SidebarBottom extends component {
 class SidebarTop extends component {
   constructor() {
     super();
+
+    this.element = this._create();
+  }
+
+  _create() {
+    const container = $("<div>").addClass("sidebar-top-container");
+
+    this._dateSelect = this._createDateSelect().appendTo(container);
+
+    return container;
+  }
+
+  _createDateSelect() {
+    const container = $("<div>").addClass("date-select");
+
+    const timelines = [
+      gsap.timeline({ paused: true }).to(container, {
+        paddingTop: 10,
+        paddingBottom: 10,
+        duration: 0.15,
+        ease: "set1",
+      }),
+    ];
+
+    const icon = new CalendarIcon();
+    timelines.push(...icon.timelines);
+
+    const yearSelect = this._createYearSelect();
+
+    container.append(icon.elements[0], yearSelect);
+
+    this._bindHoverTimelines(container, timelines);
+
+    return container;
+  }
+
+  _createYearSelect() {
+    const currentYear = new Date().getFullYear();
+    const years = Array.from(
+      { length: currentYear - 2019 },
+      (_, index) => 2020 + index
+    );
+
+    const select = new Select({
+      options: years.map((number) => number.toString()),
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
+    if (formatLocalStorageDate()) {
+      select.val(formatLocalStorageDate().year);
+    } else {
+      select.val(currentYear.toString());
+    }
+
+    return select.element;
+  }
+
+  _bindHoverTimelines(element, timelines) {
+    timelines.forEach((tl) => {
+      element.on("mouseenter", () => tl.play());
+      element.on("mouseleave", () => tl.reverse());
+    });
   }
 }
 
