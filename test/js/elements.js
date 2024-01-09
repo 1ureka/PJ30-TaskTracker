@@ -199,6 +199,28 @@ class LoadIcon extends IconInterface {
   }
 }
 
+class CalendarIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    return [tl];
+  }
+}
+
+//
+//
+//
+
 class DoubleColorLabel {
   constructor(text = "未定義") {
     this.element = this._create(text);
@@ -225,5 +247,123 @@ class DoubleColorLabel {
       .to(this._redLabel, { y: 0 }, "<");
 
     return tl;
+  }
+}
+
+class Select {
+  constructor(config) {
+    this.element = this._create(config);
+  }
+
+  _create(config) {
+    // 取出所需變數
+    this.options = config.options;
+    this.outlineWidth = config.outlineWidth;
+    this.duration = config.duration;
+
+    const container = $("<div>").addClass("select-container");
+
+    this._select = $("<select>").appendTo(container);
+
+    this.options.forEach((option) => {
+      $(`<option value="${option}">${option}</option>`).appendTo(this._select);
+    });
+
+    this._createOutline()._createTimeline()._bindTimeline();
+
+    return container;
+  }
+
+  _createOutline() {
+    const clonedSelect = this._select.clone().appendTo("body");
+
+    const size = {
+      innerWidth: clonedSelect.innerWidth(),
+      innerHeight: clonedSelect.innerHeight(),
+    };
+
+    clonedSelect.remove();
+
+    // 創建所需元素
+    this._outlineContainer = $("<div>").css({
+      position: "absolute",
+      width: size.innerWidth,
+      height: size.innerHeight,
+      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+    });
+
+    this._outline1 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        bottom: -1 * this.outlineWidth,
+        left: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._outline2 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        top: -1 * this.outlineWidth,
+        right: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._select.before(this._outlineContainer);
+
+    return this;
+  }
+
+  _createTimeline() {
+    this._timeline = gsap
+      .timeline({
+        defaults: { duration: this.duration, ease: "set1" },
+        paused: true,
+      })
+      .to(this._outline1, {
+        width: `calc(100% + ${this.outlineWidth * 2}px)`,
+        height: `calc(100% + ${this.outlineWidth * 2}px)`,
+      })
+      .to(
+        this._outline2,
+        {
+          width: `calc(100% + ${this.outlineWidth * 2}px)`,
+          height: `calc(100% + ${this.outlineWidth * 2}px)`,
+        },
+        "<"
+      );
+
+    return this;
+  }
+
+  _bindTimeline() {
+    const hoverElement = this._select;
+    const focusElement = this._select;
+
+    hoverElement.on("mouseover", () => {
+      this._timeline.play();
+    });
+    hoverElement.on("mouseleave", () => {
+      if (!focusElement.is(":focus")) this._timeline.reverse();
+    });
+    focusElement.on("focus", () => {
+      this._timeline.play();
+    });
+    focusElement.on("blur", () => {
+      this._timeline.reverse();
+    });
+
+    return this;
+  }
+
+  val(value) {
+    if (!value) return this._select.val();
+
+    this._select.val(value);
+
+    return this;
   }
 }
