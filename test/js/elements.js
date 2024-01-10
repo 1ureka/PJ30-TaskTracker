@@ -3,6 +3,7 @@
  */
 class IconInterface {
   constructor() {
+    this._isAppendTo = false;
     /** 用於存儲圖示元素的陣列。 @type {JQuery[] | JQuery} */
     this.elements = this._createIcon();
     /** 於存儲時間軸的陣列。 @type {TimelineMax[] | TimelineMax} */
@@ -23,6 +24,19 @@ class IconInterface {
    */
   _createTimeline() {
     return [];
+  }
+
+  /**
+   * 附加實例元素到指定的 DOM 選擇器。
+   */
+  appendTo(selector) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.elements.forEach((element) => element.appendTo($(selector)));
+
+    return this;
   }
 }
 
@@ -338,6 +352,7 @@ class Select {
    * @param {number} config.duration - 選單動畫的持續時間。
    */
   constructor(config) {
+    this._isAppendTo = false;
     /**
      * 選單的根容器。
      * @type {jQuery}
@@ -362,10 +377,6 @@ class Select {
 
     const container = $("<div>").addClass("select-container");
 
-    /**
-     * 下拉選單元素。
-     * @type {jQuery}
-     */
     this._select = $("<select>").appendTo(container);
 
     this.options.forEach((option) => {
@@ -489,8 +500,159 @@ class Select {
 
     return this;
   }
+
+  /**
+   * 公開方法，用於附加元素進DOM。
+   * @returns {Select} - Select 類別的實例。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
 }
 
-class TextArea {}
+class TextArea {
+  constructor(config) {
+    this._isAppendTo = false;
+    /**
+     * 選單的根容器。
+     * @type {jQuery}
+     */
+    this.element = this._create(config);
+  }
 
-class TextInput {}
+  _create(config) {
+    this.width = config.width;
+    this.height = config.height;
+    this.placeholder = config.placeholder;
+    this.outlineWidth = config.outlineWidth;
+    this.duration = config.duration;
+
+    const container = $("<div>")
+      .addClass("textarea-container")
+      .css({ width: this.width, height: this.height });
+
+    this._textarea = $("<textarea>")
+      .appendTo(container)
+      .attr("placeholder", this.placeholder);
+
+    this._createOutline()._createTimeline()._bindTimeline();
+  }
+
+  _createOutline() {
+    this._outlineContainer = $("<div>").css({
+      position: "absolute",
+      width: this.width,
+      height: this.height,
+      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+    });
+
+    this._outline1 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        bottom: -1 * this.outlineWidth,
+        left: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._outline2 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        top: -1 * this.outlineWidth,
+        right: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._textarea.before(this._outlineContainer);
+
+    return this;
+  }
+
+  _createTimeline() {
+    this._timeline = gsap
+      .timeline({
+        defaults: { duration: this.duration, ease: "set1" },
+        paused: true,
+      })
+      .to(this._outline1, {
+        width: `calc(100% + ${this.outlineWidth * 2}px)`,
+        height: `calc(100% + ${this.outlineWidth * 2}px)`,
+      })
+      .to(
+        this._outline2,
+        {
+          width: `calc(100% + ${this.outlineWidth * 2}px)`,
+          height: `calc(100% + ${this.outlineWidth * 2}px)`,
+        },
+        "<"
+      );
+
+    return this;
+  }
+
+  _bindTimeline() {
+    const hoverElement = this._textarea;
+    const focusElement = this._textarea;
+
+    hoverElement.on("mouseover", () => {
+      this._timeline.play();
+    });
+    hoverElement.on("mouseleave", () => {
+      if (!focusElement.is(":focus")) this._timeline.reverse();
+    });
+    focusElement.on("focus", () => {
+      this._timeline.play();
+    });
+    focusElement.on("blur", () => {
+      this._timeline.reverse();
+    });
+
+    return this;
+  }
+
+  /**
+   * 公開方法，用於附加元素進DOM。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
+}
+
+class TextInput {
+  constructor(config) {
+    this._isAppendTo = false;
+    /**
+     * 選單的根容器。
+     * @type {jQuery}
+     */
+    this.element = this._create(config);
+  }
+
+  /**
+   * 公開方法，用於附加元素進DOM。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
+}
