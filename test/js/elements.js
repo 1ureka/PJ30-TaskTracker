@@ -292,6 +292,7 @@ class DoubleColorLabel {
    * @param {string} - 標籤的初始文本內容。
    */
   constructor(text = "未定義") {
+    this._isAppendTo = false;
     /**
      * 元素的根容器。
      * @type {jQuery}
@@ -335,6 +336,20 @@ class DoubleColorLabel {
       .to(this._redLabel, { y: 0 }, "<");
 
     return tl;
+  }
+
+  /**
+   * 公開方法，用於附加元素進DOM。
+   * @returns {DoubleColorLabel} - DoubleColorLabel 類別的實例。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
   }
 }
 
@@ -396,6 +411,7 @@ class Select {
   _createOutline() {
     const clonedSelect = this._select.clone().appendTo("body");
 
+    // size可以利用onload後拿取
     const size = {
       innerWidth: clonedSelect.innerWidth(),
       innerHeight: clonedSelect.innerHeight(),
@@ -542,6 +558,8 @@ class TextArea {
       .attr("placeholder", this.placeholder);
 
     this._createOutline()._createTimeline()._bindTimeline();
+
+    return container;
   }
 
   _createOutline() {
@@ -615,6 +633,14 @@ class TextArea {
     focusElement.on("blur", () => {
       this._timeline.reverse();
     });
+
+    return this;
+  }
+
+  val(value) {
+    if (!value) return this._textarea.val();
+
+    this._textarea.val(value);
 
     return this;
   }
