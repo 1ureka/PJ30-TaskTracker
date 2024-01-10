@@ -169,6 +169,8 @@ class SidebarTop extends component {
   constructor() {
     super();
 
+    this._handlers = {};
+
     this.element = this._create();
   }
 
@@ -195,13 +197,34 @@ class SidebarTop extends component {
     const icon = new CalendarIcon();
     timelines.push(...icon.timelines);
 
-    const yearSelect = this._createYearSelect();
+    const { year, month } = this._getLocalStorageDate();
 
-    container.append(icon.elements[0], yearSelect);
+    this._yearSelect = this._createYearSelect();
+    this._yearSelect.val(year);
+
+    this._monthSelect = this._createMonthSelect();
+    this._monthSelect.val(month);
+
+    container.append(
+      icon.elements[0],
+      this._yearSelect.element,
+      this._monthSelect.element
+    );
 
     this._bindHoverTimelines(container, timelines);
 
     return container;
+  }
+
+  _getLocalStorageDate() {
+    const localStorageDate = formatLocalStorageDate();
+
+    if (localStorageDate) return localStorageDate;
+
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+
+    return { year: currentYear, month: currentMonth };
   }
 
   _createYearSelect() {
@@ -217,13 +240,48 @@ class SidebarTop extends component {
       duration: 0.2,
     });
 
-    if (formatLocalStorageDate()) {
-      select.val(formatLocalStorageDate().year);
-    } else {
-      select.val(currentYear.toString());
-    }
+    return select;
+  }
 
-    return select.element;
+  _createMonthSelect() {
+    const currentYear = new Date().getFullYear();
+    const selectedYear = parseInt(this._yearSelect.val());
+
+    const endMonth =
+      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+
+    const months = Array.from({ length: endMonth }, (_, index) =>
+      (index + 1).toString().padStart(2, "0")
+    );
+
+    const select = new Select({
+      options: months,
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
+    return select;
+  }
+
+  _resetMonthOptions() {
+    const currentYear = new Date().getFullYear();
+    const selectedYear = parseInt(this._yearSelect.val());
+
+    const endMonth =
+      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+
+    const months = Array.from({ length: endMonth }, (_, index) =>
+      (index + 1).toString().padStart(2, "0")
+    );
+
+    const select = this._monthSelect._select;
+    select.empty();
+
+    months.forEach((month) => {
+      select.append(`<option value="${month}">${month}</option>`);
+    });
+
+    return this;
   }
 
   _bindHoverTimelines(element, timelines) {
@@ -231,6 +289,44 @@ class SidebarTop extends component {
       element.on("mouseenter", () => tl.play());
       element.on("mouseleave", () => tl.reverse());
     });
+  }
+
+  onDateSelect(handler) {
+    if (this._handlers.date) return this;
+
+    const yearSelect = this._yearSelect.element;
+    const monthSelect = this._monthSelect.element;
+
+    const getDate = () => {
+      return { year: this._yearSelect.val(), month: this._monthSelect.val() };
+    };
+
+    this._handlers.date = {
+      year: () => {
+        // 根據年份初始化月份
+        this._resetMonthOptions();
+
+        handler(getDate());
+      },
+      month: () => {
+        handler(getDate());
+      },
+    };
+
+    yearSelect.on("change", this._handlers.date.year);
+    monthSelect.on("change", this._handlers.date.month);
+
+    return this;
+  }
+
+  onAdd(handler) {
+    if (this._handlers.add) return this;
+
+    this._handlers.add = (e) => {
+      handler(e);
+    };
+
+    this._addBtn.on("click", this._handlers.add);
   }
 }
 
