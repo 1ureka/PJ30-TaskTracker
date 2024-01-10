@@ -1,3 +1,16 @@
+const categorise = [
+  "未分類",
+  "PJ24",
+  "PJ25",
+  "PJ26",
+  "PJ27",
+  "PJ28",
+  "PJ29",
+  "PJ30",
+];
+
+const status = ["未完成", "跳過", "完成", "失敗"];
+
 /**
  * 組件的預設空白類
  */
@@ -190,16 +203,7 @@ class SidebarTop extends component {
     this._textarea.appendTo(container);
 
     this._categorySelect = new Select({
-      options: [
-        "未分類",
-        "PJ24",
-        "PJ25",
-        "PJ26",
-        "PJ27",
-        "PJ28",
-        "PJ29",
-        "PJ30",
-      ],
+      options: categorise,
       outlineWidth: 2,
       duration: 0.2,
     });
@@ -389,6 +393,66 @@ class SidebarTop extends component {
 class Header extends component {
   constructor() {
     super();
+
+    this._create();
+  }
+
+  _create() {
+    this.element = $("#header");
+
+    const input = this._createSearchInput();
+    const select = this._createCategorySelect();
+
+    this.element.append(input, select);
+
+    return this;
+  }
+
+  _createSearchInput() {
+    const container = $("<div>").addClass("search-input");
+
+    const searchIcon = new SearchIcon();
+    searchIcon.appendTo(container);
+
+    this._input = new TextInput();
+    this._input.appendTo(container);
+
+    this._eraserIcon = new EraserIcon();
+    this._eraserIcon.appendTo(container);
+
+    return container;
+  }
+
+  _createCategorySelect() {
+    const container = $("<div>").addClass("category-select");
+    const label = $("<label>").text("篩選").appendTo(container);
+
+    this._select = new Select({
+      options: [],
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
+    this._select.appendTo(container);
+
+    return container;
+  }
+
+  onInput(handler) {
+    if (this._handler) return this;
+
+    this._handler = (e) => {
+      if (this._input.val()) {
+        this._eraserIcon.show();
+      } else {
+        this._eraserIcon.hide();
+      }
+
+      handler(e);
+    };
+
+    this._input.on("input");
+    this._select.on("change");
   }
 }
 
