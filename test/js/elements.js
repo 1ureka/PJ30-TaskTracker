@@ -277,6 +277,46 @@ class CalendarIcon extends IconInterface {
   }
 }
 
+class SearchIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    return [tl];
+  }
+}
+
+class EraserIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    return [tl];
+  }
+
+  show() {}
+
+  hide() {}
+}
+
 //
 //
 //
