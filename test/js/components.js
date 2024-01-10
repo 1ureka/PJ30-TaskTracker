@@ -11,7 +11,7 @@ class component {
    * @param {string} selector - DOM 選擇器。
    */
   appendTo(selector) {
-    if (this._isAppendTo) return;
+    if (this._isAppendTo) return this;
     this._isAppendTo = true;
     this.parent = selector;
     this.element = this.element.appendTo(selector);
@@ -179,6 +179,14 @@ class SidebarTop extends component {
 
     this._dateSelect = this._createDateSelect().appendTo(container);
 
+    this._textarea = new TextArea({
+      placeholder: "新增工作",
+      width: 240,
+      height: 210,
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
     return container;
   }
 
@@ -195,21 +203,16 @@ class SidebarTop extends component {
     ];
 
     const icon = new CalendarIcon();
+    icon.appendTo(container);
     timelines.push(...icon.timelines);
 
     const { year, month } = this._getLocalStorageDate();
 
     this._yearSelect = this._createYearSelect();
-    this._yearSelect.val(year);
+    this._yearSelect.appendTo(container).val(year);
 
     this._monthSelect = this._createMonthSelect();
-    this._monthSelect.val(month);
-
-    container.append(
-      icon.elements[0],
-      this._yearSelect.element,
-      this._monthSelect.element
-    );
+    this._monthSelect.appendTo(container).val(month);
 
     this._bindHoverTimelines(container, timelines);
 
@@ -224,7 +227,10 @@ class SidebarTop extends component {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
-    return { year: currentYear, month: currentMonth };
+    return {
+      year: currentYear,
+      month: currentMonth.toString().padStart(2, "0"),
+    };
   }
 
   _createYearSelect() {
