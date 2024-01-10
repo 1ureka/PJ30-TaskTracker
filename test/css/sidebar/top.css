@@ -24,3 +24,7 @@
   margin-bottom: 10px;
   border-radius: 10px;
 }
+
+.sidebar-top-container > .btn {
+  margin: 10px;
+}

@@ -7,7 +7,10 @@ $(async function () {
   console.log("2");
 
   const sidebarTop = new SidebarTop();
-  sidebarTop.appendTo("#sidebar").onDateSelect((date) => console.log(date));
+  sidebarTop
+    .appendTo("#sidebar")
+    .onDateSelect((date) => console.log(date))
+    .onAdd((data) => console.log(data));
 
   const sidebarBottom = new SidebarBottom();
   sidebarBottom.appendTo("#sidebar").onSelect((type) => console.log(type));
