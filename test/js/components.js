@@ -187,6 +187,28 @@ class SidebarTop extends component {
       duration: 0.2,
     });
 
+    this._textarea.appendTo(container);
+
+    this._categorySelect = new Select({
+      options: [
+        "未分類",
+        "PJ24",
+        "PJ25",
+        "PJ26",
+        "PJ27",
+        "PJ28",
+        "PJ29",
+        "PJ30",
+      ],
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
+    this._categorySelect.element.css("margin", "10px");
+    this._categorySelect.appendTo(container);
+
+    this._addBtn = this._createAddBtn().appendTo(container);
+
     return container;
   }
 
@@ -290,6 +312,31 @@ class SidebarTop extends component {
     return this;
   }
 
+  _createAddBtn() {
+    const btn = $("<button>").addClass("btn");
+
+    const label = new DoubleColorLabel("新增");
+    label.appendTo(btn);
+
+    this._bindClickTimeline(btn);
+    this._bindHoverTimelines(btn, [
+      label.timeline,
+      gsap
+        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+        .to(btn, { scale: 1.1 }),
+    ]);
+
+    return btn;
+  }
+
+  _bindClickTimeline(btn) {
+    const tl = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+
+    btn.on("click", () => tl.restart());
+  }
+
   _bindHoverTimelines(element, timelines) {
     timelines.forEach((tl) => {
       element.on("mouseenter", () => tl.play());
@@ -328,8 +375,11 @@ class SidebarTop extends component {
   onAdd(handler) {
     if (this._handlers.add) return this;
 
-    this._handlers.add = (e) => {
-      handler(e);
+    this._handlers.add = () => {
+      const category = this._categorySelect.val();
+      const content = this._textarea.val();
+
+      if (content.trim()) handler({ category, content });
     };
 
     this._addBtn.on("click", this._handlers.add);
