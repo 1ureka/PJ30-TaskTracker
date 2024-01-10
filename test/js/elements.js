@@ -267,12 +267,35 @@ class CalendarIcon extends IconInterface {
 //
 //
 
+/**
+ * DoubleColorLabel 類別用於創建具有雙色標籤效果的元素。
+ * @class
+ */
 class DoubleColorLabel {
+  /**
+   * DoubleColorLabel 類別的建構子。
+   * @constructor
+   * @param {string} - 標籤的初始文本內容。
+   */
   constructor(text = "未定義") {
+    /**
+     * 元素的根容器。
+     * @type {jQuery}
+     */
     this.element = this._create(text);
+    /**
+     * GSAP 時間軸，用於處理標籤的動畫效果。
+     * @type {TimelineMax}
+     */
     this.timeline = this._createTimeline();
   }
 
+  /**
+   * 私有方法，用於創建標籤元素。
+   * @private
+   * @param {string} text - 標籤的文本內容。
+   * @returns {jQuery} - 創建的標籤元素的 jQuery 物件。
+   */
   _create(text) {
     const container = $("<div>").addClass("label-container");
 
@@ -284,6 +307,11 @@ class DoubleColorLabel {
     return container;
   }
 
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {TimelineMax} - 創建的 GSAP 時間軸。
+   */
   _createTimeline() {
     gsap.set(this._redLabel, { y: -40 });
 
@@ -296,11 +324,36 @@ class DoubleColorLabel {
   }
 }
 
+/**
+ * Select 類別用於創建自定義樣式的下拉選單。
+ * @class
+ */
 class Select {
+  /**
+   * Select 類別的建構子。
+   * @constructor
+   * @param {Object} config - 選單的配置項。
+   * @param {Array<string>} config.options - 選單的選項。
+   * @param {number} config.outlineWidth - 選單輪廓的寬度。
+   * @param {number} config.duration - 選單動畫的持續時間。
+   */
   constructor(config) {
+    /**
+     * 選單的根容器。
+     * @type {jQuery}
+     */
     this.element = this._create(config);
   }
 
+  /**
+   * 私有方法，用於創建選單元素。
+   * @private
+   * @param {Object} config - 選單的配置項。
+   * @param {Array<string>} config.options - 選單的選項。
+   * @param {number} config.outlineWidth - 選單輪廓的寬度。
+   * @param {number} config.duration - 選單動畫的持續時間。
+   * @returns {jQuery} - 創建的選單元素的 jQuery 物件。
+   */
   _create(config) {
     // 取出所需變數
     this.options = config.options;
@@ -309,6 +362,10 @@ class Select {
 
     const container = $("<div>").addClass("select-container");
 
+    /**
+     * 下拉選單元素。
+     * @type {jQuery}
+     */
     this._select = $("<select>").appendTo(container);
 
     this.options.forEach((option) => {
@@ -320,6 +377,11 @@ class Select {
     return container;
   }
 
+  /**
+   * 私有方法，用於創建選單的外框。
+   * @private
+   * @returns {Select} - Select 類別的實例。
+   */
   _createOutline() {
     const clonedSelect = this._select.clone().appendTo("body");
 
@@ -363,6 +425,11 @@ class Select {
     return this;
   }
 
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {Select} - Select 類別的實例。
+   */
   _createTimeline() {
     this._timeline = gsap
       .timeline({
@@ -385,6 +452,11 @@ class Select {
     return this;
   }
 
+  /**
+   * 私有方法，用於綁定事件和時間軸。
+   * @private
+   * @returns {Select} - Select 類別的實例。
+   */
   _bindTimeline() {
     const hoverElement = this._select;
     const focusElement = this._select;
@@ -405,6 +477,11 @@ class Select {
     return this;
   }
 
+  /**
+   * 公開方法，用於設置或獲取選中的值。
+   * @param {string} [value] - 要設置的值。如果未提供，則返回當前選中的值。
+   * @returns {string | Select} - Select 類別的實例。
+   */
   val(value) {
     if (!value) return this._select.val();
 
@@ -413,3 +490,7 @@ class Select {
     return this;
   }
 }
+
+class TextArea {}
+
+class TextInput {}
