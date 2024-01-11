@@ -415,6 +415,50 @@ class EraserIcon extends IconInterface {
   }
 }
 
+class ScrollIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>")
+      .addClass("icon-container")
+      .css({
+        width: "30px",
+        height: "30px",
+        clipPath: "circle(17.5px at center)",
+      });
+
+    this._white = $("<img>")
+      .attr("src", "icons/up (white).png")
+      .css({ width: "30px", height: "30px" });
+    this._dark = $("<img>")
+      .attr("src", "icons/up (dark).png")
+      .css({ width: "30px", height: "30px" });
+
+    container.append(this._white, this._dark);
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    gsap.set(this._dark, { y: 40 });
+
+    const tl = gsap
+      .timeline({
+        defaults: { duration: 0.2, ease: "set1" },
+        paused: true,
+      })
+      .to(this._white, { y: -40 })
+      .to(this._dark, { y: 0 }, "<")
+      .to(container, { scale: 1.2 }, "<");
+
+    return [tl];
+  }
+}
+
 //
 //
 //
