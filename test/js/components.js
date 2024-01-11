@@ -134,13 +134,18 @@ class ScrollButtons extends component {
     return this;
   }
 
+  /**
+   * 設置點擊事件處理函式，當上滾動或下滾動按鈕被點擊時觸發。
+   * @param {function} handler - 點擊事件處理函式，傳遞一個字串參數，代表點擊的按鈕類型 ("up" 或 "down")。
+   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
+   */
   onClick(handler) {
     if (this._handlers.up || this._handlers.down) return this;
 
-    this._handlers.up = async () => {
+    this._handlers.up = () => {
       handler("up");
     };
-    this._handlers.down = async () => {
+    this._handlers.down = () => {
       handler("down");
     };
 
