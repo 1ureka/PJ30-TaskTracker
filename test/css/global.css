@@ -106,7 +106,8 @@ button {
 }
 
 .select-container,
-.textarea-container {
+.textarea-container,
+.input-container {
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -125,4 +126,11 @@ button {
   width: 100%;
   height: 100%;
   resize: none;
+}
+.input-container > input {
+  position: relative;
+  box-sizing: border-box;
+  outline: 0;
+  width: 100%;
+  height: 100%;
 }
