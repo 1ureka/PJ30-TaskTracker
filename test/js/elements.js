@@ -27,6 +27,7 @@ class IconInterface {
   }
 
   /**
+   * @param {string|HTMLElement|jQuery} selector - 要附加到的 DOM 元素。
    * 附加實例元素到指定的 DOM 選擇器。
    */
   appendTo(selector) {
@@ -477,6 +478,7 @@ class DoubleColorLabel {
 
   /**
    * 公開方法，用於附加元素進DOM。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
    * @returns {DoubleColorLabel} - DoubleColorLabel 類別的實例。
    */
   appendTo(element) {
@@ -656,6 +658,7 @@ class Select {
 
   /**
    * 公開方法，用於附加元素進DOM。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
    * @returns {Select} - Select 類別的實例。
    */
   appendTo(element) {
@@ -669,7 +672,21 @@ class Select {
   }
 }
 
+/**
+ * TextArea 類別用於創建具有自定義樣式的文字區域。
+ * @class
+ */
 class TextArea {
+  /**
+   * TextArea 類別的建構子。
+   * @constructor
+   * @param {Object} config - 文字區域的配置項。
+   * @param {number} config.width - 文字區域的寬度。
+   * @param {number} config.height - 文字區域的高度。
+   * @param {string} config.placeholder - 文字區域的預設提示文字。
+   * @param {number} config.outlineWidth - 文字區域輪廓的寬度。
+   * @param {number} config.duration - 文字區域動畫的持續時間。
+   */
   constructor(config) {
     this._isAppendTo = false;
     /**
@@ -679,6 +696,12 @@ class TextArea {
     this.element = this._create(config);
   }
 
+  /**
+   * 私有方法，用於創建文字區域元素。
+   * @private
+   * @param {Object} config - 文字區域的配置項。
+   * @returns {jQuery} - 創建的文字區域元素的 jQuery 物件。
+   */
   _create(config) {
     this.width = config.width;
     this.height = config.height;
@@ -699,6 +722,11 @@ class TextArea {
     return container;
   }
 
+  /**
+   * 私有方法，用於創建文字區域的輪廓。
+   * @private
+   * @returns {TextArea} - TextArea 類別的實例。
+   */
   _createOutline() {
     this._outlineContainer = $("<div>").css({
       position: "absolute",
@@ -732,6 +760,11 @@ class TextArea {
     return this;
   }
 
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {TextArea} - TextArea 類別的實例。
+   */
   _createTimeline() {
     this._timeline = gsap
       .timeline({
@@ -754,6 +787,11 @@ class TextArea {
     return this;
   }
 
+  /**
+   * 私有方法，用於綁定事件和時間軸。
+   * @private
+   * @returns {TextArea} - TextArea 類別的實例。
+   */
   _bindTimeline() {
     const hoverElement = this._textarea;
     const focusElement = this._textarea;
@@ -774,6 +812,11 @@ class TextArea {
     return this;
   }
 
+  /**
+   * 公開方法，用於設置或獲取文字區域的值。
+   * @param {string} [value] - 要設置的值。如果未提供，則返回當前文字區域的值。
+   * @returns {TextArea} - TextArea 類別的實例。
+   */
   val(value) {
     if (!value) return this._textarea.val();
 
@@ -783,7 +826,9 @@ class TextArea {
   }
 
   /**
-   * 公開方法，用於附加元素進DOM。
+   * 公開方法，用於將文字區域元素附加到指定的 DOM 元素。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
+   * @returns {TextArea} - TextArea 類別的實例。
    */
   appendTo(element) {
     if (this._isAppendTo) return this;
@@ -796,7 +841,21 @@ class TextArea {
   }
 }
 
+/**
+ * TextInput 類別用於創建具有自定義樣式的文字輸入框。
+ * @class
+ */
 class TextInput {
+  /**
+   * TextInput 類別的建構子。
+   * @constructor
+   * @param {Object} config - 文字輸入框的配置項。
+   * @param {number} config.width - 文字輸入框的寬度。
+   * @param {number} config.height - 文字輸入框的高度。
+   * @param {string} config.placeholder - 文字輸入框的預設提示文字。
+   * @param {number} config.outlineWidth - 文字輸入框輪廓的寬度。
+   * @param {number} config.duration - 文字輸入框動畫的持續時間。
+   */
   constructor(config) {
     this._isAppendTo = false;
     /**
@@ -806,6 +865,12 @@ class TextInput {
     this.element = this._create(config);
   }
 
+  /**
+   * 私有方法，用於創建文字輸入框元素。
+   * @private
+   * @param {Object} config - 文字輸入框的配置項。
+   * @returns {jQuery} - 創建的文字輸入框元素的 jQuery 物件。
+   */
   _create(config) {
     this.width = config.width;
     this.height = config.height;
@@ -827,6 +892,11 @@ class TextInput {
     return container;
   }
 
+  /**
+   * 私有方法，用於創建文字輸入框的輪廓。
+   * @private
+   * @returns {TextInput} - TextInput 類別的實例。
+   */
   _createOutline() {
     this._outlineContainer = $("<div>").css({
       position: "absolute",
@@ -860,6 +930,11 @@ class TextInput {
     return this;
   }
 
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {TextInput} - TextInput 類別的實例。
+   */
   _createTimeline() {
     this.timeline = gsap
       .timeline({
@@ -882,6 +957,11 @@ class TextInput {
     return this;
   }
 
+  /**
+   * 公開方法，用於設置或獲取文字輸入框的值。
+   * @param {string} [value] - 要設置的值。如果未提供，則返回當前文字輸入框的值。
+   * @returns {TextInput} - TextInput 類別的實例。
+   */
   val(value) {
     if (!value && value !== "") return this._input.val();
 
@@ -891,7 +971,9 @@ class TextInput {
   }
 
   /**
-   * 公開方法，用於附加元素進DOM。
+   * 公開方法，用於將文字輸入框元素附加到指定的 DOM 元素。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
+   * @returns {TextInput} - TextInput 類別的實例。
    */
   appendTo(element) {
     if (this._isAppendTo) return this;
