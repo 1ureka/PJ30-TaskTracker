@@ -6,6 +6,9 @@ $(async function () {
 
   console.log("2");
 
+  const header = new Header();
+  header.onInput((e) => console.log(e)).onClear(() => console.log("clear"));
+
   const sidebarTop = new SidebarTop();
   sidebarTop
     .appendTo("#sidebar")
