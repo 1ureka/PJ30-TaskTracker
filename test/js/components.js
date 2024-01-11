@@ -394,6 +394,8 @@ class Header extends component {
   constructor() {
     super();
 
+    this._handlers = {};
+
     this._create();
   }
 
@@ -411,24 +413,55 @@ class Header extends component {
   _createSearchInput() {
     const container = $("<div>").addClass("search-input");
 
+    const timelines = [];
+
     const searchIcon = new SearchIcon();
     searchIcon.appendTo(container);
+    timelines.push(...searchIcon.timelines);
 
-    this._input = new TextInput();
+    this._input = new TextInput({
+      placeholder: "搜尋",
+      width: 410,
+      height: 40,
+      outlineWidth: 2,
+      duration: 0.2,
+    });
+
     this._input.appendTo(container);
+    const timeline = this._input.timeline;
+    const hoverElement = container;
+    const focusElement = this._input._input;
+
+    hoverElement.on("mouseover", () => {
+      timeline.play();
+    });
+    hoverElement.on("mouseleave", () => {
+      if (!focusElement.is(":focus")) timeline.reverse();
+    });
+    focusElement.on("focus", () => {
+      timeline.play();
+    });
+    focusElement.on("blur", () => {
+      timeline.reverse();
+    });
 
     this._eraserIcon = new EraserIcon();
     this._eraserIcon.appendTo(container);
+
+    this._bindHoverTimelines(container, timelines);
 
     return container;
   }
 
   _createCategorySelect() {
-    const container = $("<div>").addClass("category-select");
+    const container = $("<div>")
+      .addClass("category-select")
+      .css("width", $("#title").width());
+
     const label = $("<label>").text("篩選").appendTo(container);
 
     this._select = new Select({
-      options: [],
+      options: ["所有類別", ...categorise],
       outlineWidth: 2,
       duration: 0.2,
     });
@@ -438,21 +471,47 @@ class Header extends component {
     return container;
   }
 
-  onInput(handler) {
-    if (this._handler) return this;
+  _bindHoverTimelines(element, timelines) {
+    timelines.forEach((tl) => {
+      element.on("mouseenter", () => tl.play());
+      element.on("mouseleave", () => tl.reverse());
+    });
+  }
 
-    this._handler = (e) => {
+  onInput(handler) {
+    if (this._handlers.input) return this;
+
+    this._handlers.input = (e) => {
+      const words = this._input.val();
+      const category = this._select.val();
+
       if (this._input.val()) {
         this._eraserIcon.show();
       } else {
         this._eraserIcon.hide();
       }
 
-      handler(e);
+      handler({ words, category });
     };
 
-    this._input.on("input");
-    this._select.on("change");
+    this._input._input.on("input", this._handlers.input);
+    this._select._select.on("change", this._handlers.input);
+
+    return this;
+  }
+
+  onClear(handler) {
+    if (this._handlers.clear) return this;
+
+    this._handlers.clear = () => {
+      this._input.val("");
+
+      handler();
+    };
+
+    this._eraserIcon.elements[0].on("click", this._handlers.clear);
+
+    return this;
   }
 }
 
