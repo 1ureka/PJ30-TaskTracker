@@ -32,6 +32,155 @@ class component {
   }
 }
 
+/**
+ * 這個類別提供創建和控制上下滾動按鈕的功能。
+ */
+class ScrollButtons extends component {
+  /**
+   * 建構一個新的 `ScrollButtons` 實例。@constructor
+   */
+  constructor() {
+    super();
+    this._timelines = {};
+    this._handlers = {};
+
+    this.isShow = false;
+
+    /**
+     * 包含上下滾動按鈕的 jQuery 物件。
+     * @type {jQuery}
+     */
+    const container = $("<div>").addClass("scroll-buttons-container");
+
+    this._up = this._createScrollButton("up");
+    this._down = this._createScrollButton("down");
+
+    container.append(this._up, this._down);
+
+    this.element = container;
+
+    this._createTimelines();
+  }
+
+  /**
+   * 創建上下滾動按鈕。
+   * @private
+   * @param {string} type - 按鈕類型，可以是 "up" 或 "down"。
+   * @returns {jQuery} - 上下滾動按鈕的 jQuery 物件。
+   */
+  _createScrollButton(type) {
+    const button = $("<button>").addClass("scroll-button").addClass(type);
+    const icon = new ScrollIcon();
+
+    if (type === "down") gsap.set(icon.elements[0], { rotate: 180 });
+
+    icon.appendTo(button);
+
+    const hoverTls = [
+      gsap
+        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+        .to(button, { backgroundColor: "#ea81af" }),
+      ...icon.timelines,
+    ];
+
+    const clickTl = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(button, { scale: 0.6, repeat: 1, yoyo: true });
+
+    this._bindTimeline(button, hoverTls, clickTl);
+
+    return button;
+  }
+
+  /**
+   * 將時間軸綁定到按鈕的不同事件。
+   * @param {jQuery} button - 要綁定的按鈕元素。
+   * @param {TimelineMax[]} hover - 滑鼠進入時觸發的時間軸陣列。
+   * @param {TimelineMax} click - 按鈕點擊時觸發的時間軸。
+   */
+  _bindTimeline(button, hover, click) {
+    button.on("mouseenter", () => {
+      hover.forEach((tl) => {
+        tl.play();
+      });
+    });
+    button.on("mouseleave", () => {
+      hover.forEach((tl) => {
+        tl.reverse();
+      });
+    });
+
+    button.on("click", () => click.restart());
+  }
+
+  /**
+   * 創建並初始化上滾動按鈕的時間軸效果。
+   * @private
+   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
+   */
+  _createTimelines() {
+    this._timelines.show = gsap
+      .timeline({
+        defaults: { ease: "back.out(4)", duration: 0.35 },
+        paused: true,
+      })
+      .from(this.element.children(), { scale: 0.5, stagger: 0.15 })
+      .from(
+        this.element.children(),
+        { ease: "set1", autoAlpha: 0, stagger: 0.15 },
+        "<"
+      );
+
+    return this;
+  }
+
+  onClick(handler) {
+    if (this._handlers.up || this._handlers.down) return this;
+
+    this._handlers.up = async () => {
+      handler("up");
+    };
+    this._handlers.down = async () => {
+      handler("down");
+    };
+
+    this._up.on("click", this._handlers.up);
+    this._down.on("click", this._handlers.down);
+
+    return this;
+  }
+
+  /**
+   * 顯示上滾動按鈕。
+   */
+  show() {
+    if (this.isShow) return this;
+
+    this.isShow = true;
+    this._timelines.show.play();
+
+    return this;
+  }
+
+  /**
+   * 隱藏上滾動按鈕。
+   */
+  async hide() {
+    if (!this.isShow) return this;
+
+    this.isShow = false;
+    this._timelines.show.reverse();
+
+    this._timelines.show.eventCallback("onReverseComplete", null);
+
+    await new Promise((resolve) => {
+      this._timelines.show.eventCallback("onReverseComplete", resolve);
+    });
+
+    return this;
+  }
+}
+
 class SidebarBottom extends component {
   constructor() {
     super();

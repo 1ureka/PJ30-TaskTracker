@@ -17,4 +17,10 @@ $(async function () {
 
   const sidebarBottom = new SidebarBottom();
   sidebarBottom.appendTo("#sidebar").onSelect((type) => console.log(type));
+
+  const scrollBtns = new ScrollButtons();
+  scrollBtns
+    .appendTo("body")
+    .onClick((type) => console.log(type))
+    .show();
 });
