@@ -285,23 +285,84 @@ class SearchIcon extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
+    this._clipPath = $("<div>")
+      .css({
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        clipPath: "circle(10px at 16.5px 17px)",
+        pointerEvents: "none",
+      })
+      .appendTo(container);
+
+    this._inner1 = $("<div>")
+      .css({
+        position: "absolute",
+        width: "12%",
+        height: "150%",
+        backgroundColor: "#ffff7a",
+      })
+      .appendTo(this._clipPath);
+
+    this._inner2 = $("<div>")
+      .css({
+        position: "absolute",
+        width: "12%",
+        height: "150%",
+        backgroundColor: "#ffff7a",
+      })
+      .appendTo(this._clipPath);
+
+    this._magnifier = $("<img>")
+      .attr("src", "icons/search.png")
+      .appendTo(container);
+
     return [container];
   }
 
   _createTimeline() {
     const container = this.elements[0];
 
-    return [tl];
+    gsap.set([this._inner1, this._inner2], { rotate: 5 });
+    gsap.set(this._inner2, { x: -10 });
+
+    const t1 = gsap
+      .timeline({ defaults: { ease: "set1", duration: 0.6 }, paused: true })
+      .to([this._inner1, this._inner2], {
+        x: "+=40",
+        rotate: 20,
+      });
+
+    const t2 = gsap
+      .timeline({ defaults: { ease: "set1", duration: 0.3 }, paused: true })
+      .to(container, {
+        scale: 1.1,
+        rotate: "+=15",
+        transformOrigin: "16.5px 17px",
+      });
+
+    return [t1, t2];
   }
 }
 
 class EraserIcon extends IconInterface {
   constructor() {
     super();
+
+    this._bindTimeline();
   }
 
   _createIcon() {
-    const container = $("<div>").addClass("icon-container");
+    const container = $("<div>")
+      .addClass("icon-container")
+      .css({ clipPath: "none", pointerEvents: "auto", cursor: "pointer" });
+
+    this._line = $("<img>")
+      .attr("src", "icons/erase (line).png")
+      .appendTo(container);
+    this._eraser = $("<img>")
+      .attr("src", "icons/erase.png")
+      .appendTo(container);
 
     return [container];
   }
@@ -309,12 +370,48 @@ class EraserIcon extends IconInterface {
   _createTimeline() {
     const container = this.elements[0];
 
-    return [tl];
+    this._show = gsap
+      .timeline({
+        defaults: { duration: 0.35, ease: "back.out(4)" },
+        paused: true,
+      })
+      .fromTo(
+        container,
+        { marginLeft: 0, width: 0, height: 0, autoAlpha: 0 },
+        { marginLeft: 10, width: 40, height: 40, autoAlpha: 1 }
+      );
+
+    this._click = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(container, { scale: 0.5, yoyo: true, repeat: 1 });
+
+    this._hover = gsap
+      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .fromTo(this._eraser, { x: 10 }, { x: -5 });
+
+    return [];
   }
 
-  show() {}
+  _bindTimeline() {
+    const container = this.elements[0];
 
-  hide() {}
+    container.on("mouseenter", () => this._hover.play());
+    container.on("mouseleave", () => this._hover.reverse());
+    container.on("click", async () => {
+      this._click.restart();
+      await delay(150);
+
+      this._show.reverse();
+    });
+  }
+
+  show() {
+    this._show.play();
+  }
+
+  hide() {
+    this._show.reverse();
+  }
 }
 
 //
@@ -707,6 +804,90 @@ class TextInput {
      * @type {jQuery}
      */
     this.element = this._create(config);
+  }
+
+  _create(config) {
+    this.width = config.width;
+    this.height = config.height;
+    this.placeholder = config.placeholder;
+    this.outlineWidth = config.outlineWidth;
+    this.duration = config.duration;
+
+    const container = $("<div>")
+      .addClass("input-container")
+      .css({ width: this.width, height: this.height });
+
+    this._input = $("<input>")
+      .attr("type", "text")
+      .appendTo(container)
+      .attr("placeholder", this.placeholder);
+
+    this._createOutline()._createTimeline();
+
+    return container;
+  }
+
+  _createOutline() {
+    this._outlineContainer = $("<div>").css({
+      position: "absolute",
+      width: this.width,
+      height: this.height,
+      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+    });
+
+    this._outline1 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        bottom: -1 * this.outlineWidth,
+        left: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._outline2 = $("<div>")
+      .css({
+        position: "absolute",
+        backgroundColor: "white",
+        borderRadius: "10px",
+        top: -1 * this.outlineWidth,
+        right: -1 * this.outlineWidth,
+      })
+      .appendTo(this._outlineContainer);
+
+    this._input.before(this._outlineContainer);
+
+    return this;
+  }
+
+  _createTimeline() {
+    this.timeline = gsap
+      .timeline({
+        defaults: { duration: this.duration, ease: "set1" },
+        paused: true,
+      })
+      .to(this._outline1, {
+        width: `calc(100% + ${this.outlineWidth * 2}px)`,
+        height: `calc(100% + ${this.outlineWidth * 2}px)`,
+      })
+      .to(
+        this._outline2,
+        {
+          width: `calc(100% + ${this.outlineWidth * 2}px)`,
+          height: `calc(100% + ${this.outlineWidth * 2}px)`,
+        },
+        "<"
+      );
+
+    return this;
+  }
+
+  val(value) {
+    if (!value && value !== "") return this._input.val();
+
+    this._input.val(value);
+
+    return this;
   }
 
   /**
