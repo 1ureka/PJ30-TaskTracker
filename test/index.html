@@ -4,12 +4,15 @@
     <link rel="icon" type="image/png" href="icons/favicon.png" />
     <title>Task Tracker</title>
     <meta charset="UTF-8" />
+
+    <!-- font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap"
       rel="stylesheet"
     />
+
     <!-- CDN -->
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -19,6 +22,8 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
@@ -29,14 +34,13 @@
 
       CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
     </script>
+
     <!-- lib -->
     <script src="lib/clickParticle.js"></script>
     <link rel="stylesheet" href="lib/clickParticle.css" />
+
     <!-- 樣式表 -->
-    <link rel="stylesheet" href="css/global.css" />
-    <link rel="stylesheet" href="css/color.css" />
-    <link rel="stylesheet" href="css/sidebar/style.css" />
-    <link rel="stylesheet" href="css/header/style.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <div id="header">
@@ -46,6 +50,7 @@
       </div>
     </div>
     <div id="sidebar"></div>
+    <!-- particle-container之後可以考慮改成JS生成附在body使其完全lib化 -->
     <div id="particle-container"></div>
 
     <script src="js/utils.js"></script>
