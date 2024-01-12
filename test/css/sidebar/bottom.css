@@ -61,3 +61,9 @@
 #version-display > p {
   margin: 0;
 }
+
+.sidebar-bottom-container > .popup {
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}

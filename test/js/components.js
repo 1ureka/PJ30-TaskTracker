@@ -195,7 +195,7 @@ class SidebarBottom extends component {
 
     this.element = this._create();
 
-    this._createTimelines();
+    this._createTimelines()._bindTimeline();
   }
 
   _create() {
@@ -213,7 +213,7 @@ class SidebarBottom extends component {
     });
 
     this._doneBtn = this._createExtraBtn().appendTo(container);
-
+    this._createClearCheck().appendTo(container);
     this._createVersionDisplay().appendTo(container);
 
     return container;
@@ -270,6 +270,46 @@ class SidebarBottom extends component {
     return container;
   }
 
+  _createClearCheck() {
+    this._clearCheck = {};
+
+    this._clearCheck.element = $("<div>").addClass("popup").css({
+      justifyContent: "space-around",
+      width: "160px",
+      flexWrap: "wrap",
+      flexDirection: "row",
+      zIndex: 99,
+    });
+
+    this._clearCheck.yes = $("<button>").data("type", "check").css({
+      boxShadow: "none",
+      textDecoration: "underline",
+    });
+
+    const label1 = new DoubleColorLabel("確定");
+    label1.appendTo(this._clearCheck.yes);
+    this._bindHoverTimelines(this._clearCheck.yes, [label1.timeline]);
+    this._bindClickTimeline(this._clearCheck.yes);
+
+    this._clearCheck.no = $("<button>").data("type", "cancel").css({
+      boxShadow: "none",
+      textDecoration: "underline",
+    });
+
+    const label2 = new DoubleColorLabel("取消");
+    label2.appendTo(this._clearCheck.no);
+    this._bindHoverTimelines(this._clearCheck.no, [label2.timeline]);
+    this._bindClickTimeline(this._clearCheck.no);
+
+    this._clearCheck.element.append(
+      $("<p>").text("確定要清空嗎"),
+      this._clearCheck.yes,
+      this._clearCheck.no
+    );
+
+    return this._clearCheck.element;
+  }
+
   _bindClickTimeline(btn) {
     const tl = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
@@ -301,31 +341,76 @@ class SidebarBottom extends component {
           autoAlpha: 1,
         }
       );
+
+    this._timelines.show.clear = gsap
+      .timeline({ defaults: { duration: 0.35 }, paused: true })
+      .from(this._clearCheck.element, {
+        ease: "back.out(2)",
+        scale: 0.1,
+        autoAlpha: 0,
+      });
+
+    return this;
+  }
+
+  // 綁定"直接"關於該組件的時間軸
+  _bindTimeline() {
+    this.element.on("click", async (e) => {
+      const element = $(e.target);
+      const type = element.data("type");
+
+      const t1 = this._timelines.show.clear;
+      if (type === "clear") {
+        if (t1.paused()) {
+          t1.play();
+        } else {
+          t1.reversed(!t1.reversed());
+        }
+      } else if (["cancel", "check"].includes(type)) {
+        await delay(100);
+        t1.reverse();
+      }
+
+      const t2 = this._timelines.show.done;
+      if (type === "delete") {
+        if (t2.paused()) {
+          t2.play();
+        } else {
+          t2.reversed(!t2.reversed());
+        }
+      } else if (type === "done") {
+        await delay(100);
+        t2.reverse();
+      }
+    });
   }
 
   onSelect(handler) {
     if (this._handler) return this;
 
+    let isDeleting = false;
+
     this._handler = async (e) => {
       const element = $(e.target);
-      const type = element.data("type");
-
-      handler(type);
-
-      const tl = this._timelines.show.done;
+      let type = element.data("type");
 
       if (type === "delete") {
-        if (tl.paused()) {
-          tl.play();
+        // 刪除鍵有兩種可能
+        if (isDeleting) {
+          // 退出刪除模式
+          isDeleting = false;
+          type = "done";
         } else {
-          tl.reversed(!tl.reversed());
+          // 進入刪除模式
+          isDeleting = true;
         }
+      } else if (type === "done") {
+        // 完成鍵只有一種可能，退出刪除模式
+        isDeleting = false;
       }
 
-      if (type === "done") {
-        await delay(100);
-        tl.reverse();
-      }
+      if (["delete", "done", "save", "load", "check"].includes(type))
+        handler(type);
     };
 
     this.element.on("click", this._handler);
@@ -500,6 +585,17 @@ class SidebarTop extends component {
       element.on("mouseenter", () => tl.play());
       element.on("mouseleave", () => tl.reverse());
     });
+  }
+
+  // 綁定"直接"關於該組件的時間軸或事件
+  _bindTimeline() {
+    const yearSelect = this._yearSelect.element;
+    const monthSelect = this._monthSelect.element;
+
+    const selectHandler = () => {};
+
+    yearSelect.on("change", this._handlers.date.year);
+    monthSelect.on("change", this._handlers.date.month);
   }
 
   onDateSelect(handler) {
