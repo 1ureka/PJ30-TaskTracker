@@ -17,9 +17,9 @@
     rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   z-index: 10;
   /* init */
-  /* opacity: 0;
-    visibility: hidden;
-    translate: 0px -110px; */
+  opacity: 0;
+  visibility: hidden;
+  translate: 0px -110px;
 }
 
 #header > #title {

@@ -15,7 +15,7 @@
     rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
   z-index: 5;
   /* init */
-  /* opacity: 0;
+  opacity: 0;
   visibility: hidden;
-  translate: -270px 0px; */
+  translate: -270px 0px;
 }
