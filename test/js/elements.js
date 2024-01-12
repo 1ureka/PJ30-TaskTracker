@@ -421,13 +421,11 @@ class ScrollIcon extends IconInterface {
   }
 
   _createIcon() {
-    const container = $("<div>")
-      .addClass("icon-container")
-      .css({
-        width: "30px",
-        height: "30px",
-        clipPath: "circle(17.5px at center)",
-      });
+    const container = $("<div>").addClass("icon-container").css({
+      width: "30px",
+      height: "30px",
+      clipPath: "circle(17.5px at center)",
+    });
 
     this._white = $("<img>")
       .attr("src", "icons/up (white).png")
@@ -462,6 +460,8 @@ class ScrollIcon extends IconInterface {
 //
 //
 //
+
+const colorMap = { O: "#", PJ25: "#" };
 
 /**
  * DoubleColorLabel 類別用於創建具有雙色標籤效果的元素。
@@ -1027,5 +1027,41 @@ class TextInput {
     this.element.appendTo($(element));
 
     return this;
+  }
+}
+
+// 不再使用自訂DOM屬性，而是真的屬性
+class Task {
+  constructor(config) {
+    this._isAppendTo = false;
+
+    this.originalInfo = config;
+    this.currentInfo = config;
+
+    this.element = this._create();
+  }
+
+  _create() {
+    // 用this.originalInfo.category, status等創建
+  }
+
+  _createTimeline() {}
+
+  _bindTimeline() {
+    // 包含互動與更新this.currentInfo，還有像是進入編輯模式等
+  }
+
+  update() {
+    this.originalInfo = this.currentInfo;
+
+    return this;
+  }
+
+  onEditing(handler) {
+    // 之後可以利用這個更新Storage與判斷是否需要存檔
+
+    this._categorySelect.on("change");
+    this._statusSelect.on("change");
+    this.element.on("input", ".task-textarea");
   }
 }
