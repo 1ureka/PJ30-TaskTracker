@@ -1,7 +1,6 @@
 $(async function () {
   let inTransition = true;
 
-  await delay(500); // 避免資源還未載入好導致自動生成之元素樣式錯誤
   // 之後要Promise.All與載入存檔寫在一起
 
   const header = new Header();

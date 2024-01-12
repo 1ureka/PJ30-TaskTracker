@@ -592,21 +592,11 @@ class Select {
    * @returns {Select} - Select 類別的實例。
    */
   _createOutline() {
-    const clonedSelect = this._select.clone().appendTo("body");
-
-    // size可以利用onload後拿取
-    const size = {
-      innerWidth: clonedSelect.innerWidth(),
-      innerHeight: clonedSelect.innerHeight(),
-    };
-
-    clonedSelect.remove();
-
     // 創建所需元素
     this._outlineContainer = $("<div>").css({
       position: "absolute",
-      width: size.innerWidth,
-      height: size.innerHeight,
+      width: "100%",
+      height: "100%",
       clipPath: `inset(-${this.outlineWidth}px round 10px)`,
     });
 
@@ -774,8 +764,8 @@ class TextArea {
   _createOutline() {
     this._outlineContainer = $("<div>").css({
       position: "absolute",
-      width: this.width,
-      height: this.height,
+      width: "100%",
+      height: "100%",
       clipPath: `inset(-${this.outlineWidth}px round 10px)`,
     });
 
@@ -944,8 +934,8 @@ class TextInput {
   _createOutline() {
     this._outlineContainer = $("<div>").css({
       position: "absolute",
-      width: this.width,
-      height: this.height,
+      width: "100%",
+      height: "100%",
       clipPath: `inset(-${this.outlineWidth}px round 10px)`,
     });
 

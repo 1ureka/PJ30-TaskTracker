@@ -424,8 +424,6 @@ class SidebarTop extends component {
     this._handlers = {};
 
     this.element = this._create();
-
-    this._bindTimeline();
   }
 
   _create() {
@@ -598,9 +596,6 @@ class SidebarTop extends component {
       element.on("mouseleave", () => tl.reverse());
     });
   }
-
-  // 綁定"直接"關於該組件的時間軸
-  _bindTimeline() {}
 
   onDateSelect(handler) {
     if (this._handlers.date) return this;
