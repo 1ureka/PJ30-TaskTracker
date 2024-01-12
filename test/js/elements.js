@@ -852,7 +852,7 @@ class TextArea {
    * @returns {TextArea} - TextArea 類別的實例。
    */
   val(value) {
-    if (!value) return this._textarea.val();
+    if (!value && value !== "") return this._textarea.val();
 
     this._textarea.val(value);
 

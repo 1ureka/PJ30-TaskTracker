@@ -637,6 +637,10 @@ class SidebarTop extends component {
 
     this._addBtn.on("click", this._handlers.add);
   }
+
+  clearText() {
+    this._textarea.val("");
+  }
 }
 
 class Header extends component {
