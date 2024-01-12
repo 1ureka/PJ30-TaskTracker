@@ -424,6 +424,8 @@ class SidebarTop extends component {
     this._handlers = {};
 
     this.element = this._create();
+
+    this._bindTimeline();
   }
 
   _create() {
@@ -587,16 +589,8 @@ class SidebarTop extends component {
     });
   }
 
-  // 綁定"直接"關於該組件的時間軸或事件
-  _bindTimeline() {
-    const yearSelect = this._yearSelect.element;
-    const monthSelect = this._monthSelect.element;
-
-    const selectHandler = () => {};
-
-    yearSelect.on("change", this._handlers.date.year);
-    monthSelect.on("change", this._handlers.date.month);
-  }
+  // 綁定"直接"關於該組件的時間軸
+  _bindTimeline() {}
 
   onDateSelect(handler) {
     if (this._handlers.date) return this;

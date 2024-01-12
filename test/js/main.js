@@ -12,7 +12,11 @@ $(async function () {
   const sidebarTop = new SidebarTop();
   sidebarTop
     .appendTo("#sidebar")
-    .onDateSelect((date) => console.log(date))
+    .onDateSelect((date) => {
+      console.log(date);
+
+      localStorage.setItem("date", `${date.year}-${date.month}`);
+    })
     .onAdd((data) => console.log(data));
 
   const sidebarBottom = new SidebarBottom();
