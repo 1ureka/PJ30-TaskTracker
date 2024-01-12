@@ -1,6 +1,7 @@
 @import url("global.css");
 @import url("color.css");
 
+@import url("loading/style.css");
 @import url("header/style.css");
 @import url("sidebar/style.css");
 @import url("scrollBtns/style.css");

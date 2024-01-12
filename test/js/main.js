@@ -17,7 +17,23 @@ $(async function () {
     .onAdd((data) => console.log(data));
 
   const sidebarBottom = new SidebarBottom();
-  sidebarBottom.appendTo("#sidebar").onSelect((type) => console.log(type));
+  sidebarBottom.appendTo("#sidebar").onSelect(async (type) => {
+    if (inTransition) {
+      console.log("停止執行了sidebarBottom.onSelect");
+      return;
+    }
+    inTransition = true;
+
+    console.log(type);
+
+    if (type === "save") {
+      showLoadingTl.play();
+      await delay(1000);
+      showLoadingTl.reverse();
+    }
+
+    inTransition = false;
+  });
 
   const scrollBtns = new ScrollButtons();
   scrollBtns.appendTo("body").onClick((type) => console.log(type));
@@ -26,8 +42,11 @@ $(async function () {
   // 全局動畫
   const hideLoadingTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.4 } })
-    .to("#loading-container", { scale: 0.5, ease: "back.in(6)" })
     .to("#loading-container", { autoAlpha: 0, duration: 0.6 }, "<");
+
+  const showLoadingTl = gsap
+    .timeline({ defaults: { ease: "power2.in", duration: 0.4 }, paused: true })
+    .to("#loading-container", { autoAlpha: 1, duration: 0.6 }, "<");
 
   const showMenuTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
