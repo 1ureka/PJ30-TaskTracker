@@ -443,6 +443,16 @@ class SidebarTop extends component {
 
     this._textarea.appendTo(container);
 
+    const textEditor = new TextEditor(this._textarea._textarea, { delay: 10 });
+    textEditor.start({
+      "(": ")",
+      "[": "]",
+      "{": "}",
+      "<": ">",
+      '"': '"',
+      "'": "'",
+    });
+
     this._categorySelect = new Select({
       options: categorise,
       outlineWidth: 2,
