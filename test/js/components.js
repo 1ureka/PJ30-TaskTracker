@@ -1,16 +1,3 @@
-const categorise = [
-  "未分類",
-  "PJ24",
-  "PJ25",
-  "PJ26",
-  "PJ27",
-  "PJ28",
-  "PJ29",
-  "PJ30",
-];
-
-const status = ["未完成", "跳過", "完成", "失敗"];
-
 /**
  * 組件的預設空白類
  */
@@ -452,7 +439,7 @@ class SidebarTop extends component {
     });
 
     this._categorySelect = new Select({
-      options: categorise,
+      options: CATEGORISE,
       outlineWidth: 2,
       duration: 0.2,
     });
@@ -714,7 +701,7 @@ class Header extends component {
     const label = $("<label>").text("篩選").appendTo(container);
 
     this._select = new Select({
-      options: ["所有類別", ...categorise],
+      options: ["所有類別", ...CATEGORISE],
       outlineWidth: 2,
       duration: 0.2,
     });
@@ -774,6 +761,10 @@ class TaskList extends component {
 
     this.mode = "normal";
   }
+
+  _create() {}
+
+  _createCopyPopup() {}
 
   switchMode(mode) {
     if (this.mode != "normal") return this;
