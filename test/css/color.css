@@ -29,7 +29,7 @@ button,
   backdrop-filter: blur(10px);
 }
 
-.task-item {
+.task-container {
   background-color: hsl(225, 10%, 23%);
 }
 
