@@ -1119,9 +1119,15 @@ class Task {
     this.originalInfo = config;
     this.currentInfo = config;
 
+    this._handlers = {};
+
     this.element = this._create();
     this._timelines = this._createTimeline();
-    this._bindTimeline();
+
+    this._bindDeleteEvents()
+      ._bindCategoryEvents()
+      ._bindStatusEvents()
+      ._bindTextEvents();
   }
 
   _create() {
@@ -1129,6 +1135,7 @@ class Task {
 
     this._deleteIcon = new DeleteIconB();
     this._deleteIcon.appendTo(container);
+    this._deleteIcon.elements[0].addClass("task-delete-icon");
 
     const contentsContainer = $("<div>").addClass("task-contents-container");
 
@@ -1142,7 +1149,8 @@ class Task {
 
     this._copyIcon = new CopyIcon();
     this._copyIcon.appendTo(functionContainer);
-    // this._status = this._createStatus().appendTo(functionContainer);
+    this._copyIcon.elements[0].addClass("task-copy-icon");
+    this._status = this._createStatus().appendTo(functionContainer);
 
     container.append(contentsContainer, functionContainer);
 
@@ -1188,7 +1196,46 @@ class Task {
     return categoryContainer;
   }
 
-  _createStatus() {}
+  _createStatus() {
+    const statusContainer = $("<div>").addClass("task-status-container");
+
+    const statusDisplayContainer = $("<div>")
+      .addClass("task-status-display-container")
+      .appendTo(statusContainer);
+
+    const statusDisplayElements = {};
+
+    const STATUSES = Object.keys(STATUSMAP);
+
+    STATUSES.forEach((status) => {
+      const statusDisplay = $("<div>")
+        .addClass("task-status-display")
+        .css("backgroundColor", COLORMAP[status])
+        .text(`${status}`)
+        .appendTo(statusDisplayContainer);
+
+      gsap.set(statusDisplay, { zIndex: 2, y: -41 });
+
+      statusDisplayElements[status] = statusDisplay;
+    });
+
+    gsap.set(statusDisplayElements[this.originalInfo.status], {
+      zIndex: 3,
+      y: 0,
+    });
+
+    const statusSelect = $("<select>")
+      .addClass("task-status-select")
+      .appendTo(statusContainer);
+
+    STATUSES.forEach((status) => {
+      $("<option>").val(status).text(STATUSMAP[status]).appendTo(statusSelect);
+    });
+
+    statusSelect.val(this.originalInfo.status);
+
+    return statusContainer;
+  }
 
   _createTimeline() {
     gsap.set(this._deleteIcon.elements[0], { autoAlpha: 0 });
@@ -1197,10 +1244,18 @@ class Task {
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
 
-    return { deleteClick };
+    const categoryHover = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .fromTo(this._category.children("div"), { scale: 1 }, { scale: 1.1 });
+
+    const statusHover = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .fromTo(this._status.children("div"), { scale: 1 }, { scale: 1.1 });
+
+    return { deleteClick, categoryHover, statusHover };
   }
 
-  _bindTimeline() {
+  _bindDeleteEvents() {
     // 包含互動與更新this.currentInfo，還有像是進入編輯模式等
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
@@ -1208,11 +1263,167 @@ class Task {
       this.element.hide(500, this.destroy);
     });
 
-    // this._category.on("change");
+    return this;
+  }
 
-    // this._status.on("change");
+  _bindCategoryEvents() {
+    // 切換動畫
+    this._category.on("change", () => {
+      const value = this._category.find("select").val();
 
-    // this.element.on("input", ".task-textarea");
+      this.currentInfo.category = value;
+
+      const targetElement = this._category
+        .find(".task-category-display")
+        .filter(function () {
+          return $(this).text() === value;
+        });
+
+      const otherElements = this._category
+        .find(".task-category-display")
+        .not(targetElement);
+
+      gsap.to(targetElement, {
+        onStart: () => {
+          gsap.set(otherElements, { zIndex: 2 });
+          gsap.set(targetElement, { zIndex: 3 });
+        },
+        y: 0,
+        onComplete: () => {
+          gsap.set(otherElements, { y: -41 });
+        },
+      });
+    });
+
+    // 懸停動畫
+    this._category.on("mouseover", () => {
+      this._timelines.categoryHover.play();
+    });
+    this._category.on("mouseleave", () => {
+      this._timelines.categoryHover.reverse();
+    });
+
+    return this;
+  }
+
+  _bindStatusEvents() {
+    // 切換動畫
+    this._status.on("change", () => {
+      const value = this._status.find("select").val();
+
+      this.currentInfo.status = value;
+
+      const targetElement = this._status
+        .find(".task-status-display")
+        .filter(function () {
+          return $(this).text() === value;
+        });
+
+      const otherElements = this._status
+        .find(".task-status-display")
+        .not(targetElement);
+
+      gsap.to(targetElement, {
+        onStart: () => {
+          gsap.set(otherElements, { zIndex: 2 });
+          gsap.set(targetElement, { zIndex: 3 });
+        },
+        y: 0,
+        onComplete: () => {
+          gsap.set(otherElements, { y: -41 });
+        },
+      });
+    });
+
+    // 懸停動畫
+    this._status.on("mouseover", () => {
+      this._timelines.statusHover.play();
+    });
+    this._status.on("mouseleave", () => {
+      this._timelines.statusHover.reverse();
+    });
+
+    return this;
+  }
+
+  _bindTextEvents() {
+    let textEditor;
+
+    this.element.on("dblclick", ".task-text", (e) => {
+      // 避免重複雙擊事件發生
+      if (this._text.is("textarea")) return;
+
+      // 停止選單編輯行為
+      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
+
+      const width = this._text.css("width", "calc(100% - 110px)").width();
+      this._text.css("width", "auto");
+
+      // 創建一個 textarea 元素
+      const textarea = $("<textarea></textarea>")
+        .val(this._text.text())
+        .attr("class", this._text.attr("class"))
+        .css("width", this._text.width())
+        .css("height", this._text.height() + 30);
+
+      // 為該 textarea 元素新增 TextEditor 實例
+      textEditor = new TextEditor(textarea, { delay: 10 });
+      textEditor.start({
+        "(": ")",
+        "[": "]",
+        "{": "}",
+        "<": ">",
+        '"': '"',
+        "'": "'",
+      });
+
+      // 替換 p 元素為 textarea
+      this._text.replaceWith(textarea);
+      this._text = textarea;
+
+      // 讓 textarea 獲取焦點
+      textarea.focus();
+
+      // 給足夠空間編輯
+      textarea.css("width", width);
+    });
+
+    this.element.on("keyup", ".task-text", (e) => {
+      this.currentInfo.text = this._text.val();
+    });
+
+    this.element.on("blur", ".task-text", (e) => {
+      // 清除 TextEditor 實例
+      textEditor.destroy();
+      textEditor = null;
+
+      this.currentInfo.text = this._text.val();
+
+      // 創建一個 p 元素
+      const p = $("<p></p>")
+        .text(this.currentInfo.text)
+        .attr("class", this._text.attr("class"));
+
+      // 替換 textarea 元素為 p
+      this._text = this._text.replaceWith(p);
+      this._text = p;
+
+      // 恢復選單編輯行為
+      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
+    });
+
+    this.element.on("input", ".task-text", (e) => {
+      const currentHeight = this._text.height();
+
+      gsap.set(this._text, { ease: "set1", duration: 0.5, height: "auto" });
+      const targetHeight = this._text[0].scrollHeight;
+
+      gsap.fromTo(
+        this._text,
+        { height: currentHeight },
+        { ease: "set1", duration: 0.1, height: targetHeight }
+      );
+    });
   }
 
   /**
@@ -1243,13 +1454,56 @@ class Task {
     return this;
   }
 
-  onEditing(handler) {
-    // 之後可以利用這個更新Storage與判斷是否需要存檔
+  onChange(handler) {
+    // 用於觸發更新本地存檔以及存檔狀態
+    if (this._handlers.change) return this;
 
-    this._category.on("change");
-    this._status.on("change");
-    this.element.on("input", ".task-textarea");
+    this._handlers.change = () => {
+      handler(this.currentInfo);
+    };
+
+    this.element.on("change", "select", this._handlers.change);
+    this.element.on("keyup", ".task-text", this._handlers.change);
+
+    return this;
   }
 
-  onCopy(handler) {}
+  onEditStart(handler) {
+    // 用於觸發關閉sort
+    if (this._handlers.editStart) return this;
+
+    this._handlers.editStart = () => {
+      handler(this.currentInfo);
+    };
+
+    this.element.on("focus", ".task-text", this._handlers.editStart);
+
+    return this;
+  }
+
+  onEditEnd(handler) {
+    // 用於觸發重新啟用sort
+    if (this._handlers.editEnd) return this;
+
+    this._handlers.editEnd = () => {
+      handler(this.currentInfo);
+    };
+
+    this.element.on("blur", ".task-text", this._handlers.editEnd);
+
+    return this;
+  }
+
+  onCopy(handler) {
+    // 用於呼叫複製popup
+    if (this._handlers.copy) return this;
+
+    this._handlers.copy = () => {
+      handler(this.currentInfo);
+    };
+
+    this._copyIcon.elements[0].on("click", this._handlers.copy);
+
+    return this;
+  }
 }
