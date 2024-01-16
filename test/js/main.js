@@ -42,6 +42,13 @@ $(async function () {
   const scrollBtns = new ScrollButtons();
   scrollBtns.appendTo("body").onClick((type) => console.log(type));
 
+  const test = new Task({
+    text: "test \n hi\n hi",
+    category: "未分類",
+    status: "O",
+  });
+  test.appendTo("#tasks-container");
+
   //
   // 全局動畫
   const hideLoadingTl = gsap
