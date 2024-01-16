@@ -1111,26 +1111,54 @@ class TextInput {
   }
 }
 
-// 不再使用自訂DOM屬性，而是真的屬性
+/**
+ * Task 類別用於創建任務元素，包含刪除、分類、狀態和文字內容。
+ * @class
+ */
 class Task {
+  /**
+   * Task 類別的建構子。
+   * @constructor
+   * @param {Object} config - 任務的配置項。
+   * @param {string} config.category - 任務分類。
+   * @param {string} config.status - 任務狀態。
+   * @param {string} config.text - 任務文字內容。
+   */
   constructor(config) {
+    /**
+     * 是否已附加到 DOM 的標誌。 @type {boolean} @private
+     */
     this._isAppendTo = false;
 
-    this.originalInfo = config;
-    this.currentInfo = config;
+    /**
+     * 任務資訊。 @type {Object} @private
+     */
+    this._info = config;
 
-    this._handlers = {};
+    /**
+     * 任務元素的根容器。 @type {jQuery}
+     */
+    this.element = this._create(config);
 
-    this.element = this._create();
+    /**
+     * 時間軸集合。 @type {Object} @private
+     */
     this._timelines = this._createTimeline();
 
+    // 綁定各種事件
     this._bindDeleteEvents()
       ._bindCategoryEvents()
       ._bindStatusEvents()
       ._bindTextEvents();
   }
 
-  _create() {
+  /**
+   * 私有方法，用於創建任務元素。
+   * @private
+   * @param {Object} config - 任務的配置項。
+   * @returns {jQuery} - 創建的任務元素的 jQuery 物件。
+   */
+  _create(config) {
     const container = $("<div>").addClass("task-container");
 
     this._deleteIcon = new DeleteIconB();
@@ -1139,10 +1167,12 @@ class Task {
 
     const contentsContainer = $("<div>").addClass("task-contents-container");
 
-    this._category = this._createCategory().appendTo(contentsContainer);
+    this._category = this._createCategory(config.category).appendTo(
+      contentsContainer
+    );
     this._text = $("<p>")
       .addClass("task-text")
-      .text(this.originalInfo.text)
+      .text(config.text)
       .appendTo(contentsContainer);
 
     const functionContainer = $("<div>").addClass("task-function-container");
@@ -1150,93 +1180,114 @@ class Task {
     this._copyIcon = new CopyIcon();
     this._copyIcon.appendTo(functionContainer);
     this._copyIcon.elements[0].addClass("task-copy-icon");
-    this._status = this._createStatus().appendTo(functionContainer);
+    this._status = this._createStatus(config.status).appendTo(
+      functionContainer
+    );
 
     container.append(contentsContainer, functionContainer);
+
+    container.data("info", JSON.stringify({ config }));
 
     return container;
   }
 
-  _createCategory() {
-    const categoryContainer = $("<div>").addClass("task-category-container");
+  /**
+   * 私有方法，用於創建分類元素。
+   * @private
+   * @param {string} initValue - 分類的初始值。
+   * @returns {jQuery} - 創建的分類元素的 jQuery 物件。
+   */
+  _createCategory(initValue) {
+    const container = $("<div>").addClass("task-category-container");
 
-    const categoryDisplayContainer = $("<div>")
+    const displayContainer = $("<div>")
       .addClass("task-category-display-container")
-      .appendTo(categoryContainer);
+      .appendTo(container);
 
-    const categoryDisplayElements = {};
+    const displayElements = {};
 
     CATEGORISE.forEach((category) => {
-      const categoryDisplay = $("<div>")
+      const display = $("<div>")
         .addClass("task-category-display")
         .css("backgroundColor", COLORMAP[category])
         .text(`${category}`)
-        .appendTo(categoryDisplayContainer);
+        .appendTo(displayContainer);
 
-      gsap.set(categoryDisplay, { zIndex: 2, y: -41 });
+      gsap.set(display, { zIndex: 2, y: -41 });
 
-      categoryDisplayElements[category] = categoryDisplay;
+      displayElements[category] = display;
     });
 
-    gsap.set(categoryDisplayElements[this.originalInfo.category], {
+    gsap.set(displayElements[initValue], {
       zIndex: 3,
       y: 0,
     });
 
-    const categorySelect = $("<select>")
+    const select = $("<select>")
       .addClass("task-category-select")
-      .appendTo(categoryContainer);
+      .appendTo(container);
 
     CATEGORISE.forEach((category) => {
-      $("<option>").val(category).text(category).appendTo(categorySelect);
+      $("<option>").val(category).text(category).appendTo(select);
     });
 
-    categorySelect.val(this.originalInfo.category);
+    select.val(initValue);
 
-    return categoryContainer;
+    return container;
   }
 
-  _createStatus() {
-    const statusContainer = $("<div>").addClass("task-status-container");
+  /**
+   * 私有方法，用於創建狀態元素。
+   * @private
+   * @param {string} initValue - 狀態的初始值。
+   * @returns {jQuery} - 創建的狀態元素的 jQuery 物件。
+   */
+  _createStatus(initValue) {
+    const container = $("<div>").addClass("task-status-container");
 
-    const statusDisplayContainer = $("<div>")
+    const displayContainer = $("<div>")
       .addClass("task-status-display-container")
-      .appendTo(statusContainer);
+      .appendTo(container);
 
-    const statusDisplayElements = {};
+    const displayElements = {};
 
     const STATUSES = Object.keys(STATUSMAP);
 
     STATUSES.forEach((status) => {
-      const statusDisplay = $("<div>")
+      const display = $("<div>")
         .addClass("task-status-display")
         .css("backgroundColor", COLORMAP[status])
         .text(`${status}`)
-        .appendTo(statusDisplayContainer);
+        .appendTo(displayContainer);
 
-      gsap.set(statusDisplay, { zIndex: 2, y: -41 });
+      gsap.set(display, { zIndex: 2, y: -41 });
 
-      statusDisplayElements[status] = statusDisplay;
+      displayElements[status] = display;
     });
 
-    gsap.set(statusDisplayElements[this.originalInfo.status], {
+    gsap.set(displayElements[initValue], {
       zIndex: 3,
       y: 0,
     });
 
-    const statusSelect = $("<select>")
+    const select = $("<select>")
       .addClass("task-status-select")
-      .appendTo(statusContainer);
+      .appendTo(container);
 
     STATUSES.forEach((status) => {
-      $("<option>").val(status).text(STATUSMAP[status]).appendTo(statusSelect);
+      $("<option>").val(status).text(STATUSMAP[status]).appendTo(select);
     });
 
-    statusSelect.val(this.originalInfo.status);
+    select.val(initValue);
 
-    return statusContainer;
+    return container;
   }
 
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {Object} - 時間軸集合。
+   */
   _createTimeline() {
     gsap.set(this._deleteIcon.elements[0], { autoAlpha: 0 });
 
@@ -1255,6 +1306,11 @@ class Task {
     return { deleteClick, categoryHover, statusHover };
   }
 
+  /**
+   * 私有方法，綁定刪除相關事件。
+   * @private
+   * @returns {Task} - Task 類別的實例。
+   */
   _bindDeleteEvents() {
     // 包含互動與更新this.currentInfo，還有像是進入編輯模式等
     this._deleteIcon.elements[0].on("click", async () => {
@@ -1266,12 +1322,18 @@ class Task {
     return this;
   }
 
+  /**
+   * 私有方法，綁定分類相關事件。
+   * @private
+   * @returns {Task} - Task 類別的實例。
+   */
   _bindCategoryEvents() {
     // 切換動畫
     this._category.on("change", () => {
       const value = this._category.find("select").val();
 
-      this.currentInfo.category = value;
+      this._info.category = value;
+      this.element.data("info", JSON.stringify(this._info));
 
       const targetElement = this._category
         .find(".task-category-display")
@@ -1306,12 +1368,18 @@ class Task {
     return this;
   }
 
+  /**
+   * 私有方法，綁定狀態相關事件。
+   * @private
+   * @returns {Task} - Task 類別的實例。
+   */
   _bindStatusEvents() {
     // 切換動畫
     this._status.on("change", () => {
       const value = this._status.find("select").val();
 
-      this.currentInfo.status = value;
+      this._info.status = value;
+      this.element.data("info", JSON.stringify(this._info));
 
       const targetElement = this._status
         .find(".task-status-display")
@@ -1346,6 +1414,11 @@ class Task {
     return this;
   }
 
+  /**
+   * 私有方法，綁定文字相關事件。
+   * @private
+   * @returns {Task} - Task 類別的實例。
+   */
   _bindTextEvents() {
     let textEditor;
 
@@ -1389,7 +1462,8 @@ class Task {
     });
 
     this.element.on("keyup", ".task-text", (e) => {
-      this.currentInfo.text = this._text.val();
+      this._info.text = this._text.val();
+      this.element.data("info", JSON.stringify(this._info));
     });
 
     this.element.on("blur", ".task-text", (e) => {
@@ -1397,11 +1471,12 @@ class Task {
       textEditor.destroy();
       textEditor = null;
 
-      this.currentInfo.text = this._text.val();
+      this._info.text = this._text.val();
+      this.element.data("info", JSON.stringify(this._info));
 
       // 創建一個 p 元素
       const p = $("<p></p>")
-        .text(this.currentInfo.text)
+        .text(this._info.text)
         .attr("class", this._text.attr("class"));
 
       // 替換 textarea 元素為 p
@@ -1427,7 +1502,7 @@ class Task {
   }
 
   /**
-   * 公開方法，用於將文字區域元素附加到指定的 DOM 元素。
+   * 公開方法，用於附加到指定的 DOM 元素。
    * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
    * @returns {Task} - Task 類別的實例。
    */
@@ -1441,69 +1516,13 @@ class Task {
     return this;
   }
 
+  /**
+   * 公開方法，用於銷毀 Task 類別的實例。
+   */
   destroy() {
     this.element.remove();
     this._timelines = null;
     this.originalInfo = null;
     this.currentInfo = null;
-  }
-
-  update() {
-    this.originalInfo = this.currentInfo;
-
-    return this;
-  }
-
-  onChange(handler) {
-    // 用於觸發更新本地存檔以及存檔狀態
-    if (this._handlers.change) return this;
-
-    this._handlers.change = () => {
-      handler(this.currentInfo);
-    };
-
-    this.element.on("change", "select", this._handlers.change);
-    this.element.on("keyup", ".task-text", this._handlers.change);
-
-    return this;
-  }
-
-  onEditStart(handler) {
-    // 用於觸發關閉sort
-    if (this._handlers.editStart) return this;
-
-    this._handlers.editStart = () => {
-      handler(this.currentInfo);
-    };
-
-    this.element.on("focus", ".task-text", this._handlers.editStart);
-
-    return this;
-  }
-
-  onEditEnd(handler) {
-    // 用於觸發重新啟用sort
-    if (this._handlers.editEnd) return this;
-
-    this._handlers.editEnd = () => {
-      handler(this.currentInfo);
-    };
-
-    this.element.on("blur", ".task-text", this._handlers.editEnd);
-
-    return this;
-  }
-
-  onCopy(handler) {
-    // 用於呼叫複製popup
-    if (this._handlers.copy) return this;
-
-    this._handlers.copy = () => {
-      handler(this.currentInfo);
-    };
-
-    this._copyIcon.elements[0].on("click", this._handlers.copy);
-
-    return this;
   }
 }
