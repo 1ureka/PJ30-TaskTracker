@@ -99,6 +99,44 @@ class DeleteIcon extends IconInterface {
   }
 }
 
+class DeleteIconB extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    this._frame = $("<img>").attr("src", "icons/delete (frame).png");
+    this._inner = $("<img>").attr("src", "icons/delete (inner).png");
+
+    container.append(this._frame, this._inner).css({ position: "absolute" });
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    gsap.set(this._inner, { transformOrigin: "17px center" });
+
+    const tl = gsap
+      .timeline({ defaults: { duration: 0.4, ease: "set1" }, paused: true })
+      .fromTo(this._inner, { rotate: 0 }, { rotate: 270 });
+
+    this._bindTimeline(tl);
+
+    return [tl];
+  }
+
+  _bindTimeline(tl) {
+    const container = this.elements[0];
+
+    container.on("mouseenter", () => tl.play());
+    container.on("mouseleave", () => tl.reverse());
+  }
+}
+
 class ClearIcon extends IconInterface {
   constructor() {
     super();
@@ -457,11 +495,64 @@ class ScrollIcon extends IconInterface {
   }
 }
 
-//
-//
-//
+class CopyIcon extends IconInterface {
+  constructor() {
+    super();
 
-const colorMap = { O: "#", PJ25: "#" };
+    this._bindTimeline();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    this._left = $("<img>")
+      .attr("src", "icons/copy (left).png")
+      .css("pointerEvents", "none");
+    this._right = $("<img>")
+      .attr("src", "icons/copy (right).png")
+      .css("pointerEvents", "none");
+
+    container
+      .append(this._left, this._right)
+      .css({ cursor: "pointer", pointerEvents: "all", userSelect: "none" });
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    const t1 = gsap.timeline({ paused: "true" }).to(this._right, {
+      duration: 0.4,
+      ease: "set1",
+      transformOrigin: "25px 15px",
+      rotate: 270,
+    });
+
+    const t2 = gsap.timeline({ paused: "true" }).to(container, {
+      duration: 0.1,
+      ease: "set1",
+      scale: 0.7,
+      yoyo: true,
+      repeat: 1,
+    });
+
+    return [t1, t2];
+  }
+
+  _bindTimeline() {
+    const container = this.elements[0];
+
+    container.on("mouseenter", () => this.timelines[0].play());
+    container.on("mouseleave", () => this.timelines[0].reverse());
+
+    container.on("click", () => this.timelines[1].restart());
+  }
+}
+
+//
+//
+//
 
 /**
  * DoubleColorLabel 類別用於創建具有雙色標籤效果的元素。
@@ -1029,16 +1120,121 @@ class Task {
     this.currentInfo = config;
 
     this.element = this._create();
+    this._timelines = this._createTimeline();
+    this._bindTimeline();
   }
 
   _create() {
-    // 用this.originalInfo.category, status等創建
+    const container = $("<div>").addClass("task-container");
+
+    this._deleteIcon = new DeleteIconB();
+    this._deleteIcon.appendTo(container);
+
+    const contentsContainer = $("<div>").addClass("task-contents-container");
+
+    this._category = this._createCategory().appendTo(contentsContainer);
+    this._text = $("<p>")
+      .addClass("task-text")
+      .text(this.originalInfo.text)
+      .appendTo(contentsContainer);
+
+    const functionContainer = $("<div>").addClass("task-function-container");
+
+    this._copyIcon = new CopyIcon();
+    this._copyIcon.appendTo(functionContainer);
+    // this._status = this._createStatus().appendTo(functionContainer);
+
+    container.append(contentsContainer, functionContainer);
+
+    return container;
   }
 
-  _createTimeline() {}
+  _createCategory() {
+    const categoryContainer = $("<div>").addClass("task-category-container");
+
+    const categoryDisplayContainer = $("<div>")
+      .addClass("task-category-display-container")
+      .appendTo(categoryContainer);
+
+    const categoryDisplayElements = {};
+
+    CATEGORISE.forEach((category) => {
+      const categoryDisplay = $("<div>")
+        .addClass("task-category-display")
+        .css("backgroundColor", COLORMAP[category])
+        .text(`${category}`)
+        .appendTo(categoryDisplayContainer);
+
+      gsap.set(categoryDisplay, { zIndex: 2, y: -41 });
+
+      categoryDisplayElements[category] = categoryDisplay;
+    });
+
+    gsap.set(categoryDisplayElements[this.originalInfo.category], {
+      zIndex: 3,
+      y: 0,
+    });
+
+    const categorySelect = $("<select>")
+      .addClass("task-category-select")
+      .appendTo(categoryContainer);
+
+    CATEGORISE.forEach((category) => {
+      $("<option>").val(category).text(category).appendTo(categorySelect);
+    });
+
+    categorySelect.val(this.originalInfo.category);
+
+    return categoryContainer;
+  }
+
+  _createStatus() {}
+
+  _createTimeline() {
+    gsap.set(this._deleteIcon.elements[0], { autoAlpha: 0 });
+
+    const deleteClick = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+
+    return { deleteClick };
+  }
 
   _bindTimeline() {
     // 包含互動與更新this.currentInfo，還有像是進入編輯模式等
+    this._deleteIcon.elements[0].on("click", async () => {
+      this._timelines.deleteClick.restart();
+      await delay(100);
+      this.element.hide(500, this.destroy);
+    });
+
+    // this._category.on("change");
+
+    // this._status.on("change");
+
+    // this.element.on("input", ".task-textarea");
+  }
+
+  /**
+   * 公開方法，用於將文字區域元素附加到指定的 DOM 元素。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
+   * @returns {Task} - Task 類別的實例。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
+
+  destroy() {
+    this.element.remove();
+    this._timelines = null;
+    this.originalInfo = null;
+    this.currentInfo = null;
   }
 
   update() {
@@ -1050,8 +1246,10 @@ class Task {
   onEditing(handler) {
     // 之後可以利用這個更新Storage與判斷是否需要存檔
 
-    this._categorySelect.on("change");
-    this._statusSelect.on("change");
+    this._category.on("change");
+    this._status.on("change");
     this.element.on("input", ".task-textarea");
   }
+
+  onCopy(handler) {}
 }
