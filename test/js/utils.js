@@ -324,6 +324,114 @@ class TextEditor {
   }
 }
 
+class Save {
+  constructor() {
+    this._originalSave = {};
+    this._currentSave = {};
+
+    this._initSave();
+
+    this._title = document.title;
+    this._isRegister = false;
+    this._isChanged = false;
+
+    /** beforeunload 事件處理函數 @param {Event} event */
+    this._handler = (event) => {
+      event.preventDefault();
+      event.returnValue = true;
+    };
+  }
+
+  _initSave() {
+    const currentYear = new Date().getFullYear();
+    const years = Array.from(
+      { length: currentYear - 2019 },
+      (_, index) => 2020 + index
+    );
+
+    const keys = years
+      .map((year) => {
+        const endMonth = year === currentYear ? new Date().getMonth() + 1 : 12;
+
+        return Array.from(
+          { length: endMonth },
+          (_, index) => `${year}-${(index + 1).toString().padStart(2, "0")}`
+        );
+      })
+      .flat();
+
+    keys.forEach((key) => {
+      this._originalSave[key] = [];
+      this._currentSave[key] = [];
+    });
+  }
+
+  _addConfirmation() {
+    if (this._isRegister) return;
+
+    window.addEventListener("beforeunload", this._handler);
+    this._isRegister = true;
+  }
+
+  _removeConfirmation() {
+    if (!this._isRegister) return;
+
+    window.removeEventListener("beforeunload", this._handler);
+    this._isRegister = false;
+  }
+
+  update() {
+    this._originalSave = { ...this._currentSave };
+    this.isChanged = false;
+  }
+
+  set(date, list, isInit = false) {
+    this._currentSave[date] = list;
+
+    if (isInit) {
+      this._originalSave[date] = list;
+      return this._currentSave;
+    }
+
+    if (lodash.isEqual(this._currentSave, this._originalSave)) {
+      this.isChanged = false;
+    } else {
+      this.isChanged = true;
+    }
+
+    return this._currentSave;
+  }
+
+  get(date = "0") {
+    if (date === "0") return this._currentSave;
+
+    return this._currentSave[date];
+  }
+
+  set isChanged(value) {
+    if (typeof value !== "boolean") {
+      console.log("錯誤：isChanged應該要是布林值");
+      return;
+    }
+    // 若沒有更改則不執行
+    if (value === this._isChanged) return;
+
+    this._isChanged = value;
+
+    if (this._isChanged) {
+      this._addConfirmation();
+      document.title = "*" + this._title;
+    } else {
+      this._removeConfirmation();
+      document.title = this._title;
+    }
+  }
+
+  get isChanged() {
+    return this._isChanged;
+  }
+}
+
 /**
  * 延遲執行的 Promise 函式，用於等待一定的時間。
  * @param {number} ms - 要延遲的時間（毫秒）。

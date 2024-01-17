@@ -3,6 +3,9 @@ $(async function () {
 
   // 之後要Promise.All與載入存檔寫在一起
 
+  const save = new Save();
+  console.log(save.set("2023-10", [50, 6]));
+
   const header = new Header();
   header.onInput((e) => console.log(e)).onClear(() => console.log("clear"));
 
