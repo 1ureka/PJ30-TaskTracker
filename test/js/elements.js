@@ -1159,7 +1159,8 @@ class Task {
     this._bindDeleteEvents()
       ._bindCategoryEvents()
       ._bindStatusEvents()
-      ._bindTextEvents();
+      ._bindTextEvents()
+      ._bindCopyEvents();
   }
 
   /**
@@ -1196,7 +1197,7 @@ class Task {
 
     container.append(contentsContainer, functionContainer);
 
-    container.data("info", JSON.stringify({ config }));
+    container.data("info", JSON.stringify(config));
 
     return container;
   }
@@ -1507,6 +1508,23 @@ class Task {
         { ease: "set1", duration: 0.1, height: targetHeight }
       );
     });
+
+    return this;
+  }
+
+  /**
+   * 私有方法，綁定複製相關事件。
+   * @private
+   * @returns {Task} - Task 類別的實例。
+   */
+  _bindCopyEvents() {
+    this._copyIcon.elements[0].on("click", () => {
+      const info = JSON.parse(this.element.data("info"));
+      const textToCopy = info.text;
+      navigator.clipboard.writeText(textToCopy);
+    });
+
+    return this;
   }
 
   /**

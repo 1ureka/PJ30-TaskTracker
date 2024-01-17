@@ -766,7 +766,8 @@ class TaskList extends component {
     this.mode = "normal";
 
     this.element = this._create(list);
-    this._createTimelines()._bindEvents();
+    gsap.set(this.element.children(), { autoAlpha: 0 });
+    this._bindEvents();
   }
 
   _create(list) {
@@ -805,11 +806,17 @@ class TaskList extends component {
   _createTimelines() {
     this._timelines.show = gsap
       .timeline({ defaults: { ease: "set1" }, paused: true })
-      .fromTo(
-        this.element.children(),
-        { autoAlpha: 0 },
-        { autoAlpha: 1, stagger: { from: "random", amount: 0.5 } }
-      );
+      .to(this.element.children(), {
+        autoAlpha: 1,
+        stagger: { from: "random", amount: 0.5 },
+      });
+
+    this._timelines.hide = gsap
+      .timeline({ defaults: { ease: "set1" }, paused: true })
+      .to(this.element.children(), {
+        autoAlpha: 0,
+        stagger: { from: "random", amount: 0.5 },
+      });
 
     return this;
   }
@@ -818,9 +825,10 @@ class TaskList extends component {
     this.element.on("focus", ".task-text", () =>
       this._sortable.option("disabled", true)
     );
-    this.element.on("blur", ".task-text", () =>
-      this._sortable.option("disabled", false)
-    );
+    $("body").on("click", () => {
+      if ($(".task-text:focus").length > 0) return;
+      this._sortable.option("disabled", false);
+    });
 
     return this;
   }
@@ -829,10 +837,12 @@ class TaskList extends component {
     if (this._handlers.change) return this;
 
     this._handlers.change = async (e) => {
-      const elements = this.element.children();
+      const elements = this.element.children().get();
 
       const list = elements.map((element) => {
-        if (element.attr("class", "separator")) return { type: "separator" };
+        element = $(element);
+
+        if (element.attr("class") === "separator") return { type: "separator" };
 
         return JSON.parse(element.data("info"));
       });
@@ -848,15 +858,8 @@ class TaskList extends component {
     if (this._handlers.copy) return this;
 
     this._handlers.copy = async (e) => {
-      const target = e.target;
-
-      const info = JSON.parse(target.parents(".task-container").data("info"));
-      const textToCopy = info.text;
-
       const scrollLeft = $(document).scrollLeft();
       const scrollTop = $(document).scrollTop();
-
-      await navigator.clipboard.writeText(textToCopy);
 
       const coordinate = {
         top: e.clientY + scrollTop,
@@ -875,10 +878,34 @@ class TaskList extends component {
     //},
   }
 
+  onAdd(handler) {
+    // 利用sortable的onAdd之類的來製作
+  }
+
+  onDelete(handler) {
+    // 利用click
+  }
+
+  async clear() {
+    this._createTimelines();
+    this._timelines.hide.play();
+
+    this._timelines.hide.eventCallback("onComplete", null);
+
+    await new Promise((resolve) => {
+      this._timelines.hide.eventCallback("onComplete", resolve);
+    });
+
+    this.element.children().forEach((element) => element.remove());
+
+    return this;
+  }
+
   async show() {
     if (this.isShow) return this;
 
     this.isShow = true;
+    this._createTimelines();
     this._timelines.show.play();
 
     this._timelines.show.eventCallback("onComplete", null);
@@ -894,12 +921,13 @@ class TaskList extends component {
     if (!this.isShow) return this;
 
     this.isShow = false;
-    this._timelines.show.reverse();
+    this._createTimelines();
+    this._timelines.hide.play();
 
-    this._timelines.show.eventCallback("onReverseComplete", null);
+    this._timelines.hide.eventCallback("onComplete", null);
 
     await new Promise((resolve) => {
-      this._timelines.show.eventCallback("onReverseComplete", resolve);
+      this._timelines.hide.eventCallback("onComplete", resolve);
     });
 
     this.remove();
@@ -908,10 +936,6 @@ class TaskList extends component {
   remove() {
     this.element.remove();
     Object.keys(this).forEach((key) => (this[key] = null));
-  }
-
-  onAdd() {
-    // 利用sortable的onAdd之類的來製作
   }
 
   switchMode(mode) {
