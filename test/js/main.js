@@ -28,12 +28,18 @@ $(async function () {
     }
     inTransition = true;
 
-    console.log(type);
-
     if (type === "save") {
       showLoadingTl.play();
       await delay(1000);
       showLoadingTl.reverse();
+    }
+
+    if (type === "delete") {
+      taskList.switchMode("delete");
+    }
+
+    if (type === "done") {
+      taskList.switchMode("normal");
     }
 
     inTransition = false;
@@ -42,12 +48,18 @@ $(async function () {
   const scrollBtns = new ScrollButtons();
   scrollBtns.appendTo("body").onClick((type) => console.log(type));
 
-  const test = new Task({
-    text: "test \n hi\n hi",
-    category: "未分類",
-    status: "O",
-  });
-  test.appendTo("#tasks-container");
+  const taskList = new TaskList([
+    {
+      text: "test \n hi",
+      category: "未分類",
+      status: "O",
+    },
+    {
+      text: "test \n hi",
+      category: "未分類",
+      status: "S",
+    },
+  ]);
 
   //
   // 全局動畫
