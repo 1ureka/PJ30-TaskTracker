@@ -803,8 +803,14 @@ class TaskList extends component {
   }
 
   _createTimelines() {
-    this._timelines.show = gsap;
-    // 1. this.element.children() (this._timelines.show)
+    this._timelines.show = gsap
+      .timeline({ defaults: { ease: "set1" }, paused: true })
+      .fromTo(
+        this.element.children(),
+        { autoAlpha: 0 },
+        { autoAlpha: 1, stagger: { from: "random", amount: 0.5 } }
+      );
+
     return this;
   }
 
@@ -873,12 +879,12 @@ class TaskList extends component {
     if (this.isShow) return this;
 
     this.isShow = true;
-    this.timelines.show.play();
+    this._timelines.show.play();
 
-    this.timelines.show.eventCallback("onComplete", null);
+    this._timelines.show.eventCallback("onComplete", null);
 
     await new Promise((resolve) => {
-      this.timelines.show.eventCallback("onComplete", resolve);
+      this._timelines.show.eventCallback("onComplete", resolve);
     });
 
     return this;
@@ -888,12 +894,12 @@ class TaskList extends component {
     if (!this.isShow) return this;
 
     this.isShow = false;
-    this.timelines.show.reverse();
+    this._timelines.show.reverse();
 
-    this.timelines.show.eventCallback("onReverseComplete", null);
+    this._timelines.show.eventCallback("onReverseComplete", null);
 
     await new Promise((resolve) => {
-      this.timelines.show.eventCallback("onReverseComplete", resolve);
+      this._timelines.show.eventCallback("onReverseComplete", resolve);
     });
 
     this.remove();

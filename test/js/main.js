@@ -59,7 +59,9 @@ $(async function () {
       category: "未分類",
       status: "S",
     },
+    { type: "separator" },
   ]);
+  taskList.onChange((e) => console.log(e)); // 之後可以加上對比資料來確定是否要存檔
 
   //
   // 全局動畫
@@ -82,7 +84,13 @@ $(async function () {
 
   const showDefaultsComponentsTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
-    .to("body", { onStart: () => scrollBtns.show(), duration: 0.65 });
+    .to("body", {
+      onStart: () => {
+        scrollBtns.show();
+        taskList.show();
+      },
+      duration: 0.65,
+    });
 
   const opening = gsap.timeline({
     onComplete: () => {

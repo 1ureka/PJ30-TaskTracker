@@ -1588,7 +1588,7 @@ class Separator {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, this.destroy);
+      this.element.hide(500, () => this.destroy());
     });
 
     return this;
