@@ -33,5 +33,6 @@
 - jQuery
 - Sortable.js
 - Fuse.js
+- lodash
 - JSON
 - GSAP
