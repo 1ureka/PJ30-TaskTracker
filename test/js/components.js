@@ -756,27 +756,218 @@ class Header extends component {
 }
 
 class TaskList extends component {
-  constructor() {
+  constructor(list) {
     super();
 
+    this._handlers = {};
+    this._timelines = {};
+
+    this.isShow = false;
     this.mode = "normal";
+
+    this.element = this._create(list);
+    this._createTimelines()._bindEvents();
   }
 
-  _create() {}
+  _create(list) {
+    const container = $("#tasks-container");
 
-  _createCopyPopup() {}
+    const instances = list.map((config) => {
+      if (config.type === "separator") return new Separator();
+
+      return new Task(config);
+    });
+
+    instances.forEach((instance) => {
+      instance.appendTo(container);
+    });
+
+    this._sortable = new Sortable(container[0], {
+      group: "shared",
+      animation: 150,
+      onStart: () => {
+        document.documentElement.style.setProperty(
+          "--is-task-list-hovable",
+          "0"
+        );
+      },
+      onEnd: () => {
+        document.documentElement.style.setProperty(
+          "--is-task-list-hovable",
+          "1"
+        );
+      },
+    });
+
+    return container;
+  }
+
+  _createTimelines() {
+    this._timelines.show = gsap;
+    // 1. this.element.children() (this._timelines.show)
+    return this;
+  }
+
+  _bindEvents() {
+    this.element.on("focus", ".task-text", () =>
+      this._sortable.option("disabled", true)
+    );
+    this.element.on("blur", ".task-text", () =>
+      this._sortable.option("disabled", false)
+    );
+
+    return this;
+  }
+
+  onChange(handler) {
+    if (this._handlers.change) return this;
+
+    this._handlers.change = async (e) => {
+      const elements = this.element.children();
+
+      const list = elements.map((element) => {
+        if (element.attr("class", "separator")) return { type: "separator" };
+
+        return JSON.parse(element.data("info"));
+      });
+
+      handler(list);
+    };
+
+    this.element.on("change", "select", this._handlers.change);
+    this.element.on("keyup", ".task-text", this._handlers.change);
+  }
+
+  onCopy(handler) {
+    if (this._handlers.copy) return this;
+
+    this._handlers.copy = async (e) => {
+      const target = e.target;
+
+      const info = JSON.parse(target.parents(".task-container").data("info"));
+      const textToCopy = info.text;
+
+      const scrollLeft = $(document).scrollLeft();
+      const scrollTop = $(document).scrollTop();
+
+      await navigator.clipboard.writeText(textToCopy);
+
+      const coordinate = {
+        top: e.clientY + scrollTop,
+        left: e.clientX + scrollLeft,
+      };
+
+      handler(coordinate);
+    };
+
+    this.element.on("click", ".task-copy-icon", this._handlers.copy);
+  }
+
+  onSort(handler) {
+    // 用於onSort: () => {
+    //  saveStatus.isChanged = true;
+    //},
+  }
+
+  async show() {
+    if (this.isShow) return this;
+
+    this.isShow = true;
+    this.timelines.show.play();
+
+    this.timelines.show.eventCallback("onComplete", null);
+
+    await new Promise((resolve) => {
+      this.timelines.show.eventCallback("onComplete", resolve);
+    });
+
+    return this;
+  }
+
+  async hide() {
+    if (!this.isShow) return this;
+
+    this.isShow = false;
+    this.timelines.show.reverse();
+
+    this.timelines.show.eventCallback("onReverseComplete", null);
+
+    await new Promise((resolve) => {
+      this.timelines.show.eventCallback("onReverseComplete", resolve);
+    });
+
+    this.remove();
+  }
+
+  remove() {
+    this.element.remove();
+    Object.keys(this).forEach((key) => (this[key] = null));
+  }
+
+  onAdd() {
+    // 利用sortable的onAdd之類的來製作
+  }
 
   switchMode(mode) {
-    if (this.mode != "normal") return this;
+    if (this.mode === mode) return this;
 
     if (mode === "normal") {
       this.mode = "normal";
 
-      return this;
+      document.documentElement.style.setProperty(
+        "--is-task-list-deleting",
+        "0"
+      );
     } else if (mode === "delete") {
       this.mode = "delete";
 
-      // 之後可以一次選取所有deleteBtnB，並用GSAP出現，增進效能
+      document.documentElement.style.setProperty(
+        "--is-task-list-deleting",
+        "1"
+      );
     }
+
+    return this;
   }
+
+  filterTasks(criteria) {}
+
+  // 生命週期：
+  // 一開始在主進程接收storage給list，使用_create製作，由於製作完立刻接_createTimeline(.children)，因此不需特別hide
+  // 主進程到後面完成後自然會呼叫show()
+  // 之後若要換新的date的資料，就直接await taskList.hide(); taskList.remove(); taskList = new TaskList(?); taskList.show()
+}
+
+class TempList extends component {
+  constructor() {}
+
+  _create() {}
+
+  _bindEvents() {
+    // 像是靠近會顯示、onEnd後若沒有東西會隱藏
+  }
+
+  show() {}
+
+  hide() {}
+
+  addTask() {
+    this.show();
+  }
+}
+
+class CopyPopup extends component {
+  constructor() {}
+
+  _create() {
+    const container = $("<div>").addClass("popup").append($("<p>").text(""));
+
+    return container;
+  }
+
+  _createTimelines() {}
+
+  async show(coordinate) {}
+
+  async hide() {}
 }
