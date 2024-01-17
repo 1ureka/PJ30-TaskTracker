@@ -107,10 +107,14 @@ class DeleteIconB extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
-    this._frame = $("<img>").attr("src", "icons/delete (frame).png");
-    this._inner = $("<img>").attr("src", "icons/delete (inner).png");
+    this._frame = $("<img>")
+      .attr("src", "icons/delete (frame).png")
+      .css({ width: 40, height: 45 });
+    this._inner = $("<img>")
+      .attr("src", "icons/delete (inner).png")
+      .css({ width: 40, height: 45 });
 
-    container.append(this._frame, this._inner).css({ position: "absolute" });
+    container.append(this._frame, this._inner).css("pointerEvents", "all");
 
     return [container];
   }
@@ -134,6 +138,12 @@ class DeleteIconB extends IconInterface {
 
     container.on("mouseenter", () => tl.play());
     container.on("mouseleave", () => tl.reverse());
+  }
+
+  addClass(className) {
+    this.elements[0].addClass(className);
+
+    return this;
   }
 }
 
@@ -1163,7 +1173,7 @@ class Task {
 
     this._deleteIcon = new DeleteIconB();
     this._deleteIcon.appendTo(container);
-    this._deleteIcon.elements[0].addClass("task-delete-icon");
+    this._deleteIcon.addClass("task-delete-icon");
 
     const contentsContainer = $("<div>").addClass("task-contents-container");
 
@@ -1289,8 +1299,6 @@ class Task {
    * @returns {Object} - 時間軸集合。
    */
   _createTimeline() {
-    gsap.set(this._deleteIcon.elements[0], { autoAlpha: 0 });
-
     const deleteClick = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
@@ -1316,7 +1324,7 @@ class Task {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, this.destroy);
+      this.element.hide(500, () => this.destroy());
     });
 
     return this;
@@ -1522,7 +1530,90 @@ class Task {
   destroy() {
     this.element.remove();
     this._timelines = null;
-    this.originalInfo = null;
-    this.currentInfo = null;
+    this._info = null;
+  }
+}
+
+/**
+ * Separator 類別用於創建分隔線元素，包含刪除圖標。
+ * @class
+ */
+class Separator {
+  /**
+   * Separator 類別的建構子。
+   * @constructor
+   */
+  constructor() {
+    this._isAppendTo = false;
+
+    this.element = this._create();
+    this._timelines = this._createTimeline();
+    this._bindDeleteEvents();
+  }
+
+  /**
+   * 私有方法，用於創建分隔線元素。
+   * @private
+   * @returns {jQuery} - 創建的分隔線元素的 jQuery 物件。
+   */
+  _create() {
+    const separator = $("<div>").addClass("separator");
+
+    this._deleteIcon = new DeleteIconB();
+    this._deleteIcon.appendTo(separator);
+    this._deleteIcon.addClass("task-delete-icon");
+
+    return separator;
+  }
+
+  /**
+   * 私有方法，用於創建 GSAP 時間軸。
+   * @private
+   * @returns {Object} - 時間軸集合。
+   */
+  _createTimeline() {
+    const deleteClick = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+
+    return { deleteClick };
+  }
+
+  /**
+   * 私有方法，綁定刪除相關事件。
+   * @private
+   * @returns {Separator} - Separator 類別的實例。
+   */
+  _bindDeleteEvents() {
+    this._deleteIcon.elements[0].on("click", async () => {
+      this._timelines.deleteClick.restart();
+      await delay(100);
+      this.element.hide(500, this.destroy);
+    });
+
+    return this;
+  }
+
+  /**
+   * 公開方法，用於將分隔線元素附加到指定的 DOM 元素。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
+   * @returns {Separator} - Separator 類別的實例。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
+
+  /**
+   * 公開方法，用於銷毀 Separator 類別的實例。
+   */
+  destroy() {
+    this.element.remove();
+    this._timelines = null;
   }
 }
