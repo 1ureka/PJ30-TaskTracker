@@ -9,15 +9,3 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-
-#tasks-container {
-  position: absolute;
-  width: 100%;
-  min-height: 350px;
-  box-sizing: border-box;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
