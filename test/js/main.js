@@ -6,25 +6,44 @@ $(async function () {
   const save = new Save();
   console.log(save.set("2023-10", [50, 6]));
 
+  //
+  // header
+  //
   const header = new Header();
-  header.onInput((e) => console.log(e)).onClear(() => console.log("clear"));
+  header
+    .onInput((e) => taskList.filterTasks(e)) // 不需要inTransition
+    .onClear((e) => taskList.filterTasks(e)); // 不需要inTransition
 
+  //
+  // sidebar
+  //
   const sidebarTop = new SidebarTop();
-  sidebarTop
-    .appendTo("#sidebar")
-    .onDateSelect((date) => {
-      console.log(date);
-
-      localStorage.setItem("date", `${date.year}-${date.month}`);
-    })
-    .onAdd((data) => {
-      console.log(data);
-
-      sidebarTop.clearText();
-    });
-
   const sidebarBottom = new SidebarBottom();
-  sidebarBottom.appendTo("#sidebar").onSelect(async (type) => {
+  sidebarTop.appendTo("#sidebar");
+  sidebarBottom.appendTo("#sidebar");
+
+  sidebarTop.onSelect(async (date) => {
+    if (inTransition) {
+      console.log("停止執行了sidebarTop.onSelect");
+      return;
+    }
+    inTransition = true;
+
+    console.log(date);
+
+    localStorage.setItem("date", `${date.year}-${date.month}`);
+
+    inTransition = false;
+  });
+
+  sidebarTop.onAdd((data) => {
+    // 不需要inTransition
+    console.log(data);
+
+    sidebarTop.clearText();
+  });
+
+  sidebarBottom.onSelect(async (type) => {
     if (inTransition) {
       console.log("停止執行了sidebarBottom.onSelect");
       return;
@@ -32,6 +51,12 @@ $(async function () {
     inTransition = true;
 
     if (type === "save") {
+      showLoadingTl.play();
+      await delay(1000);
+      showLoadingTl.reverse();
+    }
+
+    if (type === "load") {
       showLoadingTl.play();
       await delay(1000);
       showLoadingTl.reverse();
@@ -45,13 +70,25 @@ $(async function () {
       taskList.switchMode("normal");
     }
 
+    if (type === "check") {
+      await taskList.clear();
+    }
+
     inTransition = false;
   });
 
-  const scrollBtns = new ScrollButtons();
-  scrollBtns.appendTo("body").onClick((type) => console.log(type));
+  //
+  // aside
+  //
 
-  const taskList = new TaskList([
+  const scrollBtns = new ScrollButtons();
+  scrollBtns.appendTo("body").onClick((type) => console.log(type)); // 不需要inTransition
+
+  //
+  // content
+  //
+
+  let taskList = new TaskList([
     {
       text: "test \n hi",
       category: "未分類",
@@ -63,7 +100,7 @@ $(async function () {
       status: "S",
     },
     { type: "separator" },
-  ]);
+  ]); // 不需要inTransition
   taskList.onChange((e) => console.log(e)); // 之後可以加上對比資料來確定是否要存檔
 
   //

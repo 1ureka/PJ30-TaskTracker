@@ -584,7 +584,7 @@ class SidebarTop extends component {
     });
   }
 
-  onDateSelect(handler) {
+  onSelect(handler) {
     if (this._handlers.date) return this;
 
     const yearSelect = this._yearSelect.element;
@@ -744,9 +744,11 @@ class Header extends component {
     if (this._handlers.clear) return this;
 
     this._handlers.clear = () => {
+      const category = this._select.val();
+
       this._input.val("");
 
-      handler();
+      handler({ words: "", category });
     };
 
     this._eraserIcon.elements[0].on("click", this._handlers.clear);
@@ -836,7 +838,7 @@ class TaskList extends component {
   onChange(handler) {
     if (this._handlers.change) return this;
 
-    this._handlers.change = async (e) => {
+    this._handlers.change = async () => {
       const elements = this.element.children().get();
 
       const list = elements.map((element) => {
@@ -886,21 +888,6 @@ class TaskList extends component {
     // 利用click
   }
 
-  async clear() {
-    this._createTimelines();
-    this._timelines.hide.play();
-
-    this._timelines.hide.eventCallback("onComplete", null);
-
-    await new Promise((resolve) => {
-      this._timelines.hide.eventCallback("onComplete", resolve);
-    });
-
-    this.element.children().forEach((element) => element.remove());
-
-    return this;
-  }
-
   async show() {
     if (this.isShow) return this;
 
@@ -930,11 +917,30 @@ class TaskList extends component {
       this._timelines.hide.eventCallback("onComplete", resolve);
     });
 
-    this.remove();
+    return this;
   }
 
-  remove() {
-    this.element.remove();
+  async clear() {
+    await this.hide();
+
+    this.element
+      .children()
+      .get()
+      .forEach((element) => $(element).remove());
+
+    this._handlers.change();
+
+    return this;
+  }
+
+  async remove() {
+    await this.hide();
+
+    this.element
+      .children()
+      .get()
+      .forEach((element) => $(element).remove());
+
     Object.keys(this).forEach((key) => (this[key] = null));
   }
 
@@ -960,7 +966,9 @@ class TaskList extends component {
     return this;
   }
 
-  filterTasks(criteria) {}
+  filterTasks(criteria) {
+    console.log(`filter: `, criteria);
+  }
 
   // 生命週期：
   // 一開始在主進程接收storage給list，使用_create製作，由於製作完立刻接_createTimeline(.children)，因此不需特別hide
@@ -987,7 +995,14 @@ class TempList extends component {
 }
 
 class CopyPopup extends component {
-  constructor() {}
+  constructor() {
+    super();
+
+    this._timelines = {};
+
+    this.element = this._create();
+    this._createTimelines();
+  }
 
   _create() {
     const container = $("<div>").addClass("popup").append($("<p>").text(""));
@@ -995,9 +1010,15 @@ class CopyPopup extends component {
     return container;
   }
 
-  _createTimelines() {}
+  _createTimelines() {
+    this._timelines.show = gsap;
 
-  async show(coordinate) {}
+    // from 0 to 1 > delay > from 1 to 0
+  }
 
-  async hide() {}
+  show(coordinate) {
+    gsap.set(this.element, coordinate);
+
+    this._timelines.show.restart();
+  }
 }
