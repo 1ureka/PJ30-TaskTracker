@@ -3,8 +3,30 @@ $(async function () {
 
   // 之後要Promise.All與載入存檔寫在一起
 
+  let date =
+    localStorage.getItem("date") ||
+    `${new Date().getFullYear()}-${(new Date().getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}`;
+
   const save = new Save();
-  console.log(save.set("2023-10", [50, 6]));
+  save.set(
+    "2024-01",
+    [
+      {
+        text: "test \n hi",
+        category: "未分類",
+        status: "O",
+      },
+      {
+        text: "test \n hi",
+        category: "未分類",
+        status: "S",
+      },
+      { type: "separator" },
+    ],
+    true
+  );
 
   //
   // header
@@ -22,16 +44,17 @@ $(async function () {
   sidebarTop.appendTo("#sidebar");
   sidebarBottom.appendTo("#sidebar");
 
-  sidebarTop.onSelect(async (date) => {
+  sidebarTop.onSelect(async (e) => {
     if (inTransition) {
       console.log("停止執行了sidebarTop.onSelect");
       return;
     }
     inTransition = true;
 
-    console.log(date);
+    date = `${e.year}-${e.month}`;
+    localStorage.setItem("date", date);
 
-    localStorage.setItem("date", `${date.year}-${date.month}`);
+    await createContents(save.get(date));
 
     inTransition = false;
   });
@@ -52,14 +75,19 @@ $(async function () {
 
     if (type === "save") {
       showLoadingTl.play();
+
       await delay(1000);
-      showLoadingTl.reverse();
+      save.update();
+
+      showLoadingTl.reverse(); // 從Save拿取
     }
 
     if (type === "load") {
       showLoadingTl.play();
+
       await delay(1000);
-      showLoadingTl.reverse();
+
+      showLoadingTl.reverse(); // 記得更新Save
     }
 
     if (type === "delete") {
@@ -83,25 +111,28 @@ $(async function () {
 
   const scrollBtns = new ScrollButtons();
   scrollBtns.appendTo("body").onClick((type) => console.log(type)); // 不需要inTransition
+  const copyPopup = new CopyPopup();
+  copyPopup.appendTo("body");
 
   //
   // content
   //
 
-  let taskList = new TaskList([
-    {
-      text: "test \n hi",
-      category: "未分類",
-      status: "O",
-    },
-    {
-      text: "test \n hi",
-      category: "未分類",
-      status: "S",
-    },
-    { type: "separator" },
-  ]); // 不需要inTransition
-  taskList.onChange((e) => console.log(e)); // 之後可以加上對比資料來確定是否要存檔
+  let taskList;
+
+  const createContents = async (list) => {
+    if (taskList) await taskList.remove();
+
+    taskList = new TaskList(list);
+
+    taskList.onChange((list) => save.set(date, list));
+    taskList.onDelete((list) => save.set(date, list));
+    taskList.onSort((list) => save.set(date, list));
+
+    taskList.onCopy((e) => copyPopup.show(e));
+
+    await taskList.show();
+  };
 
   //
   // 全局動畫
@@ -127,7 +158,7 @@ $(async function () {
     .to("body", {
       onStart: () => {
         scrollBtns.show();
-        taskList.show();
+        createContents(save.get(date));
       },
       duration: 0.65,
     });
