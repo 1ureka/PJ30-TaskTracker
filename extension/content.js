@@ -29,14 +29,32 @@ async function uploadSave(save) {
   console.log("上傳完成");
 }
 
-window.addEventListener("loadSave", async () => {
-  const save = await loadSave();
-  localStorage.setItem("save", save);
-  window.dispatchEvent(new Event("saveLoaded"));
-});
+const handleLoadSave = async () => {
+  window.removeEventListener("loadSave", handleLoadSave);
 
-window.addEventListener("uploadSave", async () => {
-  const save = localStorage.getItem("save");
-  await uploadSave(save);
-  window.dispatchEvent(new Event("saveUploaded"));
-});
+  try {
+    const save = await loadSave();
+    localStorage.setItem("save", save);
+    window.dispatchEvent(new Event("saveLoaded"));
+  } catch (error) {
+    console.error("loadSave 發生錯誤:", error);
+  } finally {
+    window.addEventListener("loadSave", handleLoadSave);
+  }
+};
+const handleUploadSave = async () => {
+  window.removeEventListener("uploadSave", handleUploadSave);
+
+  try {
+    const save = localStorage.getItem("save");
+    await uploadSave(save);
+    window.dispatchEvent(new Event("saveUploaded"));
+  } catch (error) {
+    console.error("uploadSave 發生錯誤:", error);
+  } finally {
+    window.addEventListener("uploadSave", handleUploadSave);
+  }
+};
+
+window.addEventListener("loadSave", handleLoadSave);
+window.addEventListener("uploadSave", handleUploadSave);
