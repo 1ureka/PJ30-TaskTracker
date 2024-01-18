@@ -381,7 +381,7 @@ class Save {
   }
 
   update() {
-    this._originalSave = { ...this._currentSave };
+    this._originalSave = lodash.cloneDeep(this._currentSave);
     this.isChanged = false;
   }
 
@@ -389,8 +389,7 @@ class Save {
     this._currentSave[date] = list;
 
     if (isInit) {
-      this._originalSave[date] = list;
-      return this._currentSave;
+      this.update();
     }
 
     if (lodash.isEqual(this._currentSave, this._originalSave)) {
@@ -399,7 +398,7 @@ class Save {
       this.isChanged = true;
     }
 
-    return this._currentSave;
+    return this;
   }
 
   get(date = "0") {
