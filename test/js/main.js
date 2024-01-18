@@ -203,16 +203,14 @@ $(async function () {
   const showDefaultsComponentsTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
     .to("body", {
-      onStart: () => {
-        scrollBtns.show();
-        createContents(save.get(date));
-      },
+      onStart: () => scrollBtns.show(),
       duration: 0.65,
     });
 
   const opening = gsap.timeline({
     onComplete: () => {
       $("#sidebar").css("transform", ""); // 避免子元素position:fixed不作用
+      createContents(save.get(date));
       inTransition = false;
     },
     delay: 1,
