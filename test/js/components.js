@@ -824,30 +824,45 @@ class TaskList extends component {
   }
 
   _bindEvents() {
-    this.element.on("focus", ".task-text", () =>
-      this._sortable.option("disabled", true)
-    );
-    $("body").on("click", () => {
+    this._handlers._inner1 = () => {
+      this._sortable.option("disabled", true);
+    };
+
+    this._handlers._inner2 = () => {
       if ($(".task-text:focus").length > 0) return;
       this._sortable.option("disabled", false);
-    });
+    };
+
+    this.element.on("focus", ".task-text", this._handlers._inner1);
+    $("body").on("click", this._handlers._inner2);
+
+    this._unbind = () => {
+      this.element.off();
+      $("body").off("click", this._handlers._inner2);
+    };
 
     return this;
+  }
+
+  getList() {
+    const elements = this.element.children().get();
+
+    const list = elements.map((element) => {
+      element = $(element);
+
+      if (element.attr("class") === "separator") return { type: "separator" };
+
+      return JSON.parse(element.data("info"));
+    });
+
+    return list;
   }
 
   onChange(handler) {
     if (this._handlers.change) return this;
 
     this._handlers.change = async () => {
-      const elements = this.element.children().get();
-
-      const list = elements.map((element) => {
-        element = $(element);
-
-        if (element.attr("class") === "separator") return { type: "separator" };
-
-        return JSON.parse(element.data("info"));
-      });
+      const list = this.getList();
 
       handler(list);
     };
@@ -875,17 +890,33 @@ class TaskList extends component {
   }
 
   onSort(handler) {
-    // 用於onSort: () => {
-    //  saveStatus.isChanged = true;
-    //},
+    if (this._handlers.sort) return this;
+
+    this._handlers.sort = () => {
+      const list = this.getList();
+
+      handler(list);
+    };
+
+    this._sortable.option("onSort", this._handlers.sort);
   }
 
   onAdd(handler) {
-    // 利用sortable的onAdd之類的來製作
+    // 利用sortable的onAdd之類的來製作 // 確認sort可以偵測到後可以刪除
   }
 
   onDelete(handler) {
-    // 利用click
+    if (this._handlers.delete) return this;
+
+    this._handlers.delete = async () => {
+      await delay(700);
+
+      const list = this.getList();
+
+      handler(list);
+    };
+
+    this.element.on("click", ".task-delete-icon", this._handlers.delete);
   }
 
   async show() {
@@ -941,6 +972,10 @@ class TaskList extends component {
       .get()
       .forEach((element) => $(element).remove());
 
+    this._unbind();
+
+    this._sortable.destroy();
+
     Object.keys(this).forEach((key) => (this[key] = null));
   }
 
@@ -969,11 +1004,6 @@ class TaskList extends component {
   filterTasks(criteria) {
     console.log(`filter: `, criteria);
   }
-
-  // 生命週期：
-  // 一開始在主進程接收storage給list，使用_create製作，由於製作完立刻接_createTimeline(.children)，因此不需特別hide
-  // 主進程到後面完成後自然會呼叫show()
-  // 之後若要換新的date的資料，就直接await taskList.hide(); taskList.remove(); taskList = new TaskList(?); taskList.show()
 }
 
 class TempList extends component {
@@ -1005,15 +1035,32 @@ class CopyPopup extends component {
   }
 
   _create() {
-    const container = $("<div>").addClass("popup").append($("<p>").text(""));
+    const container = $("<div>")
+      .addClass("popup")
+      .text("已複製內文")
+      .css({ pointerEvents: "none" });
 
     return container;
   }
 
   _createTimelines() {
-    this._timelines.show = gsap;
+    this._timelines.show = gsap
+      .timeline({ defaults: { ease: "set1" }, paused: true })
+      .from(this.element, {
+        ease: "back.out(2)",
+        duration: 0.3,
+        scale: 0.1,
+        autoAlpha: 0,
+      })
+      .to(
+        this.element,
+        { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
+        "<"
+      )
+      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 })
+      .to(this.element, { top: 0, left: 0, duration: 0.1 });
 
-    // from 0 to 1 > delay > from 1 to 0
+    return this;
   }
 
   show(coordinate) {
