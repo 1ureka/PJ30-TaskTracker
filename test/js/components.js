@@ -319,7 +319,7 @@ class SidebarBottom extends component {
       .fromTo(
         this._doneBtn,
         {
-          scale: 0.1,
+          scale: 0.5,
           autoAlpha: 0,
         },
         {
@@ -617,9 +617,9 @@ class SidebarTop extends component {
 
     this._handlers.add = () => {
       const category = this._categorySelect.val();
-      const content = this._textarea.val();
+      const text = this._textarea.val();
 
-      if (content.trim()) handler({ category, content });
+      if (text.trim()) handler({ category, text });
     };
 
     this._addBtn.on("click", this._handlers.add);
@@ -1007,20 +1007,106 @@ class TaskList extends component {
 }
 
 class TempList extends component {
-  constructor() {}
+  constructor() {
+    super();
 
-  _create() {}
+    this._timelines = {};
 
-  _bindEvents() {
-    // 像是靠近會顯示、onEnd後若沒有東西會隱藏
+    this._isOpen = false;
+
+    this.element = this._create();
+    this._createTimelines()._bindEvents();
   }
 
-  show() {}
+  _create() {
+    const container = $("<div>").addClass("temp-list-container");
 
-  hide() {}
+    const icon = new ArrowIcon();
+    icon.appendTo(container).addClass("temp-list-icon");
+    this._icon = icon.elements[0];
+    this._timelines.icon = icon.timelines;
 
-  addTask() {
-    this.show();
+    const scroller = $("<div>")
+      .addClass("temp-list-scroller")
+      .appendTo(container);
+
+    const list = $("<div>").addClass("temp-list").appendTo(scroller);
+    this._list = list;
+
+    this._sortable = new Sortable(list, {
+      group: {
+        name: "shared",
+        put: false,
+      },
+      animation: 150,
+      sort: false,
+    });
+
+    return container;
+  }
+
+  _createTimelines() {
+    this._timelines.show = gsap;
+
+    this._timelines.open = gsap;
+
+    return this;
+  }
+
+  _bindEvents() {
+    this.element.on("mouseover", () => {
+      this.show();
+    });
+    this.element.on("mouseleave", () => {
+      if (!this._isOpen) this.hide();
+    });
+    this._sortable.option("onEnd", () => {
+      if (this._list.length === 0) this.close().hide();
+    });
+
+    return this;
+  }
+
+  open() {
+    this._timelines.open.play();
+
+    this._isOpen = true;
+  }
+
+  close() {
+    this._timelines.open.reverse();
+
+    this._isOpen = false;
+  }
+
+  show() {
+    this._timelines.show.play();
+  }
+
+  hide() {
+    this._timelines.show.reverse();
+  }
+
+  addTask(config) {
+    this.show().open();
+
+    const create = (config) => {
+      if (config.text === "--") return new Separator();
+
+      config.status = "U";
+
+      return new Task(config);
+    };
+
+    const task = create(config);
+
+    task.hide();
+
+    task.appendTo(this.element);
+
+    task.show(500);
+
+    return this;
   }
 }
 

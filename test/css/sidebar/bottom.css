@@ -38,8 +38,8 @@
 .sidebar-bottom-container > .done {
   position: fixed;
   right: 135px;
-  bottom: 30px;
-  padding: 10px;
+  bottom: 33px;
+  padding: 7px 10px;
   margin: 0;
 }
 

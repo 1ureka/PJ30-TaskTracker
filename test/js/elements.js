@@ -560,6 +560,28 @@ class CopyIcon extends IconInterface {
   }
 }
 
+class ArrowIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    return [t1, t2];
+  }
+
+  addClass(className) {
+    this.elements[0].addClass(className);
+  }
+}
+
 //
 //
 //
