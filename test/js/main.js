@@ -158,6 +158,8 @@ $(async function () {
   scrollBtns.appendTo("body").onClick((type) => console.log(type)); // 不需要inTransition
   const copyPopup = new CopyPopup();
   copyPopup.appendTo("body");
+  const tempList = new TempList();
+  tempList.appendTo("body");
 
   //
   // content
