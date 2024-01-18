@@ -30,6 +30,7 @@
 .temp-list-icon {
   cursor: pointer;
   position: relative;
+  pointer-events: all;
   margin-bottom: 10px;
   display: flex;
   justify-content: center;
@@ -37,6 +38,12 @@
   width: 35px;
   height: 35px;
   z-index: 7;
+  clip-path: none;
+}
+.temp-list-icon > div {
+  width: 35px;
+  height: 35px;
+  clip-path: none;
 }
 
 .temp-list {

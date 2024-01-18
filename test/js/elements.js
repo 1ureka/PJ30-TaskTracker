@@ -563,18 +563,49 @@ class CopyIcon extends IconInterface {
 class ArrowIcon extends IconInterface {
   constructor() {
     super();
+
+    this._bindTimeline();
   }
 
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
+    const container2 = $("<div>")
+      .addClass("icon-container")
+      .appendTo(container);
+
+    this._arrow = $("<img>").attr("src", "icons/top (arrow).png");
+    this._line = $("<img>").attr("src", "icons/top (line).png");
+
+    container2.append(this._arrow, this._line);
+
     return [container];
   }
 
   _createTimeline() {
+    this._timelines = {};
+
     const container = this.elements[0];
 
-    return [t1, t2];
+    this._timelines.click = () =>
+      gsap
+        .timeline({ defaults: { duration: 0.05, ease: "set1" } })
+        .to(container.children(), { scale: 0.65, yoyo: true, repeat: 1 });
+
+    this._timelines.hover = gsap
+      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .to(this._arrow, { y: -8 }, "<")
+      .to(this._line, { y: -1.5, scale: 1.25 }, "<0.05");
+
+    return [];
+  }
+
+  _bindTimeline() {
+    const container = this.elements[0];
+
+    container.on("click", () => this._timelines.click());
+    container.on("mouseover", () => this._timelines.hover.play());
+    container.on("mouseleave", () => this._timelines.hover.reverse());
   }
 
   addClass(className) {
