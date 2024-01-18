@@ -1024,7 +1024,6 @@ class TempList extends component {
     const icon = new ArrowIcon();
     icon.appendTo(container).addClass("temp-list-icon");
     this._icon = icon.elements[0];
-    this._timelines.icon = icon.timelines;
 
     const scroller = $("<div>")
       .addClass("temp-list-scroller")
@@ -1033,7 +1032,7 @@ class TempList extends component {
     const list = $("<div>").addClass("temp-list").appendTo(scroller);
     this._list = list;
 
-    this._sortable = new Sortable(list, {
+    this._sortable = new Sortable(list[0], {
       group: {
         name: "shared",
         put: false,
@@ -1046,9 +1045,14 @@ class TempList extends component {
   }
 
   _createTimelines() {
-    this._timelines.show = gsap;
+    this._timelines.show = gsap
+      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
+      .fromTo(this.element.children(), { autoAlpha: 0 }, { autoAlpha: 1 });
 
-    this._timelines.open = gsap;
+    this._timelines.open = gsap
+      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
+      .fromTo(this.element, { y: 230 }, { y: 0 })
+      .to(this._icon, { y: 55, scaleY: -1 }, "<");
 
     return this;
   }
@@ -1060,8 +1064,18 @@ class TempList extends component {
     this.element.on("mouseleave", () => {
       if (!this._isOpen) this.hide();
     });
+
     this._sortable.option("onEnd", () => {
       if (this._list.length === 0) this.close().hide();
+    });
+
+    this.element.on("click", ".temp-list-icon", async () => {
+      await delay(100);
+      if (this._isOpen) {
+        this.close().hide();
+      } else {
+        this.open();
+      }
     });
 
     return this;
@@ -1071,20 +1085,28 @@ class TempList extends component {
     this._timelines.open.play();
 
     this._isOpen = true;
+
+    return this;
   }
 
   close() {
     this._timelines.open.reverse();
 
     this._isOpen = false;
+
+    return this;
   }
 
   show() {
     this._timelines.show.play();
+
+    return this;
   }
 
   hide() {
     this._timelines.show.reverse();
+
+    return this;
   }
 
   addTask(config) {
