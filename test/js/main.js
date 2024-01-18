@@ -1,32 +1,86 @@
 $(async function () {
   let inTransition = true;
 
-  // 之後要Promise.All與載入存檔寫在一起
+  //
+  // 初始化
+  //
+  const initDate = () => {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const monthString = currentMonth.toString().padStart(2, "0");
 
-  let date =
-    localStorage.getItem("date") ||
-    `${new Date().getFullYear()}-${(new Date().getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
+    return localStorage.getItem("date") || `${currentYear}-${monthString}`;
+  };
+
+  let date = initDate();
 
   const save = new Save();
-  save.set(
-    "2024-01",
-    [
-      {
-        text: "test \n hi",
-        category: "未分類",
-        status: "O",
-      },
-      {
-        text: "test \n hi",
-        category: "未分類",
-        status: "S",
-      },
-      { type: "separator" },
-    ],
-    true
-  );
+
+  const loadSave = async () => {
+    const timeoutDuration = 5000;
+
+    await new Promise((resolve) => {
+      const interval = setInterval(
+        () => window.dispatchEvent(new Event("loadSave")),
+        500
+      );
+
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        console.error("無法載入雲端存檔，使用本地存檔");
+        window.dispatchEvent(new Event("saveLoaded"));
+      }, timeoutDuration);
+
+      window.addEventListener(
+        "saveLoaded",
+        () => {
+          clearInterval(interval);
+          clearTimeout(timeout);
+          resolve();
+        },
+        { once: true }
+      );
+    });
+
+    const str = localStorage.getItem("save");
+    const obj = JSON.parse(str);
+
+    Object.keys(obj).forEach((date) => save.set(date, obj[date]));
+
+    save.update();
+  };
+
+  const uploadSave = async () => {
+    const timeoutDuration = 5000;
+
+    const obj = save.get();
+    const str = JSON.stringify(obj, null, 2);
+
+    localStorage.setItem("save", str);
+
+    window.dispatchEvent(new Event("uploadSave"));
+
+    const timeout = setTimeout(() => {
+      console.error("無法存入雲端存檔，暫存於本地存檔");
+      window.dispatchEvent(new Event("saveUploaded"));
+    }, timeoutDuration);
+
+    await new Promise((resolve) =>
+      window.addEventListener(
+        "saveUploaded",
+        () => {
+          clearTimeout(timeout);
+          resolve();
+        },
+        { once: true }
+      )
+    );
+  };
+
+  //
+  // 載入存檔
+  //
+  await loadSave();
 
   //
   // header
@@ -45,22 +99,13 @@ $(async function () {
   sidebarBottom.appendTo("#sidebar");
 
   sidebarTop.onSelect(async (e) => {
-    if (inTransition) {
-      console.log("停止執行了sidebarTop.onSelect");
-      return;
-    }
-    inTransition = true;
-
     date = `${e.year}-${e.month}`;
     localStorage.setItem("date", date);
 
     await createContents(save.get(date));
-
-    inTransition = false;
   });
 
   sidebarTop.onAdd((data) => {
-    // 不需要inTransition
     console.log(data);
 
     sidebarTop.clearText();
@@ -131,18 +176,20 @@ $(async function () {
 
     taskList.onCopy((e) => copyPopup.show(e));
 
+    await delay(350);
+
     await taskList.show();
   };
 
   //
   // 全局動畫
   const hideLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.out", duration: 0.4 } })
-    .to("#loading-container", { autoAlpha: 0, duration: 0.6 }, "<");
+    .timeline({ defaults: { ease: "power2.out" } })
+    .to("#loading-container", { autoAlpha: 0, duration: 0.3 }, "<");
 
   const showLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.in", duration: 0.4 }, paused: true })
-    .to("#loading-container", { autoAlpha: 1, duration: 0.6 }, "<");
+    .timeline({ defaults: { ease: "power2.in" }, paused: true })
+    .to("#loading-container", { autoAlpha: 1, duration: 0.3 }, "<");
 
   const showMenuTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
