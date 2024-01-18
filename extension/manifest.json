@@ -16,7 +16,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://1ureka.github.io/PJ30-TaskTracker/"],
+      "matches": [
+        "https://1ureka.github.io/PJ30-TaskTracker/",
+        "http://127.0.0.1:5500/*"
+      ],
       "js": ["content.js"]
     }
   ],
