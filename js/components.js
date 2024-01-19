@@ -762,6 +762,17 @@ class Header extends component {
 
     return this;
   }
+
+  async reset() {
+    this._input.val("");
+    this._select.val("所有類別");
+
+    await delay(100);
+
+    this._eraserIcon.hide();
+
+    return this;
+  }
 }
 
 class TaskList extends component {
@@ -906,10 +917,6 @@ class TaskList extends component {
     };
 
     this._sortable.option("onSort", this._handlers.sort);
-  }
-
-  onAdd(handler) {
-    // 利用sortable的onAdd之類的來製作 // 確認sort可以偵測到後可以刪除
   }
 
   onDelete(handler) {

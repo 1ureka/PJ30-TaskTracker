@@ -102,6 +102,8 @@ $(async function () {
     date = `${e.year}-${e.month}`;
     localStorage.setItem("date", date);
 
+    header.reset();
+
     await createContents(save.get(date));
   });
 
