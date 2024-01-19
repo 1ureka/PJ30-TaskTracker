@@ -729,7 +729,7 @@ class Header extends component {
     if (this._handlers.input) return this;
 
     this._handlers.input = (e) => {
-      const words = this._input.val();
+      const text = this._input.val();
       const category = this._select.val();
 
       if (this._input.val()) {
@@ -738,7 +738,7 @@ class Header extends component {
         this._eraserIcon.hide();
       }
 
-      handler({ words, category });
+      handler({ text, category });
     };
 
     this._input._input.on("input", this._handlers.input);
@@ -755,7 +755,7 @@ class Header extends component {
 
       this._input.val("");
 
-      handler({ words: "", category });
+      handler({ text: "", category });
     };
 
     this._eraserIcon.elements[0].on("click", this._handlers.clear);
@@ -1016,7 +1016,50 @@ class TaskList extends component {
   }
 
   filterTasks(criteria) {
-    console.log(`filter: `, criteria);
+    const list = this.getList();
+
+    // 獲取分隔符的索引
+    const separatorIndex = list
+      .map((val, index) => (val.type === "separator" ? index : -1))
+      .filter((val) => val !== -1);
+
+    // 獲取搜索條件的索引
+    let searchIndex;
+    if (criteria.text) {
+      const options = { shouldSort: false, keys: ["text"] };
+      const fuse = new Fuse(list, options);
+      searchIndex = fuse.search(criteria.text).map((val) => val.refIndex);
+    } else {
+      searchIndex = list.map((_, index) => index);
+    }
+
+    // 獲取類別條件的索引
+    let categoryIndex;
+    if (criteria.category && criteria.category !== "所有類別") {
+      categoryIndex = list
+        .map((val, index) => (val.category === criteria.category ? index : -1))
+        .filter((val) => val !== -1);
+    } else {
+      categoryIndex = list.map((_, index) => index);
+    }
+
+    // 獲取搜索條件和類別條件的交集索引
+    const intersectIndex = searchIndex.filter((val) =>
+      categoryIndex.includes(val)
+    );
+
+    // 合併分隔符索引和交集索引，並去重複
+    const result = Array.from(new Set([...separatorIndex, ...intersectIndex]));
+
+    // 根據最終的索引獲取對應的元素
+    let elements = this.element.children();
+    if (result.length > 0) {
+      elements = result.map((val) => elements[val]);
+    } else {
+      elements = [];
+    }
+
+    console.log(`filter: `, elements);
   }
 }
 
