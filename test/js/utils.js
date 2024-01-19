@@ -451,3 +451,44 @@ function formatLocalStorageDate() {
   const [year, month] = dateString.split("-");
   return { year, month };
 }
+
+/**
+ * 找到"U"工作狀態的第一個匹配工作指標
+ * @returns {{index: number, taskTop: number}} - 第一個未完成工作的指標，若沒找到則返回-1
+ */
+function findFirstUnfinished(list) {
+  const tasks = list.filter((element) => element.type !== "separator");
+
+  let low = 0;
+  let high = tasks.length - 1;
+  let index = -1;
+  let skip = 0;
+
+  while (low <= high) {
+    const mid = skip
+      ? Math.floor((low + high) / 2) + skip
+      : Math.floor((low + high) / 2);
+    const status = tasks[mid].status;
+
+    if (status === "U") {
+      // 如果中間位置對應的工作是未完成的，更新結果指標，並縮小搜索範圍到前半部分
+      index = mid;
+      high = mid - 1;
+      skip = 0;
+    } else if (status === "O" || status === "F") {
+      // 如果中間位置對應的工作是已完成或失敗的，縮小搜索範圍到後半部分
+      low = mid + 1;
+      skip = 0;
+    } else {
+      // 如果中間位置對應的工作是跳過的，無法得知任何訊息，移動中間值
+      skip += 1;
+    }
+  }
+
+  const tasksElements = $("#tasks-container > .task-container");
+  const height = tasksElements.eq(index).position().top;
+  const windowHeight = window.innerHeight / 2;
+  const taskTop = height - windowHeight;
+
+  return { index, taskTop };
+}

@@ -105,8 +105,8 @@ $(async function () {
     await createContents(save.get(date));
   });
 
-  sidebarTop.onAdd((data) => {
-    console.log(data);
+  sidebarTop.onAdd((config) => {
+    tempList.addTask(config);
 
     sidebarTop.clearText();
   });
@@ -154,17 +154,49 @@ $(async function () {
   // aside
   //
 
-  const scrollBtns = new ScrollButtons();
-  scrollBtns.appendTo("body").onClick((type) => console.log(type)); // 不需要inTransition
   const copyPopup = new CopyPopup();
   copyPopup.appendTo("body");
   const tempList = new TempList();
   tempList.appendTo("body");
+  const scrollBtns = new ScrollButtons();
+  scrollBtns.appendTo("body").onClick((type) => {
+    const tasksContainer = $("#tasks-container");
+
+    if (!tasksContainer) return;
+
+    // 根據容許值判斷現在畫面是否已在目標工作項目
+    const isAtTask = (taskTop) => {
+      const tolerance = window.innerHeight / 2.5;
+      const currentTop = $("#content").scrollTop();
+
+      return Math.abs(currentTop - taskTop) <= tolerance;
+    };
+
+    const { index, taskTop } = findFirstUnfinished(taskList.getList());
+    const currentTop = $("#content").scrollTop();
+    let targetTop;
+
+    if (index === -1) {
+      targetTop = type === "down" ? tasksContainer.height() : 0;
+      // 若index === -1，代表沒有找到目標工作或是清單為空，則滑動至底/頂部
+    } else if (type === "down") {
+      // 判斷是否要滑動至底部 (目前畫面是否已在目標工作項目範圍 或是 下方)
+      const isGoingToBottom = isAtTask(taskTop) || currentTop > taskTop;
+      targetTop = isGoingToBottom ? tasksContainer.height() : taskTop;
+    } else if (type === "up") {
+      // 判斷是否要滑動至頂部 (目前畫面是否已在目標工作項目範圍 或是 上方)
+      const isGoingToTop = isAtTask(taskTop) || currentTop < taskTop;
+      targetTop = isGoingToTop ? 0 : taskTop;
+    }
+
+    $("#content").animate({ scrollTop: targetTop }, 500);
+  });
 
   //
   // content
   //
 
+  /** @type {TaskList} */
   let taskList;
 
   const createContents = async (list) => {
