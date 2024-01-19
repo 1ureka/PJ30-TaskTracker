@@ -1,5 +1,5 @@
 $(async function () {
-  let inTransition = true;
+  $("body").css("pointerEvents", "none");
 
   //
   // 初始化
@@ -87,8 +87,8 @@ $(async function () {
   //
   const header = new Header();
   header
-    .onInput((e) => taskList.filterTasks(e)) // 不需要inTransition
-    .onClear((e) => taskList.filterTasks(e)); // 不需要inTransition
+    .onInput((e) => taskList.filterTasks(e))
+    .onClear((e) => taskList.filterTasks(e));
 
   //
   // sidebar
@@ -99,12 +99,14 @@ $(async function () {
   sidebarBottom.appendTo("#sidebar");
 
   sidebarTop.onSelect(async (e) => {
+    $("body").css("pointerEvents", "none");
     date = `${e.year}-${e.month}`;
     localStorage.setItem("date", date);
 
     header.reset();
 
     await createContents(save.get(date));
+    $("body").css("pointerEvents", "auto");
   });
 
   sidebarTop.onAdd((config) => {
@@ -114,15 +116,12 @@ $(async function () {
   });
 
   sidebarBottom.onSelect(async (type) => {
-    if (inTransition) {
-      console.log("停止執行了sidebarBottom.onSelect");
-      return;
-    }
-    inTransition = true;
+    $("body").css("pointerEvents", "none");
 
     if (type === "save") {
       showLoadingTl.play();
 
+      console.log(taskList.getList());
       await delay(1000);
       save.update();
 
@@ -151,7 +150,7 @@ $(async function () {
       await taskList.clear();
     }
 
-    inTransition = false;
+    $("body").css("pointerEvents", "auto");
   });
 
   //
@@ -241,16 +240,16 @@ $(async function () {
   const showDefaultsComponentsTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
     .to("body", {
-      onStart: () => scrollBtns.show(),
+      onStart: async () => {
+        scrollBtns.show();
+        await createContents(save.get(date));
+        $("body").css("pointerEvents", "auto");
+      },
       duration: 0.65,
     });
 
   const opening = gsap.timeline({
-    onComplete: () => {
-      $("#sidebar").css("transform", ""); // 避免子元素position:fixed不作用
-      createContents(save.get(date));
-      inTransition = false;
-    },
+    onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
     delay: 1,
     paused: true,
   });
