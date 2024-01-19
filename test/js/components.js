@@ -357,25 +357,29 @@ class SidebarBottom extends component {
         await delay(100);
         t1.reverse();
       }
-
-      const t2 = this._timelines.show.done;
-      if (type === "delete") {
-        if (t2.paused()) {
-          t2.play();
-        } else {
-          t2.reversed(!t2.reversed());
-        }
-      } else if (type === "done") {
-        await delay(100);
-        t2.reverse();
-      }
     });
+  }
+
+  showDoneBtn() {
+    this._timelines.show.done.play();
+  }
+
+  async hideDownBtn() {
+    await delay(100);
+    this._timelines.show.done.reverse();
   }
 
   onSelect(handler) {
     if (this._handler) return this;
 
     let isDeleting = false;
+
+    const contextmenuHandler = (e) => {
+      e.preventDefault();
+      isDeleting = false;
+      handler("done");
+      $("body").off("contextmenu", contextmenuHandler);
+    };
 
     this._handler = async (e) => {
       const element = $(e.target);
@@ -387,13 +391,16 @@ class SidebarBottom extends component {
           // 退出刪除模式
           isDeleting = false;
           type = "done";
+          $("body").off("contextmenu", contextmenuHandler);
         } else {
           // 進入刪除模式
           isDeleting = true;
+          $("body").on("contextmenu", contextmenuHandler);
         }
       } else if (type === "done") {
         // 完成鍵只有一種可能，退出刪除模式
         isDeleting = false;
+        $("body").off("contextmenu", contextmenuHandler);
       }
 
       if (["delete", "done", "save", "load", "check"].includes(type))

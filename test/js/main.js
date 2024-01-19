@@ -137,10 +137,12 @@ $(async function () {
 
     if (type === "delete") {
       taskList.switchMode("delete");
+      sidebarBottom.showDoneBtn();
     }
 
     if (type === "done") {
       taskList.switchMode("normal");
+      sidebarBottom.hideDownBtn();
     }
 
     if (type === "check") {
