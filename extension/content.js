@@ -15,7 +15,7 @@ async function loadSave() {
 }
 
 async function uploadSave(save) {
-  const data = JSON.stringify(save, null, 2);
+  const data = save;
 
   await chrome.runtime.sendMessage({
     action: "POST",

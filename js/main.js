@@ -120,20 +120,16 @@ $(async function () {
 
     if (type === "save") {
       showLoadingTl.play();
-
-      console.log(taskList.getList());
-      await delay(1000);
+      await uploadSave();
       save.update();
-
       showLoadingTl.reverse(); // 從Save拿取
     }
 
     if (type === "load") {
       showLoadingTl.play();
-
-      await delay(1000);
-
-      showLoadingTl.reverse(); // 記得更新Save
+      await loadSave();
+      showLoadingTl.reverse();
+      await createContents(save.get(date));
     }
 
     if (type === "delete") {
