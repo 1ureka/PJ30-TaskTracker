@@ -1,3 +1,7 @@
+/**
+ * 任務的分類列表。
+ * @type {string[]}
+ */
 const CATEGORISE = [
   "未分類",
   "PJ24",
@@ -9,6 +13,10 @@ const CATEGORISE = [
   "PJ30",
 ];
 
+/**
+ * 將不同類別映射到相應顏色的對象。
+ * @type {{ [key: string]: string }}
+ */
 const COLORMAP = {
   U: "#bbb",
   S: "#92e9ff",
@@ -24,4 +32,8 @@ const COLORMAP = {
   PJ30: "#ea81af",
 };
 
+/**
+ * 將狀態縮寫映射到相應全名的對象。
+ * @type {{ [key: string]: string }}
+ */
 const STATUSMAP = { U: "未完成", S: "跳過", O: "完成", F: "失敗" };

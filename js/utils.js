@@ -324,13 +324,25 @@ class TextEditor {
   }
 }
 
+/**
+ * Save 類別用於處理保存、檢查更改狀態並提供頁面離開確認功能。
+ * @class
+ */
 class Save {
+  /**
+   * Save 類別的建構子。
+   * @constructor
+   */
   constructor() {
+    /** 原始保存的數據。 @type {Object} @private */
     this._originalSave = {};
+    /** 當前保存的數據。 @type {Object} @private */
     this._currentSave = {};
 
+    // 初始化保存數據
     this._initSave();
 
+    /** 頁面標題的原始值。 @type {string} @private */
     this._title = document.title;
     this._isRegister = false;
     this._isChanged = false;
@@ -342,6 +354,10 @@ class Save {
     };
   }
 
+  /**
+   * 私有方法，用於初始化保存數據。
+   * @private
+   */
   _initSave() {
     const currentYear = new Date().getFullYear();
     const years = Array.from(
@@ -366,6 +382,10 @@ class Save {
     });
   }
 
+  /**
+   * 私有方法，用於添加頁面離開確認。
+   * @private
+   */
   _addConfirmation() {
     if (this._isRegister) return;
 
@@ -373,6 +393,10 @@ class Save {
     this._isRegister = true;
   }
 
+  /**
+   * 私有方法，用於移除頁面離開確認。
+   * @private
+   */
   _removeConfirmation() {
     if (!this._isRegister) return;
 
@@ -380,11 +404,21 @@ class Save {
     this._isRegister = false;
   }
 
+  /**
+   * 更新原始保存數據，標記更改狀態為未更改。
+   */
   update() {
     this._originalSave = lodash.cloneDeep(this._currentSave);
     this.isChanged = false;
   }
 
+  /**
+   * 設置指定日期的保存數據。
+   * @param {string} date - 日期字符串。
+   * @param {Array} list - 要保存的列表數據。
+   * @param {boolean} isInit - 是否為初始化。
+   * @returns {Save} - Save 類別的實例。
+   */
   set(date, list, isInit = false) {
     this._currentSave[date] = list;
 
@@ -401,12 +435,21 @@ class Save {
     return this;
   }
 
+  /**
+   * 獲取指定日期的保存數據或全部保存數據。
+   * @param {string} [date="0"] - 日期字符串。如果為 "0"，則返回全部保存數據。
+   * @returns {Object|Array} - 保存數據對象或列表數據。
+   */
   get(date = "0") {
     if (date === "0") return this._currentSave;
 
     return this._currentSave[date];
   }
 
+  /**
+   * 設置是否有未保存的更改。
+   * @param {boolean} value - 是否有未保存的更改。
+   */
   set isChanged(value) {
     if (typeof value !== "boolean") {
       console.log("錯誤：isChanged應該要是布林值");
@@ -426,6 +469,10 @@ class Save {
     }
   }
 
+  /**
+   * 獲取是否有未保存的更改。
+   * @returns {boolean} - 是否有未保存的更改。
+   */
   get isChanged() {
     return this._isChanged;
   }

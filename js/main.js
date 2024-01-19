@@ -122,7 +122,7 @@ $(async function () {
       showLoadingTl.play();
       await uploadSave();
       save.update();
-      showLoadingTl.reverse(); // 從Save拿取
+      showLoadingTl.reverse();
     }
 
     if (type === "load") {
