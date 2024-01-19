@@ -1048,8 +1048,13 @@ class TaskList extends component {
       categoryIndex.includes(val)
     );
 
-    // 合併分隔符索引和交集索引，並去重複
-    const result = Array.from(new Set([...separatorIndex, ...intersectIndex]));
+    // 去除分隔符索引
+    const finalIndex = intersectIndex.filter(
+      (val) => !separatorIndex.includes(val)
+    );
+
+    // 去重複
+    const result = Array.from(new Set([...finalIndex]));
 
     // 根據最終的索引獲取對應的元素
     let elements = this.element.children();
@@ -1059,7 +1064,22 @@ class TaskList extends component {
       elements = [];
     }
 
-    console.log(`filter: `, elements);
+    const tasks = this.element.children(".task-container");
+    const complements = tasks.not(elements);
+    gsap.to(elements, {
+      autoAlpha: 1,
+      height: "auto",
+      padding: "20px 10px",
+      ease: "set1",
+      duration: 0.2,
+    });
+    gsap.to(complements, {
+      autoAlpha: 0,
+      height: 0,
+      padding: 0,
+      ease: "set1",
+      duration: 0.2,
+    });
   }
 }
 
