@@ -1065,8 +1065,13 @@ class TempList extends component {
       if (!this._isOpen) this.hide();
     });
 
+    this._sortable.option("onStart", () => {
+      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
+    });
     this._sortable.option("onEnd", () => {
-      if (this._list.length === 0) this.close().hide();
+      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
+
+      if (this._list.children().length === 0) this.close().hide();
     });
 
     this.element.on("click", ".temp-list-icon", async () => {
@@ -1116,17 +1121,14 @@ class TempList extends component {
       if (config.text === "--") return new Separator();
 
       config.status = "U";
-
       return new Task(config);
     };
 
     const task = create(config);
 
-    task.hide();
-
-    task.appendTo(this.element);
-
-    task.show(500);
+    task.element.hide();
+    task.appendTo(this._list);
+    task.element.show(500);
 
     return this;
   }
