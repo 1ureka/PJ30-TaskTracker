@@ -1,0 +1,20 @@
+#header > .search-input {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#header > .category-select {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.search-input > :first-child,
+.category-select > :first-child {
+  margin-right: 10px;
+}
+.search-input > :last-child {
+  margin-left: 10px;
+}

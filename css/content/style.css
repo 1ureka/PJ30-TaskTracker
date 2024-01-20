@@ -1,0 +1,11 @@
+@import url("task.css");
+
+#content {
+  position: fixed;
+  top: 100px;
+  left: 260px;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

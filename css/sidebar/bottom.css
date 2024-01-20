@@ -1,0 +1,73 @@
+.sidebar-bottom-container {
+  position: absolute;
+  width: 240px;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-bottom-container > .btn {
+  height: 40px;
+  width: 115px;
+  margin-bottom: 10px;
+  padding: 0;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.sidebar-bottom-container > .btn:nth-child(1) {
+  border-radius: 10px 5px 5px 5px;
+}
+
+.sidebar-bottom-container > .btn:nth-child(2) {
+  border-radius: 5px 10px 5px 5px;
+}
+
+.sidebar-bottom-container > .btn:nth-child(3) {
+  border-radius: 5px 5px 5px 10px;
+}
+
+.sidebar-bottom-container > .btn:nth-child(4) {
+  border-radius: 5px 5px 10px 5px;
+}
+
+.sidebar-bottom-container > .done {
+  position: fixed;
+  right: 135px;
+  bottom: 33px;
+  padding: 7px 10px;
+  margin: 0;
+}
+
+#version-display {
+  min-width: 265px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  left: -10px;
+  padding: 10px 0;
+  border-radius: 0 10px 0 0;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
+  /* init */
+  opacity: 0;
+  visibility: hidden;
+  translate: 0px 60px;
+}
+
+#version-display > p {
+  margin: 0;
+}
+
+.sidebar-bottom-container > .popup {
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}

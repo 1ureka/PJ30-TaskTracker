@@ -1,0 +1,197 @@
+:root {
+  --is-task-list-hovable: 1;
+  --is-task-list-deleting: 0;
+}
+
+/*  */
+
+#tasks-container {
+  position: absolute;
+  width: 100%;
+  min-height: 350px;
+  box-sizing: border-box;
+  padding: 15px;
+
+  translate: calc(55px * var(--is-task-list-deleting));
+  /* padding-left: calc(15px + 55px * var(--is-task-list-deleting)); */
+  transition: translate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/*  */
+/*  */
+
+.task-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  min-width: 50%;
+  max-width: fit-content;
+  padding: 20px 10px;
+  border-radius: 10px;
+  gap: 20px;
+  cursor: grab;
+
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
+
+  transition: backdrop-filter 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+    filter 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+    scale 0.15s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.task-container:hover {
+  filter: brightness(calc(1 + 0.25 * var(--is-task-list-hovable)));
+  backdrop-filter: brightness(calc(1 + 0.25 * var(--is-task-list-hovable)));
+  scale: calc(1 + 0.02 * var(--is-task-list-hovable));
+}
+
+/*  */
+/*  */
+
+.task-contents-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: calc(100% - 110px);
+  gap: 20px;
+}
+.task-function-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 90px;
+  gap: 10px;
+}
+
+/*  */
+/*  */
+
+.task-text {
+  white-space: pre-wrap;
+  text-wrap: pretty;
+  min-width: auto;
+  max-width: calc(100% - 110px);
+  margin: 0;
+  transition: width cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s;
+  overflow-y: hidden;
+}
+
+/*  */
+/*  */
+
+.task-category-container,
+.task-status-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
+}
+.task-category-container {
+  align-self: flex-start;
+  width: 70px;
+  height: 40px;
+}
+.task-status-container {
+  width: 40px;
+  height: 40px;
+}
+
+/*  */
+
+.task-category-display-container,
+.task-status-display-container {
+  clip-path: inset(1px round 10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.task-category-display,
+.task-status-display {
+  position: absolute;
+  border-radius: 10px;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  font-weight: bold;
+  z-index: 2;
+  pointer-events: none;
+  color: black;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
+    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
+    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
+}
+.task-category-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.task-status-display {
+  font-size: 24px;
+}
+
+/*  */
+
+.task-category-select,
+.task-status-select {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  cursor: pointer;
+}
+
+/*  */
+
+.separator {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  cursor: grab;
+  position: relative;
+  unicode-bidi: isolate;
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+  border-style: solid;
+  border-width: 1px;
+}
+
+/*  */
+/*  */
+
+.task-delete-icon {
+  position: absolute;
+  top: 10px;
+  left: -50px;
+  width: 40px;
+  height: 45px;
+  padding-right: 10px;
+  cursor: pointer;
+
+  opacity: var(--is-task-list-deleting);
+  transition: opacity 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.separator > .task-delete-icon {
+  top: auto;
+}

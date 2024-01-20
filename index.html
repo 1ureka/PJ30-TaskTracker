@@ -4,12 +4,15 @@
     <link rel="icon" type="image/png" href="icons/favicon.png" />
     <title>Task Tracker</title>
     <meta charset="UTF-8" />
+
+    <!-- font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap"
       rel="stylesheet"
     />
+
     <!-- CDN -->
     <!-- jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -19,6 +22,12 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+    <script type="module">
+      import lodash from "https://cdn.jsdelivr.net/npm/lodash@4.17.21/+esm";
+      window.lodash = lodash;
+    </script>
+
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
@@ -29,253 +38,37 @@
 
       CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
     </script>
+
     <!-- lib -->
-    <script src="lib/mousetrap.min.js"></script>
-    <script src="lib/saveStatus.js"></script>
-    <script src="lib/textEditor.js"></script>
     <script src="lib/clickParticle.js"></script>
-    <link rel="stylesheet" href="lib/clickParticle.css" />
+
     <!-- 樣式表 -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <div id="header">
-      <img id="favicon" src="icons/favicon.png" />
-      <h1>Task Tracker</h1>
-      <div id="search-container">
-        <div id="search-img-container">
-          <div id="search-clip-path">
-            <div class="search-inner"></div>
-            <div class="search-inner"></div>
-          </div>
-          <img id="search" src="icons/search.png" alt="" />
-        </div>
-        <div id="search-input-container">
-          <input
-            type="text"
-            class="mousetrap"
-            id="search-input"
-            placeholder="搜尋"
-          />
-        </div>
-        <div id="search-erase-container">
-          <img id="search-erase-line" src="icons/erase (line).png" alt="" />
-          <img id="search-erase" src="icons/erase.png" alt="" />
-        </div>
-      </div>
-      <div id="filter-container">
-        <label for="filter-select">篩選</label>
-        <div id="filter-select-container">
-          <select id="filter-select">
-            <option value="all">所有類別</option>
-            <option value="未分類">未分類</option>
-            <option value="PJ24">PJ24</option>
-            <option value="PJ25">PJ25</option>
-            <option value="PJ26">PJ26</option>
-            <option value="PJ27">PJ27</option>
-            <option value="PJ28">PJ28</option>
-            <option value="PJ29">PJ29</option>
-            <option value="PJ30">PJ30</option>
-          </select>
-        </div>
+      <div id="title">
+        <img id="favicon" src="icons/favicon.png" />
+        <h1>Task Tracker</h1>
       </div>
     </div>
-    <div id="left-panel">
-      <div id="left-panel-top">
-        <div id="date-select-container">
-          <div id="calendar-img-container">
-            <img id="calendar-img-frame" src="icons/calendar (frame).png" />
-            <img src="icons/calendar (inner1).png" />
-            <img src="icons/calendar (inner2).png" />
-            <img src="icons/calendar (inner3).png" />
-            <img src="icons/calendar (inner4).png" />
-            <img src="icons/calendar (inner5).png" />
-            <img src="icons/calendar (inner6).png" />
-          </div>
-          <div id="year-select-container">
-            <select id="year"></select>
-          </div>
-          <div id="month-select-container">
-            <select id="month"></select>
-          </div>
-        </div>
-        <div id="task-input-container">
-          <textarea
-            id="task-input"
-            class="mousetrap"
-            placeholder="新增工作"
-          ></textarea>
-        </div>
-        <div id="category-container">
-          <select id="category">
-            <option value="未分類">未分類</option>
-            <option value="PJ24">PJ24</option>
-            <option value="PJ25">PJ25</option>
-            <option value="PJ26">PJ26</option>
-            <option value="PJ27">PJ27</option>
-            <option value="PJ28">PJ28</option>
-            <option value="PJ29">PJ29</option>
-            <option value="PJ30">PJ30</option>
-          </select>
-        </div>
-        <button id="add">
-          <div id="add-label-container">
-            <label id="add-label-red" class="red" for="add">新增</label>
-            <label id="add-label-white" class="white" for="add">新增</label>
-          </div>
-        </button>
-      </div>
-      <div id="left-panel-bottom">
-        <button id="delete">
-          <div id="garbage-bin-container">
-            <img src="icons/garbage bin.png" />
-            <img src="icons/garbage bin (cover).png" />
-            <div id="garbage-bin-lines-container">
-              <img src="icons/garbage bin (line1).png" />
-              <img src="icons/garbage bin (line2).png" />
-              <img src="icons/garbage bin (line3).png" />
-              <img src="icons/garbage bin (line1).png" />
-              <img src="icons/garbage bin (line2).png" />
-              <img src="icons/garbage bin (line3).png" />
-            </div>
-          </div>
-          <div id="delete-label-container">
-            <label id="delete-label-red" class="red" for="delete">刪除</label>
-            <label id="delete-label-white" class="white" for="delete"
-              >刪除</label
-            >
-          </div>
-        </button>
-        <button id="delete-done">
-          <div id="delete-done-label-container">
-            <label id="delete-done-label-red" class="red" for="delete-done"
-              >完成</label
-            >
-            <label id="delete-done-label-white" class="white" for="delete-done"
-              >完成</label
-            >
-          </div>
-        </button>
-        <button id="clear">
-          <div id="broom-img-container">
-            <img src="icons/broom (trail).png" />
-            <img src="icons/broom.png" />
-          </div>
-          <div id="clear-label-container">
-            <label id="clear-label-red" class="red" for="clear">清空</label>
-            <label id="clear-label-white" class="white" for="clear">清空</label>
-          </div>
-        </button>
-        <button id="save">
-          <div id="save-img-container">
-            <img src="icons/save (frame).png" />
-            <img src="icons/save (frame).png" />
-            <img src="icons/save (inner).png" />
-          </div>
-          <div id="save-label-container">
-            <label id="save-label-red" class="red" for="save">存檔</label>
-            <label id="save-label-white" class="white" for="save">存檔</label>
-          </div>
-        </button>
-        <button id="upload">
-          <div id="upload-img-container">
-            <img src="icons/upload (frame).png" />
-            <img src="icons/upload (dot).png" />
-            <img src="icons/upload (arrow).png" />
-            <img src="icons/upload (arrow).png" />
-          </div>
-          <div id="upload-label-container">
-            <label id="upload-label-red" class="red" for="upload">上傳</label>
-            <label id="upload-label-white" class="white" for="upload"
-              >上傳</label
-            >
-          </div>
-        </button>
-        <input type="file" id="file-input" accept=".json" />
-        <div id="version-display">
-          <p>版本： @1.0.2</p>
-        </div>
-      </div>
-    </div>
-    <div id="right-panel-container">
-      <div id="right-panel-img-container">
-        <img id="right-panel-img-arrow" src="icons/top (arrow).png" />
-        <img id="right-panel-img-line" src="icons/top (line).png" />
-      </div>
-      <div id="right-panel">
-        <div id="temp-task-container">
-          <!-- 工作項目將在這裡動態顯示 -->
-        </div>
-      </div>
-    </div>
-    <div id="task-container-scroller">
-      <div id="task-container">
-        <!-- 工作項目將在這裡動態顯示 -->
-      </div>
-    </div>
-    <div id="up-down-btn-container">
-      <div class="pop-up" id="up-btn">
-        <div id="up-img-container">
-          <img src="icons/up (white).png" />
-          <img src="icons/up (dark).png" />
-        </div>
-      </div>
-      <div class="pop-up" id="down-btn">
-        <div id="down-img-container">
-          <img src="icons/up (white).png" />
-          <img src="icons/up (dark).png" />
-        </div>
-      </div>
-    </div>
-    <div class="pop-up" id="copied">已複製內文</div>
-    <div class="pop-up" id="cleared">
-      <p>確定要清空嗎</p>
-      <button type="button" id="cleared-check">
-        <div id="cleared-check-label-container">
-          <label id="cleared-check-label-red" class="red" for="cleared-check"
-            >確定</label
-          >
-          <label
-            id="cleared-check-label-white"
-            class="white"
-            for="cleared-check"
-            >確定</label
-          >
-        </div>
-      </button>
-      <button type="button" id="cleared-cancel">
-        <div id="cleared-cancel-label-container">
-          <label id="cleared-cancel-label-red" class="red" for="cleared-cancel"
-            >取消</label
-          >
-          <label
-            id="cleared-cancel-label-white"
-            class="white"
-            for="cleared-cancel"
-            >取消</label
-          >
-        </div>
-      </button>
-    </div>
-    <div id="particle-container"></div>
 
-    <!-- js文件 (全局函數) -->
-    <script src="js/taskUtils.js"></script>
+    <div id="sidebar"></div>
 
-    <!-- js文件 (事件註冊) -->
-    <script src="js/localStorage.js"></script>
-    <!-- 用作在兩個JS間傳遞的全局變數 -->
-    <script>
-      let sortableTaskList;
-      let sortableTempList;
-    </script>
-    <script src="js/eventHandlers.js"></script>
+    <div id="content">
+      <div id="tasks-container"></div>
+    </div>
 
-    <!-- js文件 (動畫) -->
-    <!-- 過場、彈出視窗動畫 -->
-    <script src="js/transitions.js"></script>
-    <!-- 交互(點擊、懸停)動畫 -->
-    <script src="js/interactions.js"></script>
-    <script src="js/interactions (input).js"></script>
+    <div id="loading-container">
+      <img src="icons/loading.gif" />
+    </div>
+
+    <script src="js/constants.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script src="js/elements.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/main.js"></script>
   </body>
 </html>

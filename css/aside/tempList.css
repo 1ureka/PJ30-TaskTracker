@@ -1,4 +1,4 @@
-#right-panel-container {
+.temp-list-container {
   position: fixed;
   right: 315px;
   bottom: 0;
@@ -11,7 +11,7 @@
   z-index: 5;
 }
 
-#right-panel {
+.temp-list-scroller {
   position: relative;
   min-width: 720px;
   max-width: 720px;
@@ -27,14 +27,10 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-
-#right-panel::-webkit-scrollbar {
-  width: 0;
-}
-
-#right-panel-img-container {
+.temp-list-icon {
   cursor: pointer;
   position: relative;
+  pointer-events: all;
   margin-bottom: 10px;
   display: flex;
   justify-content: center;
@@ -42,20 +38,20 @@
   width: 35px;
   height: 35px;
   z-index: 7;
+  clip-path: none;
+}
+.temp-list-icon > div {
+  width: 35px;
+  height: 35px;
+  clip-path: none;
 }
 
-#right-panel-img-line,
-#right-panel-img-arrow {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-#temp-task-container {
+.temp-list {
   position: relative;
   width: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 20px;
 }
