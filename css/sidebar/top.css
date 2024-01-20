@@ -10,7 +10,6 @@
 
 .sidebar-top-container > .date-select {
   position: relative;
-  bottom: 10px;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -24,7 +23,35 @@
   margin-bottom: 10px;
   border-radius: 10px;
 }
-
 .sidebar-top-container > .btn {
   margin: 10px;
+}
+.sidebar-top-container > .separator {
+  cursor: default;
+}
+
+.sidebar-top-container > .sidebar-top-btns-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  gap: 10px;
+}
+.sidebar-top-btns-container > button {
+  position: relative;
+  width: 50%;
+  height: 45px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+.sidebar-top-btns-container .circle {
+  position: relative;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  background-color: white;
 }

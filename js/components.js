@@ -423,6 +423,11 @@ class SidebarTop extends component {
   _create() {
     const container = $("<div>").addClass("sidebar-top-container");
 
+    this._createBtns().appendTo(container);
+
+    const separator = new Separator();
+    separator.appendTo(container);
+
     this._dateSelect = this._createDateSelect().appendTo(container);
 
     this._textarea = new TextArea({
@@ -455,6 +460,57 @@ class SidebarTop extends component {
     this._categorySelect.appendTo(container);
 
     this._addBtn = this._createAddBtn().appendTo(container);
+
+    return container;
+  }
+
+  _createBtns() {
+    const container = $("<div>").addClass("sidebar-top-btns-container");
+
+    this._taskBtn = $("<button>");
+    const bulb1 = new Bulb(20, 20);
+    bulb1.appendTo(this._taskBtn);
+    const bulb1TL = bulb1.createTimeline("#ea81af");
+
+    const lable1 = new DoubleColorLabel("工作");
+    lable1.appendTo(this._taskBtn);
+
+    this._insBtn = $("<button>");
+    const bulb2 = new Bulb(20, 20);
+    bulb2.appendTo(this._insBtn);
+    const bulb2TL = bulb2.createTimeline("#ea81af");
+
+    const label2 = new DoubleColorLabel("靈感");
+    label2.appendTo(this._insBtn);
+
+    this._bindClickTimeline(this._taskBtn);
+    this._bindClickTimeline(this._insBtn);
+
+    this._bindHoverTimelines(this._taskBtn, [
+      lable1.timeline,
+      gsap
+        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+        .to(this._taskBtn, { scale: 1.1 }),
+    ]);
+    this._bindHoverTimelines(this._insBtn, [
+      label2.timeline,
+      gsap
+        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+        .to(this._insBtn, { scale: 1.1 }),
+    ]);
+
+    this._taskBtn.on("click", () => {
+      bulb1TL.play();
+      bulb2TL.reverse();
+    });
+    this._insBtn.on("click", () => {
+      bulb1TL.reverse();
+      bulb2TL.play();
+    });
+
+    container.append(this._taskBtn, this._insBtn);
+
+    bulb1TL.play();
 
     return container;
   }

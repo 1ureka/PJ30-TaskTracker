@@ -1688,3 +1688,91 @@ class Separator {
     this._timelines = null;
   }
 }
+
+/**
+ * Bulb 類別用於創建可控制顏色和強度的燈泡元素。
+ * @class
+ */
+class Bulb {
+  /**
+   * Bulb 類別的建構子。
+   * @constructor
+   * @param {number} width - 燈泡的寬度。
+   * @param {number} height - 燈泡的高度。
+   */
+  constructor(width, height) {
+    this._isAppendTo = false;
+
+    this.element = this._createBulb(width, height);
+  }
+
+  /**
+   * 私有方法，用於創建燈泡元素。
+   * @private
+   * @param {number} width - 燈泡的寬度。
+   * @param {number} height - 燈泡的高度。
+   * @returns {jQuery} - 燈泡元素的 jQuery 對象。
+   */
+  _createBulb(width, height) {
+    const container = $("<div>")
+      .addClass("bulb-container")
+      .css({
+        width: `${width + 20}px`,
+        height: `${height + 20}px`,
+      });
+
+    const bulb = $("<div>")
+      .addClass("bulb")
+      .css({ width: `${width}px`, height: `${height}px` });
+    const bulbFilter = $("<div>")
+      .addClass("bulb-filter")
+      .css({ width: `${width}px`, height: `${height}px` });
+
+    bulbFilter.appendTo(bulb);
+
+    bulb.appendTo(container);
+
+    return container;
+  }
+
+  /**
+   * 創建控制顏色和強度的動畫時間軸。
+   * @param {string} toColor - 目標顏色。
+   * @param {number} [toIntensity=1] - 目標強度，預設值為 1。
+   * @returns {gsap.timeline} - GSAP 時間軸對象。
+   */
+  createTimeline(toColor, toIntensity = 1) {
+    const i = toIntensity;
+    const c = toColor;
+
+    const bulb = this.element.find(".bulb");
+    const bulbFilter = this.element.find(".bulb-filter");
+
+    const tl = gsap
+      .timeline({
+        defaults: { duration: 0.2, ease: "set1" },
+        paused: true,
+      })
+      .to(bulb, { backgroundColor: c }, "<")
+      .to(bulbFilter, { filter: "blur(3px)" }, "<")
+      .to(bulb, { boxShadow: `0 0 20px ${i * 5}px ${c}` }, "<")
+      .to(bulb, { boxShadow: `0 0 20px 0px ${c}` });
+
+    return tl;
+  }
+
+  /**
+   * 公開方法，用於將元素附加到指定的 DOM 元素。
+   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
+   * @returns {Bulb} - Bulb 類別的實例。
+   */
+  appendTo(element) {
+    if (this._isAppendTo) return this;
+
+    this._isAppendTo = true;
+
+    this.element.appendTo($(element));
+
+    return this;
+  }
+}
