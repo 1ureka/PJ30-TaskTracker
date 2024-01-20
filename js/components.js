@@ -423,12 +423,11 @@ class SidebarTop extends component {
   _create() {
     const container = $("<div>").addClass("sidebar-top-container");
 
-    this._createBtns().appendTo(container);
-
+    this._dateSelect = this._createDateSelect();
+    const btns = this._createBtns();
     const separator = new Separator();
-    separator.appendTo(container);
 
-    this._dateSelect = this._createDateSelect().appendTo(container);
+    container.append(btns, separator.element, this._dateSelect);
 
     this._textarea = new TextArea({
       placeholder: "新增工作",
@@ -465,52 +464,71 @@ class SidebarTop extends component {
   }
 
   _createBtns() {
-    const container = $("<div>").addClass("sidebar-top-btns-container");
+    const create = () => {
+      const container = $("<div>").addClass("sidebar-top-btns-container");
 
-    this._taskBtn = $("<button>");
-    const bulb1 = new Bulb(20, 20);
-    bulb1.appendTo(this._taskBtn);
-    const bulb1TL = bulb1.createTimeline("#ea81af");
+      const btns = ["工作", "靈感"].map((name) => {
+        const element = $("<button>");
 
-    const lable1 = new DoubleColorLabel("工作");
-    lable1.appendTo(this._taskBtn);
+        const bulb = new Bulb(20, 20);
+        const bulbTL = bulb.createTimeline("#ea81af");
+        bulb.appendTo(element);
 
-    this._insBtn = $("<button>");
-    const bulb2 = new Bulb(20, 20);
-    bulb2.appendTo(this._insBtn);
-    const bulb2TL = bulb2.createTimeline("#ea81af");
+        const lable = new DoubleColorLabel(name);
+        lable.appendTo(element);
+        const labelTL = lable.timeline;
 
-    const label2 = new DoubleColorLabel("靈感");
-    label2.appendTo(this._insBtn);
+        element.appendTo(container);
 
-    this._bindClickTimeline(this._taskBtn);
-    this._bindClickTimeline(this._insBtn);
+        return { element, bulbTL, labelTL };
+      });
 
-    this._bindHoverTimelines(this._taskBtn, [
-      lable1.timeline,
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(this._taskBtn, { scale: 1.1 }),
-    ]);
-    this._bindHoverTimelines(this._insBtn, [
-      label2.timeline,
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(this._insBtn, { scale: 1.1 }),
-    ]);
+      return { container, btns };
+    };
 
-    this._taskBtn.on("click", () => {
-      bulb1TL.play();
-      bulb2TL.reverse();
-    });
-    this._insBtn.on("click", () => {
-      bulb1TL.reverse();
-      bulb2TL.play();
-    });
+    const { container, btns } = create();
 
-    container.append(this._taskBtn, this._insBtn);
+    const bindTimeline = (btns) => {
+      btns.forEach((btn) => {
+        this._bindClickTimeline(btn.element);
 
-    bulb1TL.play();
+        const hoverTls = [
+          btn.labelTL,
+          gsap
+            .timeline({ defaults: { ease: "set1" }, paused: true })
+            .to(btn.element, { duration: 0.2, scale: 1.1 }),
+        ];
+
+        this._bindHoverTimelines(btn.element, hoverTls);
+      });
+    };
+
+    bindTimeline(btns);
+
+    const options = {
+      defaults: { ease: "set1", duration: 0.35 },
+      paused: true,
+    };
+    const tl = gsap
+      .timeline(options)
+      .to(this._dateSelect, { autoAlpha: 0, height: 0, margin: 0 });
+
+    const bindEvents = (container, btns) => {
+      container.on("click", "button", (e) => {
+        const index = $(e.target).index();
+        btns[index].bulbTL.play();
+        btns[1 - index].bulbTL.reverse();
+
+        index === 1 ? tl.play() : tl.reverse();
+      });
+    };
+
+    bindEvents(container, btns);
+
+    btns[0].bulbTL.play();
+
+    this._taskBtn = btns[0].element;
+    this._inspirationBtn = btns[1].element;
 
     return container;
   }
@@ -669,8 +687,24 @@ class SidebarTop extends component {
       },
     };
 
+    let lastMode = "normal";
+    this._handlers.click = {
+      task: () => {
+        if (lastMode !== "normal") handler(getDate());
+
+        lastMode = "normal";
+      },
+      inspiration: () => {
+        if (lastMode !== "inspiration") handler({ year: "0000", month: "00" });
+
+        lastMode = "inspiration";
+      },
+    };
+
     yearSelect.on("change", this._handlers.date.year);
     monthSelect.on("change", this._handlers.date.month);
+    this._taskBtn.on("click", this._handlers.click.task);
+    this._inspirationBtn.on("click", this._handlers.click.inspiration);
 
     return this;
   }

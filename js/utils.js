@@ -376,6 +376,8 @@ class Save {
       })
       .flat();
 
+    keys.push("0000-00");
+
     keys.forEach((key) => {
       this._originalSave[key] = [];
       this._currentSave[key] = [];

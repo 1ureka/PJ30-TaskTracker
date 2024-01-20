@@ -100,8 +100,9 @@ $(async function () {
 
   sidebarTop.onSelect(async (e) => {
     $("body").css("pointerEvents", "none");
+
     date = `${e.year}-${e.month}`;
-    localStorage.setItem("date", date);
+    if (e.year !== "0000") localStorage.setItem("date", date);
 
     header.reset();
 
