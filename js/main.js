@@ -28,6 +28,7 @@ $(async function () {
       const timeout = setTimeout(() => {
         clearInterval(interval);
         console.error("無法載入雲端存檔，使用本地存檔");
+        alert("無法載入雲端存檔，使用本地存檔");
         window.dispatchEvent(new Event("saveLoaded"));
       }, timeoutDuration);
 
@@ -62,6 +63,7 @@ $(async function () {
 
     const timeout = setTimeout(() => {
       console.error("無法存入雲端存檔，暫存於本地存檔");
+      alert("無法存入雲端存檔，暫存於本地存檔");
       window.dispatchEvent(new Event("saveUploaded"));
     }, timeoutDuration);
 
