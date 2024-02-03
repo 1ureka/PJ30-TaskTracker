@@ -1502,9 +1502,11 @@ class Task {
       if (this._text.is("textarea")) return;
 
       // 停止選單編輯行為
-      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
+      $(":root").css("--is-task-list-hovable", "0");
 
-      const width = this._text.css("width", "calc(100% - 110px)").width();
+      this.element.css("min-width", "30%");
+      const width = this._text.css("width", "100%").width();
+      this.element.css("min-width", "");
       this._text.css("width", "auto");
 
       // 創建一個 textarea 元素
@@ -1512,7 +1514,7 @@ class Task {
         .val(this._text.text())
         .attr("class", this._text.attr("class"))
         .css("width", this._text.width())
-        .css("height", this._text.height() + 30);
+        .css("height", this._text.height() + 10);
 
       // 為該 textarea 元素新增 TextEditor 實例
       textEditor = new TextEditor(textarea, { delay: 10 });
