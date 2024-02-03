@@ -751,14 +751,14 @@ class Select {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -768,7 +768,7 @@ class Select {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -920,14 +920,14 @@ class TextArea {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -937,7 +937,7 @@ class TextArea {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -1090,14 +1090,14 @@ class TextInput {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -1107,7 +1107,7 @@ class TextInput {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -1264,6 +1264,8 @@ class Task {
   _createCategory(initValue) {
     const container = $("<div>").addClass("task-category-container");
 
+    gsap.set(container, { y: -2 });
+
     const displayContainer = $("<div>")
       .addClass("task-category-display-container")
       .appendTo(container);
@@ -1308,6 +1310,8 @@ class Task {
    */
   _createStatus(initValue) {
     const container = $("<div>").addClass("task-status-container");
+
+    gsap.set(container, { y: -2 });
 
     const displayContainer = $("<div>")
       .addClass("task-status-display-container")
@@ -1359,11 +1363,19 @@ class Task {
 
     const categoryHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .fromTo(this._category.children("div"), { scale: 1 }, { scale: 1.1 });
+      .to(this._category, {
+        y: 1,
+        boxShadow:
+          "rgba(0, 0, 0, 0.75) 0px 0px 0px, rgba(0, 0, 0, 0.35) 3px 6px 3px -3px, rgba(0, 0, 0, 0.45) 0px -5px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 10px -3px inset",
+      });
 
     const statusHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .fromTo(this._status.children("div"), { scale: 1 }, { scale: 1.1 });
+      .to(this._status, {
+        y: 1,
+        boxShadow:
+          "rgba(0, 0, 0, 0.75) 0px 0px 0px, rgba(0, 0, 0, 0.35) 3px 6px 3px -3px, rgba(0, 0, 0, 0.45) 0px -5px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 10px -3px inset",
+      });
 
     return { deleteClick, categoryHover, statusHover };
   }

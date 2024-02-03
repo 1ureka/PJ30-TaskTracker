@@ -212,7 +212,7 @@ class SidebarBottom extends component {
     const timelines = [
       gsap
         .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
+        .to(btn, { scale: 1.05 }),
     ];
 
     const icon = config.icon;
@@ -235,7 +235,7 @@ class SidebarBottom extends component {
     const timelines = [
       gsap
         .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
+        .to(btn, { scale: 1.05 }),
     ];
 
     const label = new DoubleColorLabel("完成");
@@ -425,9 +425,11 @@ class SidebarTop extends component {
 
     this._dateSelect = this._createDateSelect();
     const btns = this._createBtns();
-    const separator = new Separator();
 
-    container.append(btns, separator.element, this._dateSelect);
+    $("<div>")
+      .addClass("sidebar-top-nav-container")
+      .appendTo(container)
+      .append($("<div>").append(btns, this._dateSelect));
 
     this._textarea = new TextArea({
       placeholder: "新增工作",
@@ -455,7 +457,6 @@ class SidebarTop extends component {
       duration: 0.2,
     });
 
-    this._categorySelect.element.css("margin", "10px");
     this._categorySelect.appendTo(container);
 
     this._addBtn = this._createAddBtn().appendTo(container);
@@ -490,15 +491,12 @@ class SidebarTop extends component {
 
     const bindTimeline = (btns) => {
       btns.forEach((btn) => {
-        this._bindClickTimeline(btn.element);
-
         const hoverTls = [
           btn.labelTL,
           gsap
-            .timeline({ defaults: { ease: "set1" }, paused: true })
-            .to(btn.element, { duration: 0.2, scale: 1.1 }),
+            .timeline({ paused: true })
+            .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
         ];
-
         this._bindHoverTimelines(btn.element, hoverTls);
       });
     };
@@ -511,7 +509,7 @@ class SidebarTop extends component {
     };
     const tl = gsap
       .timeline(options)
-      .to(this._dateSelect, { autoAlpha: 0, height: 0, margin: 0 });
+      .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
 
     const bindEvents = (container, btns) => {
       container.on("click", "button", (e) => {
@@ -538,9 +536,8 @@ class SidebarTop extends component {
 
     const timelines = [
       gsap.timeline({ paused: true }).to(container, {
-        paddingTop: 10,
-        paddingBottom: 10,
-        duration: 0.15,
+        y: 3,
+        duration: 0.25,
         ease: "set1",
       }),
     ];
