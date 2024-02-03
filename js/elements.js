@@ -1290,6 +1290,7 @@ class Task {
 
     const select = $("<select>")
       .addClass("task-category-select")
+      .attr("tabindex", "-1")
       .appendTo(container);
 
     CATEGORISE.forEach((category) => {
@@ -1339,6 +1340,7 @@ class Task {
 
     const select = $("<select>")
       .addClass("task-status-select")
+      .attr("tabindex", "-1")
       .appendTo(container);
 
     STATUSES.forEach((status) => {
