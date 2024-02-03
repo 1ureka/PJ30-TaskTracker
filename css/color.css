@@ -1,20 +1,15 @@
 body {
-  background-color: hsl(210, 15%, 15%);
+  background-color: hsl(210, 15%, 30%);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(210, 0%, 35%);
+  background: hsl(225, 10%, 15%);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(210, 0%, 60%);
+  background: hsl(225, 10%, 10%);
 }
 
-button,
 .popup,
-.date-select {
-  background-color: hsl(240, 5%, 10%);
-}
-
 #header,
 #version-display {
   background-color: hsl(240, 5%, 10%);
@@ -29,12 +24,21 @@ button,
   backdrop-filter: blur(10px);
 }
 
-.task-container {
-  background-color: hsl(225, 10%, 23%);
+button,
+.task-container,
+.sidebar-top-nav-container {
+  background-color: hsl(240, 5%, 15%);
+}
+.popup button {
+  background-color: hsl(240, 5%, 10%);
 }
 
 input,
 select,
 textarea {
-  background-color: hsl(210, 0%, 25%);
+  background-color: hsl(210, 0%, 30%);
+}
+
+.sidebar-top-nav-container::after {
+  background-color: #ea81af;
 }
