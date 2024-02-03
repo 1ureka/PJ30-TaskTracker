@@ -31,7 +31,7 @@
   align-items: center;
   position: relative;
   min-width: 50%;
-  max-width: fit-content;
+  max-width: calc(100% - var(--is-task-list-deleting) * 80px);
   padding: 20px 10px;
   border-radius: 5px;
   gap: 20px;
@@ -44,7 +44,8 @@
 
   transition: background-color 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
     translate 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
-    box-shadow 0.15s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
+    max-width 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 .task-container:hover {
   translate: 0px 3px;
