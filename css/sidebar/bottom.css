@@ -19,22 +19,6 @@
   align-items: center;
 }
 
-.sidebar-bottom-container > .btn:nth-child(1) {
-  border-radius: 10px 5px 5px 5px;
-}
-
-.sidebar-bottom-container > .btn:nth-child(2) {
-  border-radius: 5px 10px 5px 5px;
-}
-
-.sidebar-bottom-container > .btn:nth-child(3) {
-  border-radius: 5px 5px 5px 10px;
-}
-
-.sidebar-bottom-container > .btn:nth-child(4) {
-  border-radius: 5px 5px 10px 5px;
-}
-
 .sidebar-bottom-container > .done {
   position: fixed;
   right: 135px;
