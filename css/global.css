@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap");
 /* 
 
   滾動條
@@ -43,6 +44,9 @@ textarea {
 }
 h1 {
   color: white;
+}
+:lang(en) {
+  font-family: "Rajdhani", sans-serif;
 }
 input,
 select,
