@@ -229,7 +229,7 @@ $(async function () {
 
   const showMenuTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
-    .to("#header, #sidebar, #version-display", {
+    .to("#header, #sidebar", {
       x: 0,
       y: 0,
       autoAlpha: 1,
@@ -256,6 +256,6 @@ $(async function () {
   opening
     .add(hideLoadingTl)
     .add(showMenuTl)
-    .add(showDefaultsComponentsTl, "<0.6")
+    .add(showDefaultsComponentsTl, "<1.2")
     .play();
 });
