@@ -1,6 +1,9 @@
 $(async function () {
   $("body").css("pointerEvents", "none");
 
+  const waveBackground = new WaveBackground(-1);
+  waveBackground.show();
+
   //
   // 初始化
   //
@@ -210,7 +213,7 @@ $(async function () {
     taskList.onDelete((list) => save.set(date, list));
     taskList.onSort((list) => save.set(date, list));
 
-    taskList.onCopy((e) => copyPopup.show(e));
+    taskList.onCopy((coordinate) => copyPopup.show(coordinate));
 
     await delay(350);
 

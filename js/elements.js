@@ -1366,16 +1366,20 @@ class Task {
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(this._category, {
         y: 1,
-        boxShadow:
-          "rgba(0, 0, 0, 0.75) 0px 0px 0px, rgba(0, 0, 0, 0.35) 3px 6px 3px -3px, rgba(0, 0, 0, 0.45) 0px -5px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 10px -3px inset",
+        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
+        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
+        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
       });
 
     const statusHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(this._status, {
         y: 1,
-        boxShadow:
-          "rgba(0, 0, 0, 0.75) 0px 0px 0px, rgba(0, 0, 0, 0.35) 3px 6px 3px -3px, rgba(0, 0, 0, 0.45) 0px -5px 0px inset, rgba(255, 255, 255, 0.1) 0px 0px 10px -3px inset",
+        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
+        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
+        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
       });
 
     return { deleteClick, categoryHover, statusHover };
@@ -1504,7 +1508,7 @@ class Task {
       // 停止選單編輯行為
       $(":root").css("--is-task-list-hovable", "0");
 
-      this.element.css("min-width", "30%");
+      this.element.css("min-width", "40%");
       const width = this._text.css("width", "100%").width();
       this.element.css("min-width", "");
       this._text.css("width", "auto");
