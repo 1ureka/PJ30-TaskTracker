@@ -90,7 +90,7 @@ class DeleteIcon extends IconInterface {
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.25 })
+      .to(container, { scale: 1.1 })
       .to(this._cover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
       .to(leftLines, { x: 0, stagger: -0.067 }, "<")
       .to(rightLines, { x: 20, stagger: -0.067 }, "<");
@@ -155,10 +155,9 @@ class ClearIcon extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
-    this._trail = $("<img>").attr("src", "icons/broom (trail).png");
     this._broom = $("<img>").attr("src", "icons/broom.png");
 
-    container.append(this._trail, this._broom);
+    container.append(this._broom);
 
     return [container];
   }
@@ -167,12 +166,11 @@ class ClearIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._broom, { rotate: -90 });
-    gsap.set(this._trail, { x: 22, y: -5, rotate: -90 });
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.25 })
-      .to([this._broom, this._trail], { rotate: 0 }, "<");
+      .to(container, { scale: 1.1 })
+      .to(this._broom, { rotate: 0 }, "<");
 
     return [tl];
   }
@@ -199,10 +197,11 @@ class SaveIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._frame2, { y: -40, rotateY: 180 });
+    gsap.set(container, { x: -3, y: 1 });
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.1 }, "<")
+      .to(container, { scale: 1.05 }, "<")
       .to(this._frame1, { rotateY: 180, y: 40 }, "<")
       .to(this._frame2, { rotateY: 0, y: 0 }, "<")
       .to(
@@ -247,7 +246,7 @@ class LoadIcon extends IconInterface {
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
       .to(this._arrow1, { y: -40 })
       .to(this._arrow2, { y: 0 }, "<")
-      .to(container, { scale: 1.25 }, "<")
+      .to(container, { scale: 1.1 }, "<")
       .to(
         this._dot,
         {

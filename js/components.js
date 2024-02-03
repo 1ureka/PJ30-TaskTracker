@@ -187,6 +187,9 @@ class SidebarBottom extends component {
 
   _create() {
     const container = $("<div>").addClass("sidebar-bottom-container");
+    const inner = $("<div>")
+      .addClass("sidebar-bottom-inner")
+      .appendTo(container);
 
     const buttons = [
       { id: "delete", icon: new DeleteIcon(), label: "刪除" },
@@ -196,12 +199,12 @@ class SidebarBottom extends component {
     ];
 
     buttons.forEach((config) => {
-      this._createBtns(config).appendTo(container);
+      this._createBtns(config).appendTo(inner);
     });
 
     this._doneBtn = this._createExtraBtn().appendTo(container);
     this._createClearCheck().appendTo(container);
-    this._createVersionDisplay().appendTo(container);
+    this._createVersionDisplay().appendTo(inner);
 
     return container;
   }
@@ -209,11 +212,7 @@ class SidebarBottom extends component {
   _createBtns(config) {
     const btn = $("<button>").addClass("btn").data("type", config.id);
 
-    const timelines = [
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.05 }),
-    ];
+    const timelines = [];
 
     const icon = config.icon;
     timelines.push(...icon.timelines);
@@ -223,7 +222,15 @@ class SidebarBottom extends component {
 
     btn.append(icon.elements[0], label.element);
 
-    this._bindClickTimeline(btn);
+    timelines.push(
+      gsap.timeline({ paused: true }).to(btn.children(), {
+        y: "+=3",
+        duration: 0.25,
+        ease: "set1",
+      })
+    );
+
+    this._bindClickTimeline2(btn);
     this._bindHoverTimelines(btn, timelines);
 
     return btn;
@@ -301,6 +308,14 @@ class SidebarBottom extends component {
     const tl = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+
+    btn.on("click", () => tl.restart());
+  }
+
+  _bindClickTimeline2(btn) {
+    const tl = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(btn.children(), { y: "+=5", yoyo: true, repeat: 1 });
 
     btn.on("click", () => tl.restart());
   }

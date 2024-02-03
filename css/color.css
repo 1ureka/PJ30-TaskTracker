@@ -26,7 +26,8 @@ body {
 
 button,
 .task-container,
-.sidebar-top-nav-container {
+.sidebar-top-nav-container,
+.sidebar-bottom-container {
   background-color: hsl(240, 5%, 15%);
 }
 .popup button {
