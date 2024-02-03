@@ -642,6 +642,8 @@ class SidebarTop extends component {
       select.append(`<option value="${month}">${month}</option>`);
     });
 
+    select.val(select.children(":last").val());
+
     return this;
   }
 
@@ -890,6 +892,7 @@ class TaskList extends component {
     this.element = this._create(list);
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
+    $(".task-delete-icon").css("pointerEvents", "none");
   }
 
   _create(list) {
@@ -995,12 +998,9 @@ class TaskList extends component {
     if (this._handlers.copy) return this;
 
     this._handlers.copy = async (e) => {
-      const scrollLeft = $(document).scrollLeft();
-      const scrollTop = $(document).scrollTop();
-
       const coordinate = {
-        top: e.clientY + scrollTop,
-        left: e.clientX + scrollLeft,
+        top: e.clientY,
+        left: e.clientX,
       };
 
       handler(coordinate);
@@ -1101,12 +1101,16 @@ class TaskList extends component {
     if (mode === "normal") {
       this.mode = "normal";
 
+      $(".task-delete-icon").css("pointerEvents", "none");
+
       document.documentElement.style.setProperty(
         "--is-task-list-deleting",
         "0"
       );
     } else if (mode === "delete") {
       this.mode = "delete";
+
+      $(".task-delete-icon").css("pointerEvents", "auto");
 
       document.documentElement.style.setProperty(
         "--is-task-list-deleting",
@@ -1327,7 +1331,7 @@ class CopyPopup extends component {
     const container = $("<div>")
       .addClass("popup")
       .text("已複製內文")
-      .css({ pointerEvents: "none" });
+      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
 
     return container;
   }
@@ -1346,8 +1350,7 @@ class CopyPopup extends component {
         { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
         "<"
       )
-      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 })
-      .to(this.element, { top: 0, left: 0, duration: 0.1 });
+      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
 
     return this;
   }
