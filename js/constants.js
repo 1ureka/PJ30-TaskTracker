@@ -11,6 +11,7 @@ const CATEGORISE = [
   "PJ28",
   "PJ29",
   "PJ30",
+  "PJ32",
   "Extra",
 ];
 
@@ -31,6 +32,7 @@ const COLORMAP = {
   PJ28: "#92e9ff",
   PJ29: "#ea81af",
   PJ30: "#ea81af",
+  PJ32: "#ea81af",
   Extra: "#a686f9",
 };
 
