@@ -508,6 +508,8 @@ function formatLocalStorageDate() {
 function findFirstUnfinished(list) {
   const tasks = list.filter((element) => element.type !== "separator");
 
+  if (tasks.length === 0) return { index: -1, taskTop: 0 };
+
   let low = 0;
   let high = tasks.length - 1;
   let index = -1;

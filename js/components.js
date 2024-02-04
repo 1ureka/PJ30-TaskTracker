@@ -755,17 +755,9 @@ class Header extends component {
 
     const bar = $("<div>").addClass("filter-bar");
 
-    const timelines = [];
-
-    const searchIcon = new SearchIcon();
-    searchIcon.appendTo(bar);
-    timelines.push(...searchIcon.timelines);
-
     const input = this._createSearchInput();
     const select = this._createCategorySelect();
-    $("<div>").append(input, select).appendTo(bar);
-
-    this._bindHoverTimelines(this.element, timelines);
+    bar.append(input, select);
 
     this.element.append(bar);
 
@@ -776,6 +768,10 @@ class Header extends component {
     const container = $("<div>").addClass("search-input");
 
     const timelines = [];
+
+    const searchIcon = new SearchIcon();
+    searchIcon.appendTo(container);
+    timelines.push(...searchIcon.timelines);
 
     this._input = new TextInput({
       placeholder: "搜尋",
@@ -954,11 +950,15 @@ class TaskList extends component {
   _bindEvents() {
     this._handlers._inner1 = () => {
       this._sortable.option("disabled", true);
+      $(".task-container").css("cursor", "default");
     };
 
-    this._handlers._inner2 = () => {
+    this._handlers._inner2 = async () => {
+      await delay(100);
       if ($(".task-text:focus").length > 0) return;
+      if (this.mode === "delete") return;
       this._sortable.option("disabled", false);
+      $(".task-container").css("cursor", "grab");
     };
 
     this.element.on("focus", ".task-text", this._handlers._inner1);
@@ -1106,21 +1106,29 @@ class TaskList extends component {
     if (mode === "normal") {
       this.mode = "normal";
 
+      this._sortable.option("disabled", false);
+      $(".task-container").css("cursor", "grab");
       $(".task-delete-icon").css("pointerEvents", "none");
 
-      document.documentElement.style.setProperty(
-        "--is-task-list-deleting",
-        "0"
-      );
+      $("#delete-mode-label").slideToggle(500);
+
+      $(":root").css({
+        "--is-task-list-deleting": 0,
+        "--is-task-list-hovable": 1,
+      });
     } else if (mode === "delete") {
       this.mode = "delete";
 
+      this._sortable.option("disabled", true);
+      $(".task-container").css("cursor", "pointer");
       $(".task-delete-icon").css("pointerEvents", "auto");
 
-      document.documentElement.style.setProperty(
-        "--is-task-list-deleting",
-        "1"
-      );
+      $("#delete-mode-label").slideToggle(500);
+
+      $(":root").css({
+        "--is-task-list-deleting": 1,
+        "--is-task-list-hovable": 0,
+      });
     }
 
     return this;
