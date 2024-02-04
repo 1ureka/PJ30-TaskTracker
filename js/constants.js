@@ -11,6 +11,7 @@ const CATEGORISE = [
   "PJ28",
   "PJ29",
   "PJ30",
+  "PJ32",
   "Extra",
 ];
 
@@ -31,6 +32,7 @@ const COLORMAP = {
   PJ28: "#92e9ff",
   PJ29: "#ea81af",
   PJ30: "#ea81af",
+  PJ32: "#ea81af",
   Extra: "#a686f9",
 };
 
@@ -39,3 +41,8 @@ const COLORMAP = {
  * @type {{ [key: string]: string }}
  */
 const STATUSMAP = { U: "未完成", S: "跳過", O: "完成", F: "失敗" };
+
+/**
+ * 存檔在雲端庫的路徑。
+ */
+const SAVEPATH = "PJ30/save.json";

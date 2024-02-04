@@ -187,6 +187,9 @@ class SidebarBottom extends component {
 
   _create() {
     const container = $("<div>").addClass("sidebar-bottom-container");
+    const inner = $("<div>")
+      .addClass("sidebar-bottom-inner")
+      .appendTo(container);
 
     const buttons = [
       { id: "delete", icon: new DeleteIcon(), label: "刪除" },
@@ -196,12 +199,12 @@ class SidebarBottom extends component {
     ];
 
     buttons.forEach((config) => {
-      this._createBtns(config).appendTo(container);
+      this._createBtns(config).appendTo(inner);
     });
 
     this._doneBtn = this._createExtraBtn().appendTo(container);
     this._createClearCheck().appendTo(container);
-    this._createVersionDisplay().appendTo(container);
+    this._createVersionDisplay().appendTo(inner);
 
     return container;
   }
@@ -209,11 +212,7 @@ class SidebarBottom extends component {
   _createBtns(config) {
     const btn = $("<button>").addClass("btn").data("type", config.id);
 
-    const timelines = [
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
-    ];
+    const timelines = [];
 
     const icon = config.icon;
     timelines.push(...icon.timelines);
@@ -223,7 +222,15 @@ class SidebarBottom extends component {
 
     btn.append(icon.elements[0], label.element);
 
-    this._bindClickTimeline(btn);
+    timelines.push(
+      gsap.timeline({ paused: true }).to(btn.children(), {
+        y: "+=3",
+        duration: 0.25,
+        ease: "set1",
+      })
+    );
+
+    this._bindClickTimeline2(btn);
     this._bindHoverTimelines(btn, timelines);
 
     return btn;
@@ -235,7 +242,7 @@ class SidebarBottom extends component {
     const timelines = [
       gsap
         .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
+        .to(btn, { scale: 1.05 }),
     ];
 
     const label = new DoubleColorLabel("完成");
@@ -252,7 +259,7 @@ class SidebarBottom extends component {
   _createVersionDisplay() {
     const container = $("<div>")
       .attr("id", "version-display")
-      .append($("<p>").text("版本： @1.1.0"));
+      .append($("<p>").text("版本： @2.0.0"));
 
     return container;
   }
@@ -301,6 +308,14 @@ class SidebarBottom extends component {
     const tl = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
       .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+
+    btn.on("click", () => tl.restart());
+  }
+
+  _bindClickTimeline2(btn) {
+    const tl = gsap
+      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+      .to(btn.children(), { y: "+=5", yoyo: true, repeat: 1 });
 
     btn.on("click", () => tl.restart());
   }
@@ -425,9 +440,11 @@ class SidebarTop extends component {
 
     this._dateSelect = this._createDateSelect();
     const btns = this._createBtns();
-    const separator = new Separator();
 
-    container.append(btns, separator.element, this._dateSelect);
+    $("<div>")
+      .addClass("sidebar-top-nav-container")
+      .appendTo(container)
+      .append($("<div>").append(btns, this._dateSelect));
 
     this._textarea = new TextArea({
       placeholder: "新增工作",
@@ -455,7 +472,6 @@ class SidebarTop extends component {
       duration: 0.2,
     });
 
-    this._categorySelect.element.css("margin", "10px");
     this._categorySelect.appendTo(container);
 
     this._addBtn = this._createAddBtn().appendTo(container);
@@ -490,15 +506,12 @@ class SidebarTop extends component {
 
     const bindTimeline = (btns) => {
       btns.forEach((btn) => {
-        this._bindClickTimeline(btn.element);
-
         const hoverTls = [
           btn.labelTL,
           gsap
-            .timeline({ defaults: { ease: "set1" }, paused: true })
-            .to(btn.element, { duration: 0.2, scale: 1.1 }),
+            .timeline({ paused: true })
+            .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
         ];
-
         this._bindHoverTimelines(btn.element, hoverTls);
       });
     };
@@ -511,7 +524,7 @@ class SidebarTop extends component {
     };
     const tl = gsap
       .timeline(options)
-      .to(this._dateSelect, { autoAlpha: 0, height: 0, margin: 0 });
+      .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
 
     const bindEvents = (container, btns) => {
       container.on("click", "button", (e) => {
@@ -538,9 +551,8 @@ class SidebarTop extends component {
 
     const timelines = [
       gsap.timeline({ paused: true }).to(container, {
-        paddingTop: 10,
-        paddingBottom: 10,
-        duration: 0.15,
+        y: 3,
+        duration: 0.25,
         ease: "set1",
       }),
     ];
@@ -629,6 +641,8 @@ class SidebarTop extends component {
     months.forEach((month) => {
       select.append(`<option value="${month}">${month}</option>`);
     });
+
+    select.val(select.children(":last").val());
 
     return this;
   }
@@ -739,70 +753,51 @@ class Header extends component {
   _create() {
     this.element = $("#header");
 
+    const bar = $("<div>").addClass("filter-bar");
+
     const input = this._createSearchInput();
     const select = this._createCategorySelect();
+    bar.append(input, select);
 
-    this.element.append(input, select);
+    bar
+      .on("mouseenter", (e) => {
+        const except = $(e.target).filter(
+          ".custom-select-options, .custom-select-option"
+        );
+
+        if (except.length) return;
+
+        select.css("pointerEvents", "auto");
+      })
+      .on("mouseleave", (e) => {
+        select.css("pointerEvents", "none");
+      });
+
+    this.element.append(bar);
 
     return this;
   }
 
   _createSearchInput() {
-    const container = $("<div>").addClass("search-input");
-
-    const timelines = [];
+    const container = $("<div>").addClass("search-input-container");
+    container.html(
+      `<input type="text" class="search-input" required="" placeholder="搜尋" />`
+    );
 
     const searchIcon = new SearchIcon();
+    searchIcon.elements[0].addClass("search-input-icon");
     searchIcon.appendTo(container);
-    timelines.push(...searchIcon.timelines);
 
-    this._input = new TextInput({
-      placeholder: "搜尋",
-      width: 410,
-      height: 40,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    this._input.appendTo(container);
-    const timeline = this._input.timeline;
-    const hoverElement = container;
-    const focusElement = this._input._input;
-
-    hoverElement.on("mouseover", () => {
-      timeline.play();
-    });
-    hoverElement.on("mouseleave", () => {
-      if (!focusElement.is(":focus")) timeline.reverse();
-    });
-    focusElement.on("focus", () => {
-      timeline.play();
-    });
-    focusElement.on("blur", () => {
-      timeline.reverse();
-    });
-
-    this._eraserIcon = new EraserIcon();
-    this._eraserIcon.appendTo(container);
-
-    this._bindHoverTimelines(container, timelines);
+    this._bindHoverTimelines(container, searchIcon.timelines);
+    this._input = container.find("input");
 
     return container;
   }
 
   _createCategorySelect() {
-    const container = $("<div>")
-      .addClass("category-select")
-      .css("width", $("#title").width());
+    const container = $("<div>").addClass("category-select");
 
-    const label = $("<label>").text("篩選").appendTo(container);
-
-    this._select = new Select({
-      options: ["所有類別", ...CATEGORISE],
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
+    this._select = new CustomSelect(["所有類別", ...CATEGORISE]);
     this._select.appendTo(container);
 
     return container;
@@ -820,46 +815,22 @@ class Header extends component {
 
     this._handlers.input = (e) => {
       const text = this._input.val();
-      const category = this._select.val();
-
-      if (this._input.val()) {
-        this._eraserIcon.show();
-      } else {
-        this._eraserIcon.hide();
-      }
+      const category = this._select.getVal();
 
       handler({ text, category });
     };
 
-    this._input._input.on("input", this._handlers.input);
-    this._select._select.on("change", this._handlers.input);
-
-    return this;
-  }
-
-  onClear(handler) {
-    if (this._handlers.clear) return this;
-
-    this._handlers.clear = () => {
-      const category = this._select.val();
-
-      this._input.val("");
-
-      handler({ text: "", category });
-    };
-
-    this._eraserIcon.elements[0].on("click", this._handlers.clear);
+    this._input.on("input", this._handlers.input);
+    this._select.onChange(this._handlers.input);
 
     return this;
   }
 
   async reset() {
     this._input.val("");
-    this._select.val("所有類別");
+    this._select.reset();
 
     await delay(100);
-
-    this._eraserIcon.hide();
 
     return this;
   }
@@ -878,6 +849,7 @@ class TaskList extends component {
     this.element = this._create(list);
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
+    $(".task-delete-icon").css("pointerEvents", "none");
   }
 
   _create(list) {
@@ -934,11 +906,15 @@ class TaskList extends component {
   _bindEvents() {
     this._handlers._inner1 = () => {
       this._sortable.option("disabled", true);
+      $(".task-container").css("cursor", "default");
     };
 
-    this._handlers._inner2 = () => {
+    this._handlers._inner2 = async () => {
+      await delay(100);
       if ($(".task-text:focus").length > 0) return;
+      if (this.mode === "delete") return;
       this._sortable.option("disabled", false);
+      $(".task-container").css("cursor", "grab");
     };
 
     this.element.on("focus", ".task-text", this._handlers._inner1);
@@ -983,12 +959,9 @@ class TaskList extends component {
     if (this._handlers.copy) return this;
 
     this._handlers.copy = async (e) => {
-      const scrollLeft = $(document).scrollLeft();
-      const scrollTop = $(document).scrollTop();
-
       const coordinate = {
-        top: e.clientY + scrollTop,
-        left: e.clientX + scrollLeft,
+        top: e.clientY,
+        left: e.clientX,
       };
 
       handler(coordinate);
@@ -1089,17 +1062,29 @@ class TaskList extends component {
     if (mode === "normal") {
       this.mode = "normal";
 
-      document.documentElement.style.setProperty(
-        "--is-task-list-deleting",
-        "0"
-      );
+      this._sortable.option("disabled", false);
+      $(".task-container").css("cursor", "grab");
+      $(".task-delete-icon").css("pointerEvents", "none");
+
+      $("#delete-mode-label").slideToggle(500);
+
+      $(":root").css({
+        "--is-task-list-deleting": 0,
+        "--is-task-list-hovable": 1,
+      });
     } else if (mode === "delete") {
       this.mode = "delete";
 
-      document.documentElement.style.setProperty(
-        "--is-task-list-deleting",
-        "1"
-      );
+      this._sortable.option("disabled", true);
+      $(".task-container").css("cursor", "pointer");
+      $(".task-delete-icon").css("pointerEvents", "auto");
+
+      $("#delete-mode-label").slideToggle(500);
+
+      $(":root").css({
+        "--is-task-list-deleting": 1,
+        "--is-task-list-hovable": 0,
+      });
     }
 
     return this;
@@ -1315,7 +1300,7 @@ class CopyPopup extends component {
     const container = $("<div>")
       .addClass("popup")
       .text("已複製內文")
-      .css({ pointerEvents: "none" });
+      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
 
     return container;
   }
@@ -1334,8 +1319,7 @@ class CopyPopup extends component {
         { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
         "<"
       )
-      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 })
-      .to(this.element, { top: 0, left: 0, duration: 0.1 });
+      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
 
     return this;
   }

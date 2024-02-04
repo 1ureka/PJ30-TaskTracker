@@ -8,13 +8,11 @@
   left: 0;
   right: 0;
   overflow: hidden;
-  backdrop-filter: blur(10px) brightness(1.1);
+  backdrop-filter: blur(10px);
   z-index: 99;
   user-select: none;
-}
 
-#loading-container > img {
-  position: relative;
-  width: 150px;
-  height: auto;
+  /* init */
+  opacity: 0;
+  visibility: hidden;
 }

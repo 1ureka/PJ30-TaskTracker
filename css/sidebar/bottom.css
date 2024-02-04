@@ -1,38 +1,47 @@
 .sidebar-bottom-container {
   position: absolute;
   width: 240px;
-  bottom: 0;
+  left: calc(252px - var(--sidebar-page) * 250px);
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+    rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
+  transition: left 0.5s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.sidebar-bottom-container > .sidebar-bottom-inner {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  width: 100%;
+  clip-path: inset(0px round 5px);
 }
 
-.sidebar-bottom-container > .btn {
-  height: 40px;
-  width: 115px;
-  margin-bottom: 10px;
-  padding: 0;
+.sidebar-bottom-container .btn {
+  height: 50px;
+  width: 50%;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  box-shadow: none;
+  border-radius: 0;
+  background-color: transparent;
 }
 
-.sidebar-bottom-container > .btn:nth-child(1) {
-  border-radius: 10px 5px 5px 5px;
+.sidebar-bottom-inner > .btn > * {
+  translate: 0px -1px;
 }
-
-.sidebar-bottom-container > .btn:nth-child(2) {
-  border-radius: 5px 10px 5px 5px;
+.sidebar-bottom-inner button {
+  transition: background-color 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
+    box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-
-.sidebar-bottom-container > .btn:nth-child(3) {
-  border-radius: 5px 5px 5px 10px;
-}
-
-.sidebar-bottom-container > .btn:nth-child(4) {
-  border-radius: 5px 5px 10px 5px;
+.sidebar-bottom-inner button:hover {
+  background-color: hsl(210, 5%, 25%);
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 3px 0px inset,
+    rgba(0, 0, 0, 0.15) 0px 3px 7px 3px inset;
 }
 
 .sidebar-bottom-container > .done {
@@ -40,26 +49,17 @@
   right: 135px;
   bottom: 33px;
   padding: 7px 10px;
-  margin: 0;
 }
 
 #version-display {
-  min-width: 265px;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  left: -10px;
   padding: 10px 0;
-  border-radius: 0 10px 0 0;
-  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
-    rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
-    rgba(0, 0, 0, 0.45) 0px -5px 0px inset,
-    rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
-  /* init */
-  opacity: 0;
-  visibility: hidden;
-  translate: 0px 60px;
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 #version-display > p {

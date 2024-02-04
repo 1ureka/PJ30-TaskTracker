@@ -90,7 +90,7 @@ class DeleteIcon extends IconInterface {
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.25 })
+      .to(container, { scale: 1.1 })
       .to(this._cover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
       .to(leftLines, { x: 0, stagger: -0.067 }, "<")
       .to(rightLines, { x: 20, stagger: -0.067 }, "<");
@@ -114,7 +114,7 @@ class DeleteIconB extends IconInterface {
       .attr("src", "icons/delete (inner).png")
       .css({ width: 40, height: 45 });
 
-    container.append(this._frame, this._inner).css("pointerEvents", "all");
+    container.append(this._frame, this._inner);
 
     return [container];
   }
@@ -155,10 +155,9 @@ class ClearIcon extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
-    this._trail = $("<img>").attr("src", "icons/broom (trail).png");
     this._broom = $("<img>").attr("src", "icons/broom.png");
 
-    container.append(this._trail, this._broom);
+    container.append(this._broom);
 
     return [container];
   }
@@ -167,12 +166,11 @@ class ClearIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._broom, { rotate: -90 });
-    gsap.set(this._trail, { x: 22, y: -5, rotate: -90 });
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.25 })
-      .to([this._broom, this._trail], { rotate: 0 }, "<");
+      .to(container, { scale: 1.1 })
+      .to(this._broom, { rotate: 0 }, "<");
 
     return [tl];
   }
@@ -199,10 +197,11 @@ class SaveIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._frame2, { y: -40, rotateY: 180 });
+    gsap.set(container, { x: -3, y: 1 });
 
     const tl = gsap
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.1 }, "<")
+      .to(container, { scale: 1.05 }, "<")
       .to(this._frame1, { rotateY: 180, y: 40 }, "<")
       .to(this._frame2, { rotateY: 0, y: 0 }, "<")
       .to(
@@ -247,7 +246,7 @@ class LoadIcon extends IconInterface {
       .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
       .to(this._arrow1, { y: -40 })
       .to(this._arrow2, { y: 0 }, "<")
-      .to(container, { scale: 1.25 }, "<")
+      .to(container, { scale: 1.1 }, "<")
       .to(
         this._dot,
         {
@@ -382,15 +381,7 @@ class SearchIcon extends IconInterface {
         rotate: 20,
       });
 
-    const t2 = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.3 }, paused: true })
-      .to(container, {
-        scale: 1.1,
-        rotate: "+=15",
-        transformOrigin: "16.5px 17px",
-      });
-
-    return [t1, t2];
+    return [t1];
   }
 }
 
@@ -421,14 +412,10 @@ class EraserIcon extends IconInterface {
 
     this._show = gsap
       .timeline({
-        defaults: { duration: 0.35, ease: "back.out(4)" },
+        defaults: { duration: 0.15, ease: "set1" },
         paused: true,
       })
-      .fromTo(
-        container,
-        { marginLeft: 0, width: 0, height: 0, autoAlpha: 0 },
-        { marginLeft: 10, width: 40, height: 40, autoAlpha: 1 }
-      );
+      .fromTo(container, { autoAlpha: 0 }, { autoAlpha: 1 });
 
     this._click = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
@@ -458,7 +445,8 @@ class EraserIcon extends IconInterface {
     this._show.play();
   }
 
-  hide() {
+  async hide() {
+    await delay(100);
     this._show.reverse();
   }
 }
@@ -751,14 +739,14 @@ class Select {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -768,7 +756,7 @@ class Select {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -920,14 +908,14 @@ class TextArea {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -937,7 +925,7 @@ class TextArea {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -1090,14 +1078,14 @@ class TextInput {
       position: "absolute",
       width: "100%",
       height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 10px)`,
+      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
     });
 
     this._outline1 = $("<div>")
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         bottom: -1 * this.outlineWidth,
         left: -1 * this.outlineWidth,
       })
@@ -1107,7 +1095,7 @@ class TextInput {
       .css({
         position: "absolute",
         backgroundColor: "white",
-        borderRadius: "10px",
+        borderRadius: "5px",
         top: -1 * this.outlineWidth,
         right: -1 * this.outlineWidth,
       })
@@ -1264,6 +1252,8 @@ class Task {
   _createCategory(initValue) {
     const container = $("<div>").addClass("task-category-container");
 
+    gsap.set(container, { y: -2 });
+
     const displayContainer = $("<div>")
       .addClass("task-category-display-container")
       .appendTo(container);
@@ -1289,6 +1279,7 @@ class Task {
 
     const select = $("<select>")
       .addClass("task-category-select")
+      .attr("tabindex", "-1")
       .appendTo(container);
 
     CATEGORISE.forEach((category) => {
@@ -1308,6 +1299,8 @@ class Task {
    */
   _createStatus(initValue) {
     const container = $("<div>").addClass("task-status-container");
+
+    gsap.set(container, { y: -2 });
 
     const displayContainer = $("<div>")
       .addClass("task-status-display-container")
@@ -1336,6 +1329,7 @@ class Task {
 
     const select = $("<select>")
       .addClass("task-status-select")
+      .attr("tabindex", "-1")
       .appendTo(container);
 
     STATUSES.forEach((status) => {
@@ -1355,15 +1349,27 @@ class Task {
   _createTimeline() {
     const deleteClick = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
 
     const categoryHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .fromTo(this._category.children("div"), { scale: 1 }, { scale: 1.1 });
+      .to(this._category, {
+        y: 1,
+        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
+        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
+        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
+      });
 
     const statusHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .fromTo(this._status.children("div"), { scale: 1 }, { scale: 1.1 });
+      .to(this._status, {
+        y: 1,
+        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
+        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
+        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
+      });
 
     return { deleteClick, categoryHover, statusHover };
   }
@@ -1378,7 +1384,7 @@ class Task {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, () => this.destroy());
+      this.element.fadeOut(500, () => this.destroy());
     });
 
     return this;
@@ -1489,9 +1495,11 @@ class Task {
       if (this._text.is("textarea")) return;
 
       // 停止選單編輯行為
-      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
+      $(":root").css("--is-task-list-hovable", "0");
 
-      const width = this._text.css("width", "calc(100% - 110px)").width();
+      this.element.css("min-width", "40%");
+      const width = this._text.css("width", "100%").width();
+      this.element.css("min-width", "");
       this._text.css("width", "auto");
 
       // 創建一個 textarea 元素
@@ -1499,7 +1507,7 @@ class Task {
         .val(this._text.text())
         .attr("class", this._text.attr("class"))
         .css("width", this._text.width())
-        .css("height", this._text.height() + 30);
+        .css("height", this._text.height() + 10);
 
       // 為該 textarea 元素新增 TextEditor 實例
       textEditor = new TextEditor(textarea, { delay: 10 });
@@ -1645,7 +1653,7 @@ class Separator {
   _createTimeline() {
     const deleteClick = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
 
     return { deleteClick };
   }
@@ -1659,7 +1667,7 @@ class Separator {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, () => this.destroy());
+      this.element.fadeOut(500, () => this.destroy());
     });
 
     return this;
