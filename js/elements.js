@@ -114,7 +114,7 @@ class DeleteIconB extends IconInterface {
       .attr("src", "icons/delete (inner).png")
       .css({ width: 40, height: 45 });
 
-    container.append(this._frame, this._inner).css("pointerEvents", "all");
+    container.append(this._frame, this._inner);
 
     return [container];
   }
@@ -381,15 +381,7 @@ class SearchIcon extends IconInterface {
         rotate: 20,
       });
 
-    const t2 = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.3 }, paused: true })
-      .to(container, {
-        scale: 1.1,
-        rotate: "+=15",
-        transformOrigin: "16.5px 17px",
-      });
-
-    return [t1, t2];
+    return [t1];
   }
 }
 
