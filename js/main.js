@@ -165,6 +165,12 @@ $(async function () {
     $("body").css("pointerEvents", "auto");
   });
 
+  $("<label>")
+    .attr("id", "delete-mode-label")
+    .text("刪除模式")
+    .appendTo("#sidebar")
+    .slideToggle();
+
   //
   // aside
   //
