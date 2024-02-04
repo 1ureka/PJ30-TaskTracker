@@ -1357,7 +1357,7 @@ class Task {
   _createTimeline() {
     const deleteClick = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
 
     const categoryHover = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
@@ -1392,7 +1392,7 @@ class Task {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, () => this.destroy());
+      this.element.fadeOut(500, () => this.destroy());
     });
 
     return this;
@@ -1661,7 +1661,7 @@ class Separator {
   _createTimeline() {
     const deleteClick = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element.children(), { scale: 0.7, yoyo: true, repeat: 1 });
+      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
 
     return { deleteClick };
   }
@@ -1675,7 +1675,7 @@ class Separator {
     this._deleteIcon.elements[0].on("click", async () => {
       this._timelines.deleteClick.restart();
       await delay(100);
-      this.element.hide(500, () => this.destroy());
+      this.element.fadeOut(500, () => this.destroy());
     });
 
     return this;
