@@ -759,6 +759,20 @@ class Header extends component {
     const select = this._createCategorySelect();
     bar.append(input, select);
 
+    bar
+      .on("mouseenter", (e) => {
+        const except = $(e.target).filter(
+          ".custom-select-options, .custom-select-option"
+        );
+
+        if (except.length) return;
+
+        select.css("pointerEvents", "auto");
+      })
+      .on("mouseleave", (e) => {
+        select.css("pointerEvents", "none");
+      });
+
     this.element.append(bar);
 
     return this;
@@ -810,14 +824,7 @@ class Header extends component {
   _createCategorySelect() {
     const container = $("<div>").addClass("category-select");
 
-    $("<label>").text("篩選").appendTo(container);
-
-    this._select = new Select({
-      options: ["所有類別", ...CATEGORISE],
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
+    this._select = new CustomSelect(["所有類別", ...CATEGORISE]);
     this._select.appendTo(container);
 
     return container;
@@ -835,7 +842,7 @@ class Header extends component {
 
     this._handlers.input = (e) => {
       const text = this._input.val();
-      const category = this._select.val();
+      const category = this._select.getVal();
 
       if (this._input.val()) {
         this._eraserIcon.show();
@@ -847,7 +854,7 @@ class Header extends component {
     };
 
     this._input._input.on("input", this._handlers.input);
-    this._select._select.on("change", this._handlers.input);
+    this._select.onChange(this._handlers.input);
 
     return this;
   }
@@ -856,7 +863,7 @@ class Header extends component {
     if (this._handlers.clear) return this;
 
     this._handlers.clear = () => {
-      const category = this._select.val();
+      const category = this._select.getVal();
 
       this._input.val("");
 
@@ -870,7 +877,7 @@ class Header extends component {
 
   async reset() {
     this._input.val("");
-    this._select.val("所有類別");
+    this._select.reset();
 
     await delay(100);
 

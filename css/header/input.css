@@ -7,13 +7,12 @@
 }
 #header .category-select {
   position: relative;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  pointer-events: none;
 }
 
-.category-select > :first-child {
-  margin-right: 10px;
+.category-select > .custom-select {
+  transform-origin: top;
+  scale: 1.1;
 }
 .search-input > :last-child {
   margin-left: 10px;
