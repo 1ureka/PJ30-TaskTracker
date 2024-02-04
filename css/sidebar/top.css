@@ -1,7 +1,7 @@
 .sidebar-top-container {
   position: absolute;
   width: 240px;
-  left: calc(var(--sidebar-page) * -250px);
+  left: calc(2px + var(--sidebar-page) * -250px);
   transition: left 0.5s cubic-bezier(0.39, 0.575, 0.565, 1);
   display: flex;
   flex-wrap: wrap;

@@ -26,6 +26,7 @@
   position: relative;
   overflow: hidden;
   width: 240px;
+  padding: 2px;
   height: calc(100vh - 250px);
 }
 
