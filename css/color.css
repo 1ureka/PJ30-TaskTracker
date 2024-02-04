@@ -27,7 +27,8 @@ body {
 button,
 .task-container,
 .sidebar-top-nav-container,
-.sidebar-bottom-container {
+.sidebar-bottom-container,
+.search-input {
   background-color: hsl(240, 5%, 15%);
 }
 .popup button {
