@@ -779,44 +779,17 @@ class Header extends component {
   }
 
   _createSearchInput() {
-    const container = $("<div>").addClass("search-input");
-
-    const timelines = [];
+    const container = $("<div>").addClass("search-input-container");
+    container.html(
+      `<input type="text" class="search-input" required="" placeholder="搜尋" />`
+    );
 
     const searchIcon = new SearchIcon();
+    searchIcon.elements[0].addClass("search-input-icon");
     searchIcon.appendTo(container);
-    timelines.push(...searchIcon.timelines);
 
-    this._input = new TextInput({
-      placeholder: "搜尋",
-      width: 410,
-      height: 40,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    this._input.appendTo(container);
-    const timeline = this._input.timeline;
-    const hoverElement = container;
-    const focusElement = this._input._input;
-
-    hoverElement.on("mouseover", () => {
-      timeline.play();
-    });
-    hoverElement.on("mouseleave", () => {
-      if (!focusElement.is(":focus")) timeline.reverse();
-    });
-    focusElement.on("focus", () => {
-      timeline.play();
-    });
-    focusElement.on("blur", () => {
-      timeline.reverse();
-    });
-
-    this._eraserIcon = new EraserIcon();
-    this._eraserIcon.appendTo(container);
-
-    this._bindHoverTimelines(container, timelines);
+    this._bindHoverTimelines(container, searchIcon.timelines);
+    this._input = container.find("input");
 
     return container;
   }
@@ -844,33 +817,11 @@ class Header extends component {
       const text = this._input.val();
       const category = this._select.getVal();
 
-      if (this._input.val()) {
-        this._eraserIcon.show();
-      } else {
-        this._eraserIcon.hide();
-      }
-
       handler({ text, category });
     };
 
-    this._input._input.on("input", this._handlers.input);
+    this._input.on("input", this._handlers.input);
     this._select.onChange(this._handlers.input);
-
-    return this;
-  }
-
-  onClear(handler) {
-    if (this._handlers.clear) return this;
-
-    this._handlers.clear = () => {
-      const category = this._select.getVal();
-
-      this._input.val("");
-
-      handler({ text: "", category });
-    };
-
-    this._eraserIcon.elements[0].on("click", this._handlers.clear);
 
     return this;
   }
@@ -880,8 +831,6 @@ class Header extends component {
     this._select.reset();
 
     await delay(100);
-
-    this._eraserIcon.hide();
 
     return this;
   }

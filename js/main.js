@@ -91,9 +91,7 @@ $(async function () {
   // header
   //
   const header = new Header();
-  header
-    .onInput((e) => taskList.filterTasks(e))
-    .onClear((e) => taskList.filterTasks(e));
+  header.onInput((e) => taskList.filterTasks(e));
 
   //
   // sidebar
