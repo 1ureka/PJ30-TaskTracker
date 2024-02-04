@@ -41,3 +41,8 @@ const COLORMAP = {
  * @type {{ [key: string]: string }}
  */
 const STATUSMAP = { U: "未完成", S: "跳過", O: "完成", F: "失敗" };
+
+/**
+ * 存檔在雲端庫的路徑。
+ */
+const SAVEPATH = "PJ30/save.json";

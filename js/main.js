@@ -1,8 +1,70 @@
 $(async function () {
-  $("body").css("pointerEvents", "none");
-
   const waveBackground = new WaveBackground(-1);
   waveBackground.show();
+
+  await login();
+
+  main();
+});
+
+async function login() {
+  // 如果已經認證過則認證完成
+  if (await checkInfo()) {
+    $("#login-container").remove();
+    return;
+  }
+
+  // 沒有認證過則顯示登入選單
+  $("html").css("--is-login", "0");
+
+  // 開始監聽submit事件，並等待認證完成
+  $("#login-container").on("submit", async function (e) {
+    e.preventDefault();
+
+    let username = $(this).find("input[type='text']").val();
+    let password = $(this).find("input[type='password']").val();
+
+    sessionStorage.setItem("username", username);
+    sessionStorage.setItem("password", password);
+
+    username = null;
+    password = null;
+
+    if (await checkInfo()) {
+      $("html").css("--is-login", "1");
+      $(this).off("submit");
+      window.dispatchEvent(new Event("login"));
+      return;
+    }
+
+    if ($("#login-fail-message").length) {
+      $("#login-fail-message").css("rotate", "15deg");
+      await delay(100);
+      $("#login-fail-message").css("rotate", "-15deg");
+      await delay(100);
+      $("#login-fail-message").css("rotate", "");
+      return;
+    }
+
+    $("<span>錯誤的名稱或密碼</span>")
+      .hide()
+      .attr("id", "login-fail-message")
+      .insertAfter($(this).find("button"))
+      .slideDown(500);
+  });
+
+  // 等待認證完成
+  await new Promise((resolve) =>
+    window.addEventListener("login", resolve, { once: true })
+  );
+
+  // 等待login退出CSS動畫完成
+  await delay(1500);
+  $("#login-container").remove();
+}
+
+async function main() {
+  $("body").css("pointerEvents", "none");
 
   //
   // 初始化
@@ -17,75 +79,20 @@ $(async function () {
 
   let date = initDate();
 
-  const save = new Save();
-
-  const loadSave = async () => {
-    const timeoutDuration = 5000;
-
-    await new Promise((resolve) => {
-      const interval = setInterval(
-        () => window.dispatchEvent(new Event("loadSave")),
-        500
-      );
-
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-        console.error("無法載入雲端存檔，使用本地存檔");
-        alert("無法載入雲端存檔，使用本地存檔");
-        window.dispatchEvent(new Event("saveLoaded"));
-      }, timeoutDuration);
-
-      window.addEventListener(
-        "saveLoaded",
-        () => {
-          clearInterval(interval);
-          clearTimeout(timeout);
-          resolve();
-        },
-        { once: true }
-      );
-    });
-
-    const str = localStorage.getItem("save");
-    const obj = JSON.parse(str);
-
-    Object.keys(obj).forEach((date) => save.set(date, obj[date]));
-
-    save.update();
-  };
-
-  const uploadSave = async () => {
-    const timeoutDuration = 5000;
-
-    const obj = save.get();
-    const str = JSON.stringify(obj, null, 2);
-
-    localStorage.setItem("save", str);
-
-    window.dispatchEvent(new Event("uploadSave"));
-
-    const timeout = setTimeout(() => {
-      console.error("無法存入雲端存檔，暫存於本地存檔");
-      alert("無法存入雲端存檔，暫存於本地存檔");
-      window.dispatchEvent(new Event("saveUploaded"));
-    }, timeoutDuration);
-
-    await new Promise((resolve) =>
-      window.addEventListener(
-        "saveUploaded",
-        () => {
-          clearTimeout(timeout);
-          resolve();
-        },
-        { once: true }
-      )
-    );
-  };
+  gsap.to("#loading-container", {
+    ease: "power2.in",
+    autoAlpha: 1,
+    duration: 0.3,
+  });
 
   //
   // 載入存檔
   //
-  await loadSave();
+  const save = new Save();
+  const content = await loadFile(SAVEPATH);
+  const data = JSON.parse(base64ToString(content));
+  Object.keys(data).forEach((date) => save.set(date, data[date]));
+  save.update();
 
   //
   // header
@@ -134,15 +141,26 @@ $(async function () {
 
     if (type === "save") {
       showLoadingTl.play();
-      await uploadSave();
+
+      const data = save.get("0");
+      const str = JSON.stringify(data, null, 2);
+      const file = stringToBase64(str);
+      await uploadFile(file, SAVEPATH);
       save.update();
+
       showLoadingTl.reverse();
     }
 
     if (type === "load") {
       showLoadingTl.play();
-      await loadSave();
+
+      const content = await loadFile(SAVEPATH);
+      const data = JSON.parse(base64ToString(content));
+      Object.keys(data).forEach((date) => save.set(date, data[date]));
+      save.update();
+
       showLoadingTl.reverse();
+
       await createContents(save.get(date));
     }
 
@@ -275,4 +293,4 @@ $(async function () {
     .add(showMenuTl)
     .add(showDefaultsComponentsTl, "<1.2")
     .play();
-});
+}
