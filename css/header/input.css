@@ -1,20 +1,24 @@
-#header > .search-input {
+#header .search-input {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0px 10px;
 }
-#header > .category-select {
+#header .category-select {
   position: relative;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
-.search-input > :first-child,
 .category-select > :first-child {
   margin-right: 10px;
 }
 .search-input > :last-child {
   margin-left: 10px;
+  position: absolute;
+  right: 10px;
+  width: 35px;
+  height: 35px;
 }
