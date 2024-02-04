@@ -100,8 +100,18 @@ $(async function () {
   //
   const sidebarTop = new SidebarTop();
   const sidebarBottom = new SidebarBottom();
-  sidebarTop.appendTo("#sidebar");
-  sidebarBottom.appendTo("#sidebar");
+  sidebarTop.appendTo("#sidebar-content");
+  sidebarBottom.appendTo("#sidebar-content");
+
+  $(".pages-btn-container")
+    .find("input")
+    .on("change", function () {
+      if ($(this).is(":checked")) {
+        $(":root").css("--sidebar-page", 1);
+      } else {
+        $(":root").css("--sidebar-page", 0);
+      }
+    });
 
   sidebarTop.onSelect(async (e) => {
     $("body").css("pointerEvents", "none");
