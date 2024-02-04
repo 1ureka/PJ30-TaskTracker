@@ -40,6 +40,7 @@
     </script>
 
     <!-- lib -->
+    <script type="module" src="lib/repo.mjs"></script>
     <script src="lib/clickParticle.js"></script>
     <script src="lib/waveBG.js"></script>
     <script src="lib/customSelect.js"></script>
@@ -48,6 +49,48 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <div id="login-container">
+      <form id="login-form">
+        <img src="icons/user.png" />
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+          "
+        >
+          <div class="wave-group">
+            <input
+              required="true"
+              type="text"
+              class="input"
+              autocomplete="off"
+            />
+            <span class="bar"></span>
+            <label class="label">
+              <span class="label-char" style="--index: 0">名</span>
+              <span class="label-char" style="--index: 1">稱</span>
+            </label>
+          </div>
+          <div class="wave-group">
+            <input
+              required="true"
+              type="password"
+              class="input"
+              autocomplete="off"
+            />
+            <span class="bar"></span>
+            <label class="label">
+              <span class="label-char" style="--index: 0">密</span>
+              <span class="label-char" style="--index: 1">碼</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" id="login-submit">登入</button>
+      </form>
+    </div>
+
     <div id="header"></div>
 
     <div id="sidebar">
@@ -88,6 +131,7 @@
         .wrapper {
           width: 120px;
           height: 60px;
+          left: -20px;
           position: relative;
           z-index: 1;
         }
