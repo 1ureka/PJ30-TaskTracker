@@ -259,7 +259,7 @@ class SidebarBottom extends component {
   _createVersionDisplay() {
     const container = $("<div>")
       .attr("id", "version-display")
-      .append($("<p>").text("版本： @1.1.0"));
+      .append($("<p>").text("版本： @2.0.0"));
 
     return container;
   }
@@ -753,10 +753,21 @@ class Header extends component {
   _create() {
     this.element = $("#header");
 
+    const bar = $("<div>").addClass("filter-bar");
+
+    const timelines = [];
+
+    const searchIcon = new SearchIcon();
+    searchIcon.appendTo(bar);
+    timelines.push(...searchIcon.timelines);
+
     const input = this._createSearchInput();
     const select = this._createCategorySelect();
+    $("<div>").append(input, select).appendTo(bar);
 
-    this.element.append(input, select);
+    this._bindHoverTimelines(this.element, timelines);
+
+    this.element.append(bar);
 
     return this;
   }
@@ -765,10 +776,6 @@ class Header extends component {
     const container = $("<div>").addClass("search-input");
 
     const timelines = [];
-
-    const searchIcon = new SearchIcon();
-    searchIcon.appendTo(container);
-    timelines.push(...searchIcon.timelines);
 
     this._input = new TextInput({
       placeholder: "搜尋",
@@ -805,11 +812,9 @@ class Header extends component {
   }
 
   _createCategorySelect() {
-    const container = $("<div>")
-      .addClass("category-select")
-      .css("width", $("#title").width());
+    const container = $("<div>").addClass("category-select");
 
-    const label = $("<label>").text("篩選").appendTo(container);
+    $("<label>").text("篩選").appendTo(container);
 
     this._select = new Select({
       options: ["所有類別", ...CATEGORISE],
