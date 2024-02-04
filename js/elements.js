@@ -420,14 +420,10 @@ class EraserIcon extends IconInterface {
 
     this._show = gsap
       .timeline({
-        defaults: { duration: 0.35, ease: "back.out(4)" },
+        defaults: { duration: 0.15, ease: "set1" },
         paused: true,
       })
-      .fromTo(
-        container,
-        { marginLeft: 0, width: 0, height: 0, autoAlpha: 0 },
-        { marginLeft: 10, width: 40, height: 40, autoAlpha: 1 }
-      );
+      .fromTo(container, { autoAlpha: 0 }, { autoAlpha: 1 });
 
     this._click = gsap
       .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
@@ -457,7 +453,8 @@ class EraserIcon extends IconInterface {
     this._show.play();
   }
 
-  hide() {
+  async hide() {
+    await delay(100);
     this._show.reverse();
   }
 }
