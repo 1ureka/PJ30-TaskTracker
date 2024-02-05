@@ -1167,419 +1167,262 @@ class TextInput {
  * @class
  */
 class Task {
-  /**
-   * Task 類別的建構子。
-   * @constructor
-   * @param {Object} config - 任務的配置項。
-   * @param {string} config.category - 任務分類。
-   * @param {string} config.status - 任務狀態。
-   * @param {string} config.text - 任務文字內容。
-   */
+  /** Task 類別的建構子。 */
   constructor(config) {
-    /**
-     * 是否已附加到 DOM 的標誌。 @type {boolean} @private
-     */
+    /** 是否已附加到 DOM 的標誌。 @type {boolean} @private */
     this._isAppendTo = false;
-
-    /**
-     * 任務資訊。 @type {Object} @private
-     */
+    /** 任務資訊。 @type {Object} @private */
     this._info = config;
-
-    /**
-     * 任務元素的根容器。 @type {jQuery}
-     */
+    /** 任務元素的根容器。 @type {jQuery} */
     this.element = this._create(config);
 
-    /**
-     * 時間軸集合。 @type {Object} @private
-     */
-    this._timelines = this._createTimeline();
-
     // 綁定各種事件
-    this._bindDeleteEvents()
-      ._bindCategoryEvents()
-      ._bindStatusEvents()
-      ._bindTextEvents()
-      ._bindCopyEvents();
+    this._bindDeleteEvents();
+    this._bindTagsEvents();
+    this._bindTextEvents();
+    this._bindCopyEvents();
+    this._bindHoverEvents();
   }
 
-  /**
-   * 私有方法，用於創建任務元素。
-   * @private
-   * @param {Object} config - 任務的配置項。
-   * @returns {jQuery} - 創建的任務元素的 jQuery 物件。
-   */
   _create(config) {
+    // 主容器
     const container = $("<div>").addClass("task-container");
-
-    this._deleteIcon = new DeleteIconB();
-    this._deleteIcon.appendTo(container);
-    this._deleteIcon.addClass("task-delete-icon");
-
-    const contentsContainer = $("<div>").addClass("task-contents-container");
-
-    this._category = this._createCategory(config.category).appendTo(
-      contentsContainer
-    );
-    this._text = $("<p>")
-      .addClass("task-text")
-      .text(config.text)
-      .appendTo(contentsContainer);
-
-    const functionContainer = $("<div>").addClass("task-function-container");
-
-    this._copyIcon = new CopyIcon();
-    this._copyIcon.appendTo(functionContainer);
-    this._copyIcon.elements[0].addClass("task-copy-icon");
-    this._status = this._createStatus(config.status).appendTo(
-      functionContainer
-    );
-
-    container.append(contentsContainer, functionContainer);
-
     container.data("info", JSON.stringify(config));
 
-    return container;
-  }
+    // 刪除模式
+    const deleteIcon = new DeleteIconB();
+    deleteIcon.appendTo(container);
+    deleteIcon.addClass("task-delete-icon");
 
-  /**
-   * 私有方法，用於創建分類元素。
-   * @private
-   * @param {string} initValue - 分類的初始值。
-   * @returns {jQuery} - 創建的分類元素的 jQuery 物件。
-   */
-  _createCategory(initValue) {
-    const container = $("<div>").addClass("task-category-container");
+    // 上半部容器
+    const infoContainer = $("<div>").addClass("task-info-container");
+    const tagsContainer = $("<div>").addClass("task-tags-container");
+    const menuContainer = $("<div>").addClass("task-menu-container");
+    infoContainer.append(tagsContainer, menuContainer).appendTo(container);
 
-    gsap.set(container, { y: -2 });
+    // 上半部內容
+    const tags = this._createTags(config.category, config.status);
+    tags.forEach((span) => span.appendTo(tagsContainer));
+    const buttons = this._createButtons();
+    buttons.forEach((btn) => btn.appendTo(menuContainer));
 
-    const displayContainer = $("<div>")
-      .addClass("task-category-display-container")
+    // 下半部
+    $("<div>")
+      .addClass("task-p-container")
+      .append($("<p>").text(config.text))
       .appendTo(container);
-
-    const displayElements = {};
-
-    CATEGORISE.forEach((category) => {
-      const display = $("<div>")
-        .addClass("task-category-display")
-        .css("backgroundColor", COLORMAP[category])
-        .text(`${category}`)
-        .appendTo(displayContainer);
-
-      gsap.set(display, { zIndex: 2, y: -41 });
-
-      displayElements[category] = display;
-    });
-
-    gsap.set(displayElements[initValue], {
-      zIndex: 3,
-      y: 0,
-    });
-
-    const select = $("<select>")
-      .addClass("task-category-select")
-      .attr("tabindex", "-1")
-      .appendTo(container);
-
-    CATEGORISE.forEach((category) => {
-      $("<option>").val(category).text(category).appendTo(select);
-    });
-
-    select.val(initValue);
 
     return container;
   }
 
-  /**
-   * 私有方法，用於創建狀態元素。
-   * @private
-   * @param {string} initValue - 狀態的初始值。
-   * @returns {jQuery} - 創建的狀態元素的 jQuery 物件。
-   */
-  _createStatus(initValue) {
-    const container = $("<div>").addClass("task-status-container");
-
-    gsap.set(container, { y: -2 });
-
-    const displayContainer = $("<div>")
-      .addClass("task-status-display-container")
-      .appendTo(container);
-
-    const displayElements = {};
-
-    const STATUSES = Object.keys(STATUSMAP);
-
-    STATUSES.forEach((status) => {
-      const display = $("<div>")
-        .addClass("task-status-display")
-        .css("backgroundColor", COLORMAP[status])
-        .text(`${status}`)
-        .appendTo(displayContainer);
-
-      gsap.set(display, { zIndex: 2, y: -41 });
-
-      displayElements[status] = display;
-    });
-
-    gsap.set(displayElements[initValue], {
-      zIndex: 3,
-      y: 0,
-    });
-
-    const select = $("<select>")
-      .addClass("task-status-select")
-      .attr("tabindex", "-1")
-      .appendTo(container);
-
-    STATUSES.forEach((status) => {
-      $("<option>").val(status).text(STATUSMAP[status]).appendTo(select);
-    });
-
-    select.val(initValue);
-
-    return container;
+  _createTags(category, status) {
+    return [
+      $("<span>")
+        .addClass("task-tag")
+        .addClass(`task-${category}`)
+        .text(`•${category}`),
+      $("<span>")
+        .addClass("task-tag")
+        .addClass(`task-${status}`)
+        .text(`•${STATUSMAP[status]}`),
+    ];
   }
 
-  /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {Object} - 時間軸集合。
-   */
-  _createTimeline() {
-    const deleteClick = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
-
-    const categoryHover = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this._category, {
-        y: 1,
-        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
-        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
-        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
-        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
-      });
-
-    const statusHover = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this._status, {
-        y: 1,
-        boxShadow: `rgba(0, 0, 0, 0.75) 0px 0px 0px, 
-        rgba(0, 0, 0, 0.35) 2px 4px 3px -3px,
-        rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
-        rgba(255, 255, 255, 0.3) 0px 0px 3px -3px inset`,
-      });
-
-    return { deleteClick, categoryHover, statusHover };
+  _createButtons() {
+    return [
+      $("<button>")
+        .addClass("task-edit-button")
+        .append($("<img>").attr("src", "icons/pencil.png")),
+      $("<button>")
+        .addClass("task-copy-button")
+        .append(
+          $("<img>").attr("src", "icons/copy (left).png"),
+          $("<img>").attr("src", "icons/copy (right).png")
+        ),
+    ];
   }
 
-  /**
-   * 私有方法，綁定刪除相關事件。
-   * @private
-   * @returns {Task} - Task 類別的實例。
-   */
   _bindDeleteEvents() {
-    // 包含互動與更新this.currentInfo，還有像是進入編輯模式等
-    this._deleteIcon.elements[0].on("click", async () => {
-      this._timelines.deleteClick.restart();
+    this.element.on("click", ".task-delete-icon", async () => {
+      gsap.to(this.element, {
+        duration: 0.1,
+        ease: "set1",
+        y: "+=5",
+        yoyo: true,
+        repeat: 1,
+      });
+
       await delay(100);
-      this.element.fadeOut(500, () => this.destroy());
-    });
 
-    return this;
+      this.element.fadeOut(500, () => {
+        this.element.trigger("task-delete");
+        this.destroy();
+      });
+    });
   }
 
-  /**
-   * 私有方法，綁定分類相關事件。
-   * @private
-   * @returns {Task} - Task 類別的實例。
-   */
-  _bindCategoryEvents() {
-    // 切換動畫
-    this._category.on("change", () => {
-      const value = this._category.find("select").val();
+  _bindTagsEvents() {
+    const tags = this.element.find(".task-tag");
 
-      this._info.category = value;
-      this.element.data("info", JSON.stringify(this._info));
+    this.element.on("click", ".task-tag:first", (e) => {
+      const select = $("<div>").addClass("task-options popup");
 
-      const targetElement = this._category
-        .find(".task-category-display")
-        .filter(function () {
-          return $(this).text() === value;
-        });
+      CATEGORISE.forEach((category) =>
+        select.append($("<div>").addClass("task-option").text(category))
+      );
 
-      const otherElements = this._category
-        .find(".task-category-display")
-        .not(targetElement);
+      select.one("click", ".task-option", (e) => {
+        const option = $(e.target).text();
 
-      gsap.to(targetElement, {
-        onStart: () => {
-          gsap.set(otherElements, { zIndex: 2 });
-          gsap.set(targetElement, { zIndex: 3 });
-        },
-        y: 0,
-        onComplete: () => {
-          gsap.set(otherElements, { y: -41 });
-        },
+        const originalClass = $(tags[0]).attr("class").split(" ")[1];
+
+        this._info.category = option;
+        this.element.data("info", JSON.stringify(this._info));
+
+        $(tags[0])
+          .removeClass(originalClass)
+          .addClass(`task-${option}`)
+          .text(`•${option}`);
+
+        this.element.trigger("task-change");
+
+        select.blur();
+      });
+
+      if (e.clientY > window.innerHeight / 2) {
+        gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
+      } else {
+        gsap.set(select, { top: e.clientY + 20, left: e.clientX });
+      }
+
+      select.attr("tabindex", "0").appendTo("body").focus();
+
+      select.on("blur", async () => {
+        await delay(350);
+        select.remove();
       });
     });
 
-    // 懸停動畫
-    this._category.on("mouseover", () => {
-      this._timelines.categoryHover.play();
-    });
-    this._category.on("mouseleave", () => {
-      this._timelines.categoryHover.reverse();
-    });
+    this.element.on("click", ".task-tag:last", (e) => {
+      const select = $("<div>").addClass("task-options popup");
 
-    return this;
-  }
+      Object.values(STATUSMAP).forEach((status) =>
+        select.append($("<div>").addClass("task-option").text(status))
+      );
 
-  /**
-   * 私有方法，綁定狀態相關事件。
-   * @private
-   * @returns {Task} - Task 類別的實例。
-   */
-  _bindStatusEvents() {
-    // 切換動畫
-    this._status.on("change", () => {
-      const value = this._status.find("select").val();
+      select.one("click", ".task-option", (e) => {
+        const option = $(e.target).text();
 
-      this._info.status = value;
-      this.element.data("info", JSON.stringify(this._info));
+        const originalClass = $(tags[1]).attr("class").split(" ")[1];
 
-      const targetElement = this._status
-        .find(".task-status-display")
-        .filter(function () {
-          return $(this).text() === value;
-        });
+        const reversedStatusMap = Object.entries(STATUSMAP).reduce(
+          (reversedMap, [key, value]) => {
+            reversedMap[value] = key;
+            return reversedMap;
+          },
+          {}
+        );
 
-      const otherElements = this._status
-        .find(".task-status-display")
-        .not(targetElement);
+        this._info.status = reversedStatusMap[option];
+        this.element.data("info", JSON.stringify(this._info));
 
-      gsap.to(targetElement, {
-        onStart: () => {
-          gsap.set(otherElements, { zIndex: 2 });
-          gsap.set(targetElement, { zIndex: 3 });
-        },
-        y: 0,
-        onComplete: () => {
-          gsap.set(otherElements, { y: -41 });
-        },
+        $(tags[1])
+          .removeClass(originalClass)
+          .addClass(`task-${reversedStatusMap[option]}`)
+          .text(`•${option}`);
+
+        this.element.trigger("task-change");
+
+        select.blur();
+      });
+
+      if (e.clientY > window.innerHeight / 2) {
+        gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
+      } else {
+        gsap.set(select, { top: e.clientY + 20, left: e.clientX });
+      }
+
+      select.attr("tabindex", "0").appendTo("body").focus();
+
+      select.on("blur", async () => {
+        await delay(350);
+        select.remove();
       });
     });
-
-    // 懸停動畫
-    this._status.on("mouseover", () => {
-      this._timelines.statusHover.play();
-    });
-    this._status.on("mouseleave", () => {
-      this._timelines.statusHover.reverse();
-    });
-
-    return this;
   }
 
-  /**
-   * 私有方法，綁定文字相關事件。
-   * @private
-   * @returns {Task} - Task 類別的實例。
-   */
   _bindTextEvents() {
-    let textEditor;
+    let textarea;
 
-    this.element.on("dblclick", ".task-text", (e) => {
-      // 避免重複雙擊事件發生
-      if (this._text.is("textarea")) return;
+    this.element.on("click", ".task-edit-button", async () => {
+      const p = this.element.find("p");
+      if (p.length === 0) return;
+
+      await delay(100);
 
       // 停止選單編輯行為
       $(":root").css("--is-task-list-hovable", "0");
-
-      this.element.css("min-width", "40%");
-      const width = this._text.css("width", "100%").width();
-      this.element.css("min-width", "");
-      this._text.css("width", "auto");
+      $(":root").css("--is-task-menu-usable", "none");
 
       // 創建一個 textarea 元素
-      const textarea = $("<textarea></textarea>")
-        .val(this._text.text())
-        .attr("class", this._text.attr("class"))
-        .css("width", this._text.width())
-        .css("height", this._text.height() + 10);
+      textarea = $("<textarea></textarea>")
+        .val(p.text())
+        .css("width", p.width())
+        .css("height", p.height() + 10);
 
-      // 為該 textarea 元素新增 TextEditor 實例
-      textEditor = new TextEditor(textarea, { delay: 10 });
-      textEditor.start({
-        "(": ")",
-        "[": "]",
-        "{": "}",
-        "<": ">",
-        '"': '"',
-        "'": "'",
-      });
+      // 取得最小寬度
+      this.element.css("min-width", "40%");
+      const minWidth = p.width();
+      this.element.css("min-width", "");
 
       // 替換 p 元素為 textarea
-      this._text.replaceWith(textarea);
-      this._text = textarea;
-
-      // 讓 textarea 獲取焦點
+      p.replaceWith(textarea);
       textarea.focus();
 
       // 給足夠空間編輯
-      textarea.css("width", width);
+      textarea.css("width", minWidth);
+
+      this.element.trigger("task-edit-focus");
     });
 
-    this.element.on("keyup", ".task-text", (e) => {
-      this._info.text = this._text.val();
+    this.element.on("keyup", "textarea", (e) => {
+      this._info.text = textarea.val();
       this.element.data("info", JSON.stringify(this._info));
+      this.element.trigger("task-change");
     });
 
-    this.element.on("blur", ".task-text", (e) => {
-      // 清除 TextEditor 實例
-      textEditor.destroy();
-      textEditor = null;
-
-      this._info.text = this._text.val();
+    this.element.on("blur", "textarea", (e) => {
+      this._info.text = textarea.val();
       this.element.data("info", JSON.stringify(this._info));
-
-      // 創建一個 p 元素
-      const p = $("<p></p>")
-        .text(this._info.text)
-        .attr("class", this._text.attr("class"));
+      this.element.trigger("task-change");
 
       // 替換 textarea 元素為 p
-      this._text = this._text.replaceWith(p);
-      this._text = p;
+      const p = $("<p></p>").text(this._info.text);
+      textarea.replaceWith(p);
 
       // 恢復選單編輯行為
-      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
+      $(":root").css("--is-task-list-hovable", "1");
+      $(":root").css("--is-task-menu-usable", "auto");
+
+      this.element.trigger("task-edit-blur");
     });
 
-    this.element.on("input", ".task-text", (e) => {
-      const currentHeight = this._text.height();
+    this.element.on("input", "textarea", (e) => {
+      const currentHeight = textarea.height();
 
-      gsap.set(this._text, { ease: "set1", duration: 0.5, height: "auto" });
-      const targetHeight = this._text[0].scrollHeight;
+      gsap.set(textarea, { height: "auto" });
+      const targetHeight = textarea[0].scrollHeight;
 
       gsap.fromTo(
-        this._text,
+        textarea,
         { height: currentHeight },
         { ease: "set1", duration: 0.1, height: targetHeight }
       );
     });
-
-    return this;
   }
 
-  /**
-   * 私有方法，綁定複製相關事件。
-   * @private
-   * @returns {Task} - Task 類別的實例。
-   */
   _bindCopyEvents() {
-    this._copyIcon.elements[0].on("click", () => {
+    this.element.on("click", ".task-copy-button", () => {
       const info = JSON.parse(this.element.data("info"));
       const textToCopy = info.text;
       navigator.clipboard.writeText(textToCopy);
@@ -1588,11 +1431,23 @@ class Task {
     return this;
   }
 
-  /**
-   * 公開方法，用於附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {Task} - Task 類別的實例。
-   */
+  _bindHoverEvents() {
+    this.element.on("mouseover", (e) => {
+      if (
+        $(e.target).hasClass("task-options") ||
+        $(e.target).hasClass("task-option")
+      )
+        $(":root").css("--is-task-list-hovable", "0");
+    });
+    this.element.on("mouseout", (e) => {
+      if (
+        $(e.target).hasClass("task-options") ||
+        $(e.target).hasClass("task-option")
+      )
+        $(":root").css("--is-task-list-hovable", "1");
+    });
+  }
+  /** @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。 @returns {Task} - Task 類別的實例。 */
   appendTo(element) {
     if (this._isAppendTo) return this;
 
@@ -1602,14 +1457,36 @@ class Task {
 
     return this;
   }
-
-  /**
-   * 公開方法，用於銷毀 Task 類別的實例。
-   */
+  /** 用於銷毀 Task 類別的實例。 */
   destroy() {
     this.element.remove();
-    this._timelines = null;
     this._info = null;
+  }
+
+  static createStyle() {
+    const styleText = Object.keys(COLORMAP)
+      .map(
+        (key) =>
+          `.task-${key}{background-color:${COLORMAP[key]}}.task-${key}:hover{outline:3px solid ${COLORMAP[key]}90}`
+      )
+      .join("");
+
+    $("<style>").text(styleText).appendTo("head");
+  }
+
+  static onCopy(handler) {
+    if (this._copyHandler) return;
+
+    this._copyHandler = (e) => {
+      const coordinate = {
+        top: e.clientY,
+        left: e.clientX,
+      };
+
+      handler(coordinate);
+    };
+
+    $("body").on("click", ".task-copy-button", this._copyHandler);
   }
 }
 

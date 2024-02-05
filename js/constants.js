@@ -20,11 +20,11 @@ const CATEGORISE = [
  * @type {{ [key: string]: string }}
  */
 const COLORMAP = {
-  U: "#bbb",
+  U: "#bbbbbb",
   S: "#92e9ff",
   O: "#8ce197",
   F: "#ea81af",
-  未分類: "#bbb",
+  未分類: "#bbbbbb",
   PJ24: "#ffff7a",
   PJ25: "#8ce197",
   PJ26: "#8ce197",
