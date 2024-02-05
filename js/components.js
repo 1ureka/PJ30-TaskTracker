@@ -906,24 +906,23 @@ class TaskList extends component {
   _bindEvents() {
     this._handlers._inner1 = () => {
       this._sortable.option("disabled", true);
-      $(".task-container").css("cursor", "default");
     };
 
     this._handlers._inner2 = async () => {
-      await delay(100);
-      if ($(".task-text:focus").length > 0) return;
       if (this.mode === "delete") return;
       this._sortable.option("disabled", false);
-      $(".task-container").css("cursor", "grab");
     };
 
-    this.element.on("focus", ".task-text", this._handlers._inner1);
-    $("body").on("click", this._handlers._inner2);
-
-    this._unbind = () => {
-      this.element.off();
-      $("body").off("click", this._handlers._inner2);
-    };
+    this.element.on(
+      "task-edit-focus",
+      ".task-container",
+      this._handlers._inner1
+    );
+    this.element.on(
+      "task-edit-blur",
+      ".task-container",
+      this._handlers._inner2
+    );
 
     return this;
   }
@@ -945,29 +944,14 @@ class TaskList extends component {
   onChange(handler) {
     if (this._handlers.change) return this;
 
-    this._handlers.change = async () => {
+    this._handlers.change = async (e) => {
+      if (e.type === "task-delete") await delay(100);
       const list = this.getList();
-
       handler(list);
     };
 
-    this.element.on("change", "select", this._handlers.change);
-    this.element.on("keyup", ".task-text", this._handlers.change);
-  }
-
-  onCopy(handler) {
-    if (this._handlers.copy) return this;
-
-    this._handlers.copy = async (e) => {
-      const coordinate = {
-        top: e.clientY,
-        left: e.clientX,
-      };
-
-      handler(coordinate);
-    };
-
-    this.element.on("click", ".task-copy-icon", this._handlers.copy);
+    this.element.on("task-change", ".task-container", this._handlers.change);
+    this.element.on("task-delete", ".task-container", this._handlers.change);
   }
 
   onSort(handler) {
@@ -980,20 +964,6 @@ class TaskList extends component {
     };
 
     this._sortable.option("onSort", this._handlers.sort);
-  }
-
-  onDelete(handler) {
-    if (this._handlers.delete) return this;
-
-    this._handlers.delete = async () => {
-      await delay(700);
-
-      const list = this.getList();
-
-      handler(list);
-    };
-
-    this.element.on("click", ".task-delete-icon", this._handlers.delete);
   }
 
   async show() {
@@ -1049,10 +1019,8 @@ class TaskList extends component {
       .get()
       .forEach((element) => $(element).remove());
 
-    this._unbind();
-
+    this.element.off();
     this._sortable.destroy();
-
     Object.keys(this).forEach((key) => (this[key] = null));
   }
 
@@ -1063,7 +1031,7 @@ class TaskList extends component {
       this.mode = "normal";
 
       this._sortable.option("disabled", false);
-      $(".task-container").css("cursor", "grab");
+      $(".task-container").css("cursor", "default");
       $(".task-delete-icon").css("pointerEvents", "none");
 
       $("#delete-mode-label").slideToggle(500);
@@ -1144,7 +1112,7 @@ class TaskList extends component {
     gsap.to(elements, {
       autoAlpha: 1,
       height: "auto",
-      padding: "20px 10px",
+      padding: "12px 15px 15px 15px",
       ease: "set1",
       duration: 0.2,
     });

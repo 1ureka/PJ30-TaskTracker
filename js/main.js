@@ -232,6 +232,8 @@ async function main() {
   //
   // content
   //
+  Task.createStyle();
+  Task.onCopy((coordinate) => copyPopup.show(coordinate));
 
   /** @type {TaskList} */
   let taskList;
@@ -242,10 +244,7 @@ async function main() {
     taskList = new TaskList(list);
 
     taskList.onChange((list) => save.set(date, list));
-    taskList.onDelete((list) => save.set(date, list));
     taskList.onSort((list) => save.set(date, list));
-
-    taskList.onCopy((coordinate) => copyPopup.show(coordinate));
 
     await delay(350);
 
