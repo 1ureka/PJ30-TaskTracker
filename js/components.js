@@ -259,7 +259,7 @@ class SidebarBottom extends component {
   _createVersionDisplay() {
     const container = $("<div>")
       .attr("id", "version-display")
-      .append($("<p>").text("版本： @2.0.0"));
+      .append($("<p>").text("版本： @2.1.0"));
 
     return container;
   }
