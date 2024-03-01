@@ -952,6 +952,7 @@ class TaskList extends component {
 
     this.element.on("task-change", ".task-container", this._handlers.change);
     this.element.on("task-delete", ".task-container", this._handlers.change);
+    this.element.on("task-delete", ".separator", this._handlers.change);
   }
 
   onSort(handler) {

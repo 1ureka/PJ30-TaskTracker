@@ -1503,7 +1503,6 @@ class Separator {
     this._isAppendTo = false;
 
     this.element = this._create();
-    this._timelines = this._createTimeline();
     this._bindDeleteEvents();
   }
 
@@ -1523,28 +1522,26 @@ class Separator {
   }
 
   /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {Object} - 時間軸集合。
-   */
-  _createTimeline() {
-    const deleteClick = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(this.element, { y: "+=5", yoyo: true, repeat: 1 });
-
-    return { deleteClick };
-  }
-
-  /**
    * 私有方法，綁定刪除相關事件。
    * @private
    * @returns {Separator} - Separator 類別的實例。
    */
   _bindDeleteEvents() {
     this._deleteIcon.elements[0].on("click", async () => {
-      this._timelines.deleteClick.restart();
+      gsap.to(this.element, {
+        duration: 0.1,
+        ease: "set1",
+        y: "+=5",
+        yoyo: true,
+        repeat: 1,
+      });
+
       await delay(100);
-      this.element.fadeOut(500, () => this.destroy());
+
+      this.element.fadeOut(500, () => {
+        this.element.trigger("task-delete");
+        this.destroy();
+      });
     });
 
     return this;
@@ -1570,7 +1567,6 @@ class Separator {
    */
   destroy() {
     this.element.remove();
-    this._timelines = null;
   }
 }
 

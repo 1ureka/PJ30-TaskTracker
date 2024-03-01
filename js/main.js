@@ -243,8 +243,8 @@ async function main() {
 
     taskList = new TaskList(list);
 
-    taskList.onChange((list) => save.set(date, list));
-    taskList.onSort((list) => save.set(date, list));
+    taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
+    taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
 
     await delay(350);
 
