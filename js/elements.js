@@ -99,54 +99,6 @@ class DeleteIcon extends IconInterface {
   }
 }
 
-class DeleteIconB extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._frame = $("<img>")
-      .attr("src", "icons/delete (frame).png")
-      .css({ width: 40, height: 45 });
-    this._inner = $("<img>")
-      .attr("src", "icons/delete (inner).png")
-      .css({ width: 40, height: 45 });
-
-    container.append(this._frame, this._inner);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    gsap.set(this._inner, { transformOrigin: "17px center" });
-
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.4, ease: "set1" }, paused: true })
-      .fromTo(this._inner, { rotate: 0 }, { rotate: 270 });
-
-    this._bindTimeline(tl);
-
-    return [tl];
-  }
-
-  _bindTimeline(tl) {
-    const container = this.elements[0];
-
-    container.on("mouseenter", () => tl.play());
-    container.on("mouseleave", () => tl.reverse());
-  }
-
-  addClass(className) {
-    this.elements[0].addClass(className);
-
-    return this;
-  }
-}
-
 class ClearIcon extends IconInterface {
   constructor() {
     super();

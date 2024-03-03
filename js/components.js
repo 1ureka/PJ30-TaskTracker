@@ -180,12 +180,6 @@ class SidebarBottom extends component {
     this._timelines = {};
     this._timelines.show = {};
 
-    this.element = this._create();
-
-    this._createTimelines()._bindTimeline();
-  }
-
-  _create() {
     const container = $("<div>").addClass("sidebar-bottom-container");
     const inner = $("<div>")
       .addClass("sidebar-bottom-inner")
@@ -202,11 +196,9 @@ class SidebarBottom extends component {
       this._createBtns(config).appendTo(inner);
     });
 
-    this._doneBtn = this._createExtraBtn().appendTo(container);
-    this._createClearCheck().appendTo(container);
     this._createVersionDisplay().appendTo(inner);
 
-    return container;
+    this.element = container;
   }
 
   _createBtns(config) {
@@ -236,72 +228,12 @@ class SidebarBottom extends component {
     return btn;
   }
 
-  _createExtraBtn() {
-    const btn = $("<button>").addClass("done").data("type", "done");
-
-    const timelines = [
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.05 }),
-    ];
-
-    const label = new DoubleColorLabel("完成");
-    timelines.push(label.timeline);
-
-    btn.append(label.element);
-
-    this._bindClickTimeline(btn);
-    this._bindHoverTimelines(btn, timelines);
-
-    return btn;
-  }
-
   _createVersionDisplay() {
     const container = $("<div>")
       .attr("id", "version-display")
       .append($("<p>").text("版本： @2.1.0"));
 
     return container;
-  }
-
-  _createClearCheck() {
-    this._clearCheck = {};
-
-    this._clearCheck.element = $("<div>").addClass("popup").css({
-      justifyContent: "space-around",
-      width: "160px",
-      flexWrap: "wrap",
-      flexDirection: "row",
-      zIndex: 99,
-    });
-
-    this._clearCheck.yes = $("<button>").data("type", "check").css({
-      boxShadow: "none",
-      textDecoration: "underline",
-    });
-
-    const label1 = new DoubleColorLabel("確定");
-    label1.appendTo(this._clearCheck.yes);
-    this._bindHoverTimelines(this._clearCheck.yes, [label1.timeline]);
-    this._bindClickTimeline(this._clearCheck.yes);
-
-    this._clearCheck.no = $("<button>").data("type", "cancel").css({
-      boxShadow: "none",
-      textDecoration: "underline",
-    });
-
-    const label2 = new DoubleColorLabel("取消");
-    label2.appendTo(this._clearCheck.no);
-    this._bindHoverTimelines(this._clearCheck.no, [label2.timeline]);
-    this._bindClickTimeline(this._clearCheck.no);
-
-    this._clearCheck.element.append(
-      $("<p>").text("確定要清空嗎"),
-      this._clearCheck.yes,
-      this._clearCheck.no
-    );
-
-    return this._clearCheck.element;
   }
 
   _bindClickTimeline(btn) {
@@ -325,63 +257,6 @@ class SidebarBottom extends component {
       btn.on("mouseenter", () => tl.play());
       btn.on("mouseleave", () => tl.reverse());
     });
-  }
-
-  // 製作"直接"關於該組件的時間軸
-  _createTimelines() {
-    this._timelines.show.done = gsap
-      .timeline({ defaults: { duration: 0.35 }, paused: true })
-      .fromTo(
-        this._doneBtn,
-        {
-          scale: 0.5,
-          autoAlpha: 0,
-        },
-        {
-          ease: "back.out(4.5)",
-          scale: 1,
-          autoAlpha: 1,
-        }
-      );
-
-    this._timelines.show.clear = gsap
-      .timeline({ defaults: { duration: 0.35 }, paused: true })
-      .from(this._clearCheck.element, {
-        ease: "back.out(2)",
-        scale: 0.1,
-        autoAlpha: 0,
-      });
-
-    return this;
-  }
-
-  // 綁定"直接"關於該組件的時間軸
-  _bindTimeline() {
-    this.element.on("click", async (e) => {
-      const element = $(e.target);
-      const type = element.data("type");
-
-      const t1 = this._timelines.show.clear;
-      if (type === "clear") {
-        if (t1.paused()) {
-          t1.play();
-        } else {
-          t1.reversed(!t1.reversed());
-        }
-      } else if (["cancel", "check"].includes(type)) {
-        await delay(100);
-        t1.reverse();
-      }
-    });
-  }
-
-  showDoneBtn() {
-    this._timelines.show.done.play();
-  }
-
-  async hideDownBtn() {
-    await delay(100);
-    this._timelines.show.done.reverse();
   }
 
   onSelect(handler) {
@@ -844,7 +719,6 @@ class TaskList extends component {
     this._timelines = {};
 
     this.isShow = false;
-    this.mode = "normal";
 
     this.element = this._create(list);
     gsap.set(this.element.children(), { autoAlpha: 0 });
@@ -909,7 +783,6 @@ class TaskList extends component {
     };
 
     this._handlers._inner2 = async () => {
-      if (this.mode === "delete") return;
       this._sortable.option("disabled", false);
     };
 
@@ -999,19 +872,6 @@ class TaskList extends component {
     return this;
   }
 
-  async clear() {
-    await this.hide();
-
-    this.element
-      .children()
-      .get()
-      .forEach((element) => $(element).remove());
-
-    this._handlers.change();
-
-    return this;
-  }
-
   async remove() {
     await this.hide();
 
@@ -1023,40 +883,6 @@ class TaskList extends component {
     this.element.off();
     this._sortable.destroy();
     Object.keys(this).forEach((key) => (this[key] = null));
-  }
-
-  switchMode(mode) {
-    if (this.mode === mode) return this;
-
-    if (mode === "normal") {
-      this.mode = "normal";
-
-      this._sortable.option("disabled", false);
-      $(".task-container").css("cursor", "default");
-      $(".task-delete-icon").css("pointerEvents", "none");
-
-      $("#delete-mode-label").slideToggle(500);
-
-      $(":root").css({
-        "--is-task-list-deleting": 0,
-        "--is-task-list-hovable": 1,
-      });
-    } else if (mode === "delete") {
-      this.mode = "delete";
-
-      this._sortable.option("disabled", true);
-      $(".task-container").css("cursor", "pointer");
-      $(".task-delete-icon").css("pointerEvents", "auto");
-
-      $("#delete-mode-label").slideToggle(500);
-
-      $(":root").css({
-        "--is-task-list-deleting": 1,
-        "--is-task-list-hovable": 0,
-      });
-    }
-
-    return this;
   }
 
   filterTasks(criteria) {

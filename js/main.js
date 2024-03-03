@@ -164,20 +164,6 @@ async function main() {
       await createContents(save.get(date));
     }
 
-    if (type === "delete") {
-      taskList.switchMode("delete");
-      sidebarBottom.showDoneBtn();
-    }
-
-    if (type === "done") {
-      taskList.switchMode("normal");
-      sidebarBottom.hideDownBtn();
-    }
-
-    if (type === "check") {
-      await taskList.clear();
-    }
-
     $("body").css("pointerEvents", "auto");
   });
 
