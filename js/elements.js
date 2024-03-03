@@ -128,6 +128,36 @@ class ClearIcon extends IconInterface {
   }
 }
 
+class AddIcon extends IconInterface {
+  constructor() {
+    super();
+  }
+
+  _createIcon() {
+    const container = $("<div>").addClass("icon-container");
+
+    this._plus = $("<img>").attr("src", "icons/add.png");
+
+    container.append(this._plus);
+
+    return [container];
+  }
+
+  _createTimeline() {
+    const container = this.elements[0];
+
+    const tl = gsap
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
+      .to(container, { scale: 1.05 }, "<")
+      .to(this._plus, { rotateZ: 90 }, "<");
+
+    return [tl];
+  }
+}
+
 class SaveIcon extends IconInterface {
   constructor() {
     super();
@@ -149,10 +179,12 @@ class SaveIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._frame2, { y: -40, rotateY: 180 });
-    gsap.set(container, { x: -3, y: 1 });
 
     const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
       .to(container, { scale: 1.05 }, "<")
       .to(this._frame1, { rotateY: 180, y: 40 }, "<")
       .to(this._frame2, { rotateY: 0, y: 0 }, "<")
@@ -195,7 +227,10 @@ class LoadIcon extends IconInterface {
     gsap.set(this._arrow2, { y: 40 });
 
     const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
       .to(this._arrow1, { y: -40 })
       .to(this._arrow2, { y: 0 }, "<")
       .to(container, { scale: 1.1 }, "<")
