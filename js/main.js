@@ -118,13 +118,6 @@ async function createContents(list) {
 
 $(async function () {
   //
-  // 等待登入
-  //
-  await login();
-
-  $("body").css("pointerEvents", "none");
-
-  //
   // 創建組件
   //
   const {
@@ -138,6 +131,12 @@ $(async function () {
     scrollBtns,
   } = createComponents();
   waveBackground.show();
+
+  //
+  // 等待登入
+  //
+  await login();
+  $("body").css("pointerEvents", "none");
   loadingIcon.show();
 
   //
