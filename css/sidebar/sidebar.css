@@ -22,17 +22,16 @@
   position: relative;
   overflow: hidden;
   width: 240px;
-  height: calc(100% - 125px);
+  height: calc(100% - 105px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 #title {
   position: relative;
   display: flex;
-  margin-bottom: 30px;
 }
 
 #title > #favicon {

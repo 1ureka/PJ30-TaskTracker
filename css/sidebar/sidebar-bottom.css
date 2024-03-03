@@ -1,6 +1,6 @@
 .sidebar-bottom-container {
   position: relative;
-  width: 240px;
+  width: 100%;
   border-radius: 5px;
   border-bottom-left-radius: 25px;
   box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
