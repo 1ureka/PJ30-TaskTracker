@@ -723,7 +723,6 @@ class TaskList extends component {
     this.element = this._create(list);
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
-    $(".task-delete-icon").css("pointerEvents", "none");
   }
 
   _create(list) {

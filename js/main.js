@@ -1,3 +1,6 @@
+/** @type {TaskList} */
+let taskList;
+
 async function login() {
   // 如果已經認證過則認證完成
   if (await checkInfo()) {
@@ -100,8 +103,6 @@ function createComponents() {
   };
 }
 
-/** @type {TaskList} */
-let taskList;
 async function createContents(list) {
   if (taskList) await taskList.remove();
 
@@ -250,12 +251,6 @@ $(async function () {
         $(":root").css("--sidebar-page", 0);
       }
     });
-
-  $("<label>")
-    .attr("id", "delete-mode-label")
-    .text("刪除模式")
-    .appendTo("#sidebar")
-    .slideToggle();
 
   //
   // 全局動畫
