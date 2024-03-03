@@ -1,5 +1,9 @@
 /** @type {TaskList} */
 let taskList;
+/** @type {"YYYY-MM"} */
+let date;
+/** @type {Save} */
+let save;
 
 async function login() {
   // 如果已經認證過則認證完成
@@ -142,8 +146,8 @@ $(async function () {
   //
   // 載入存檔
   //
-  let date = initDate();
-  const save = new Save();
+  date = initDate();
+  save = new Save();
   const content = await loadFile(SAVEPATH);
   const data = JSON.parse(base64ToString(content));
   Object.keys(data).forEach((date) => save.set(date, data[date]));
