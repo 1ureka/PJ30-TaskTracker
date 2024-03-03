@@ -99,6 +99,8 @@ function createComponents() {
   copyPopup.appendTo("body");
   scrollButtons.appendTo("body");
 
+  sidebarTop.setActive(date);
+
   return {
     header,
     sidebarTop,
@@ -158,6 +160,7 @@ $(async function () {
     if (!["0000-00", "1111-11"].includes(date))
       localStorage.setItem("date", date);
 
+    sidebarTop.setActive(date);
     await header.reset();
     await createContents(save.get(date));
 

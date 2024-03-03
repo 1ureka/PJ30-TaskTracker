@@ -321,6 +321,15 @@ class SidebarTop extends component {
       .addClass("sidebar-top-mask")
       .appendTo("#sidebar-content");
 
+    const styleTag = document.createElement("style");
+    document.head.appendChild(styleTag);
+    styleTag.sheet.insertRule(`
+      .sidebar-top-opt.active::after {
+        background: url("icons/play.png");
+        background-size: 20px 20px;
+      }
+      `);
+
     this.element = section.append(content);
   }
 
@@ -366,6 +375,11 @@ class SidebarTop extends component {
 
   _createOption(title, id) {
     return $("<button>").addClass("sidebar-top-opt").text(title).attr("id", id);
+  }
+
+  setActive(id) {
+    $(".sidebar-top-opt.active").removeClass("active");
+    $(`#${id}`).addClass("active");
   }
 
   onSelect(handler) {

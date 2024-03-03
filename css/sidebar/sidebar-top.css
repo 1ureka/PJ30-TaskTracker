@@ -73,6 +73,9 @@
 /*  */
 .sidebar-top-opt {
   align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   box-shadow: none;
   background-color: transparent;
@@ -85,4 +88,32 @@
   background-color: #ea81af;
   color: rgb(10, 10, 10);
   font-weight: bold;
+}
+.sidebar-top-opt > * {
+  pointer-events: none;
+}
+.sidebar-top-opt.active {
+  pointer-events: none;
+  translate: 10px;
+  text-decoration: underline;
+}
+.sidebar-top-opt.active::after {
+  pointer-events: none;
+  position: absolute;
+  left: 10px;
+  content: "";
+  width: 20px;
+  height: 20px;
+  animation: active-swing 1.5s ease-in-out infinite;
+}
+@keyframes active-swing {
+  0% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+  100% {
+    transform: translateX(3px);
+  }
 }
