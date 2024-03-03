@@ -490,6 +490,18 @@ function delay(ms) {
 }
 
 /**
+ * 如果本地存儲中存在日期，則返回存儲的日期；否則，返回當前年份和月份的組合，格式為 'YYYY-MM'。
+ * @returns {string} 初始日期，格式為 'YYYY-MM'。
+ */
+function initDate() {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
+  const monthString = currentMonth.toString().padStart(2, "0");
+
+  return localStorage.getItem("date") || `${currentYear}-${monthString}`;
+}
+
+/**
  * 格式化瀏覽器紀錄之時間資訊，若無則回傳null
  * @returns {{year: string; month: string;} | null}
  */

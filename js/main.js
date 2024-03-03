@@ -1,12 +1,3 @@
-$(async function () {
-  const waveBackground = new WaveBackground(-1);
-  waveBackground.show();
-
-  await login();
-
-  main();
-});
-
 async function login() {
   // 如果已經認證過則認證完成
   if (await checkInfo()) {
@@ -63,31 +54,95 @@ async function login() {
   $("#login-container").remove();
 }
 
-async function main() {
+function createComponents() {
+  const waveBackground = new WaveBackground(-1);
+  const loadingIcon = {
+    show: () =>
+      gsap.to("#loading-container", {
+        ease: "power2.in",
+        autoAlpha: 1,
+        duration: 0.3,
+      }),
+    hide: () =>
+      gsap.to("#loading-container", {
+        ease: "power2.out",
+        autoAlpha: 0,
+        duration: 0.3,
+      }),
+  };
+
+  Task.createStyle();
+
+  const header = new Header();
+  const sidebarTop = new SidebarTop();
+  const sidebarBottom = new SidebarBottom();
+
+  const copyPopup = new CopyPopup();
+  const tempList = new TempList();
+  const scrollBtns = new ScrollButtons();
+
+  sidebarTop.appendTo("#sidebar-content");
+  sidebarBottom.appendTo("#sidebar-content");
+
+  copyPopup.appendTo("body");
+  tempList.appendTo("body");
+  scrollBtns.appendTo("body");
+
+  return {
+    waveBackground,
+    loadingIcon,
+    header,
+    sidebarTop,
+    sidebarBottom,
+    copyPopup,
+    tempList,
+    scrollBtns,
+  };
+}
+
+/** @type {TaskList} */
+let taskList;
+async function createContents(list) {
+  if (taskList) await taskList.remove();
+
+  taskList = new TaskList(list);
+
+  taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
+  taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
+
+  await delay(350);
+
+  await taskList.show();
+}
+
+$(async function () {
+  //
+  // 等待登入
+  //
+  await login();
+
   $("body").css("pointerEvents", "none");
 
   //
-  // 初始化
+  // 創建組件
   //
-  const initDate = () => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const monthString = currentMonth.toString().padStart(2, "0");
-
-    return localStorage.getItem("date") || `${currentYear}-${monthString}`;
-  };
-
-  let date = initDate();
-
-  gsap.to("#loading-container", {
-    ease: "power2.in",
-    autoAlpha: 1,
-    duration: 0.3,
-  });
+  const {
+    waveBackground,
+    loadingIcon,
+    header,
+    sidebarTop,
+    sidebarBottom,
+    copyPopup,
+    tempList,
+    scrollBtns,
+  } = createComponents();
+  waveBackground.show();
+  loadingIcon.show();
 
   //
   // 載入存檔
   //
+  let date = initDate();
   const save = new Save();
   const content = await loadFile(SAVEPATH);
   const data = JSON.parse(base64ToString(content));
@@ -95,29 +150,11 @@ async function main() {
   save.update();
 
   //
-  // header
+  // 事件監聽
   //
-  const header = new Header();
-  header.onInput((e) => taskList.filterTasks(e));
-
-  //
-  // sidebar
-  //
-  const sidebarTop = new SidebarTop();
-  const sidebarBottom = new SidebarBottom();
-  sidebarTop.appendTo("#sidebar-content");
-  sidebarBottom.appendTo("#sidebar-content");
-
-  $(".pages-btn-container")
-    .find("input")
-    .on("change", function () {
-      if ($(this).is(":checked")) {
-        $(":root").css("--sidebar-page", 1);
-      } else {
-        $(":root").css("--sidebar-page", 0);
-      }
-    });
-
+  header.onInput((e) => {
+    taskList.filterTasks(e);
+  });
   sidebarTop.onSelect(async (e) => {
     $("body").css("pointerEvents", "none");
 
@@ -127,15 +164,14 @@ async function main() {
     header.reset();
 
     await createContents(save.get(date));
+
     $("body").css("pointerEvents", "auto");
   });
-
   sidebarTop.onAdd((config) => {
     tempList.addTask(config);
 
     sidebarTop.clearText();
   });
-
   sidebarBottom.onSelect(async (type) => {
     $("body").css("pointerEvents", "none");
 
@@ -166,23 +202,7 @@ async function main() {
 
     $("body").css("pointerEvents", "auto");
   });
-
-  $("<label>")
-    .attr("id", "delete-mode-label")
-    .text("刪除模式")
-    .appendTo("#sidebar")
-    .slideToggle();
-
-  //
-  // aside
-  //
-
-  const copyPopup = new CopyPopup();
-  copyPopup.appendTo("body");
-  const tempList = new TempList();
-  tempList.appendTo("body");
-  const scrollBtns = new ScrollButtons();
-  scrollBtns.appendTo("body").onClick((type) => {
+  scrollBtns.onClick((type) => {
     const tasksContainer = $("#tasks-container");
 
     if (!tasksContainer) return;
@@ -214,28 +234,28 @@ async function main() {
 
     $("#content").animate({ scrollTop: targetTop }, 500);
   });
+  Task.onCopy((coordinate) => {
+    copyPopup.show(coordinate);
+  });
 
   //
-  // content
+  // 其他
   //
-  Task.createStyle();
-  Task.onCopy((coordinate) => copyPopup.show(coordinate));
+  $(".pages-btn-container")
+    .find("input")
+    .on("change", function () {
+      if ($(this).is(":checked")) {
+        $(":root").css("--sidebar-page", 1);
+      } else {
+        $(":root").css("--sidebar-page", 0);
+      }
+    });
 
-  /** @type {TaskList} */
-  let taskList;
-
-  const createContents = async (list) => {
-    if (taskList) await taskList.remove();
-
-    taskList = new TaskList(list);
-
-    taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
-    taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
-
-    await delay(350);
-
-    await taskList.show();
-  };
+  $("<label>")
+    .attr("id", "delete-mode-label")
+    .text("刪除模式")
+    .appendTo("#sidebar")
+    .slideToggle();
 
   //
   // 全局動畫
@@ -278,4 +298,4 @@ async function main() {
     .add(showMenuTl)
     .add(showDefaultsComponentsTl, "<1.2")
     .play();
-}
+});
