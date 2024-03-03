@@ -302,265 +302,81 @@ class SidebarBottom extends component {
 }
 
 class SidebarTop extends component {
-  constructor(list) {
+  constructor() {
     super();
 
-    this._handlers = {};
-
     const section = $("<section>").addClass("sidebar-top-container");
-    const content = $("<div>").addClass("sidebar-top-content");
+    const content = $("<nav>").addClass("sidebar-top-content");
 
-    list.forEach((config) => {
-      if (config.type === "seperator")
-        this._createSeperator(config.title).appendTo(content);
+    const navList = this._createList();
+
+    navList.forEach((config) => {
+      if (config.type === "separator")
+        this._createSeparator(config.title).appendTo(content);
       if (config.type === "option")
-        this._createOption(config.title).appendTo(content);
+        this._createOption(config.title, config.id).appendTo(content);
     });
+
+    const mask = $("<div>")
+      .addClass("sidebar-top-mask")
+      .appendTo("#sidebar-content");
 
     this.element = section.append(content);
   }
 
-  _createSeperator(title) {}
+  _createList() {
+    const navList = [
+      { type: "separator", title: "其他" },
+      { type: "option", title: "靈感", id: "0000-00" },
+      { type: "option", title: "檢討與筆記", id: "1111-11" },
+    ];
 
-  _createOption(title) {}
+    // 取得當前年份和月份
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // 月份是從0開始的，所以需要加1
 
-  // _create() {
-  //   const container = $("<div>").addClass("sidebar-top-container");
+    // 設定起始年份
+    const startYear = 2020;
 
-  //   this._dateSelect = this._createDateSelect();
-  //   const btns = this._createBtns();
+    // 生成年份範圍
+    for (let year = currentYear; year >= startYear; year--) {
+      navList.push({ type: "separator", title: `${year}年` });
 
-  //   $("<div>")
-  //     .addClass("sidebar-top-nav-container")
-  //     .appendTo(container)
-  //     .append($("<div>").append(btns, this._dateSelect));
+      // 生成月份
+      const endMonth = year === currentYear ? currentMonth : 12;
+      for (let month = endMonth; month >= 1; month--) {
+        const monthString = month < 10 ? `0${month}` : `${month}`;
+        const id = `${year}-${monthString}`;
+        const title = `${year}年${month}月`;
+        navList.push({ type: "option", title, id });
+      }
+    }
 
-  //   return container;
-  // }
+    return navList;
+  }
 
-  // _createBtns() {
-  //   const create = () => {
-  //     const container = $("<div>").addClass("sidebar-top-btns-container");
+  _createSeparator(title) {
+    return $("<div>").addClass("sidebar-top-sep").append(
+      $("<span>").addClass("sidebar-top-sep-1"), // 固定寬度 whatever
+      $("<p>").text(title), // 自動寬度 inline-block
+      $("<span>").addClass("sidebar-top-sep-2") // 剩下寬度 block或flex-grow
+    );
+  }
 
-  //     const btns = ["工作", "靈感"].map((name) => {
-  //       const element = $("<button>");
-
-  //       const bulb = new Bulb(20, 20);
-  //       const bulbTL = bulb.createTimeline("#ea81af");
-  //       bulb.appendTo(element);
-
-  //       const lable = new DoubleColorLabel(name);
-  //       lable.appendTo(element);
-  //       const labelTL = lable.timeline;
-
-  //       element.appendTo(container);
-
-  //       return { element, bulbTL, labelTL };
-  //     });
-
-  //     return { container, btns };
-  //   };
-
-  //   const { container, btns } = create();
-
-  //   const bindTimeline = (btns) => {
-  //     btns.forEach((btn) => {
-  //       const hoverTls = [
-  //         btn.labelTL,
-  //         gsap
-  //           .timeline({ paused: true })
-  //           .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
-  //       ];
-  //       this._bindHoverTimelines(btn.element, hoverTls);
-  //     });
-  //   };
-
-  //   bindTimeline(btns);
-
-  //   const options = {
-  //     defaults: { ease: "set1", duration: 0.35 },
-  //     paused: true,
-  //   };
-  //   const tl = gsap
-  //     .timeline(options)
-  //     .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
-
-  //   const bindEvents = (container, btns) => {
-  //     container.on("click", "button", (e) => {
-  //       const index = $(e.target).index();
-  //       btns[index].bulbTL.play();
-  //       btns[1 - index].bulbTL.reverse();
-
-  //       index === 1 ? tl.play() : tl.reverse();
-  //     });
-  //   };
-
-  //   bindEvents(container, btns);
-
-  //   btns[0].bulbTL.play();
-
-  //   this._taskBtn = btns[0].element;
-  //   this._inspirationBtn = btns[1].element;
-
-  //   return container;
-  // }
-
-  // _createDateSelect() {
-  //   const container = $("<div>").addClass("date-select");
-
-  //   const timelines = [
-  //     gsap.timeline({ paused: true }).to(container, {
-  //       y: 3,
-  //       duration: 0.25,
-  //       ease: "set1",
-  //     }),
-  //   ];
-
-  //   const icon = new CalendarIcon();
-  //   icon.appendTo(container);
-  //   timelines.push(...icon.timelines);
-
-  //   const { year, month } = this._getLocalStorageDate();
-
-  //   this._yearSelect = this._createYearSelect();
-  //   this._yearSelect.appendTo(container).val(year);
-
-  //   this._monthSelect = this._createMonthSelect();
-  //   this._monthSelect.appendTo(container).val(month);
-
-  //   this._bindHoverTimelines(container, timelines);
-
-  //   return container;
-  // }
-
-  // _getLocalStorageDate() {
-  //   const localStorageDate = formatLocalStorageDate();
-
-  //   if (localStorageDate) return localStorageDate;
-
-  //   const currentYear = new Date().getFullYear();
-  //   const currentMonth = new Date().getMonth() + 1;
-
-  //   return {
-  //     year: currentYear,
-  //     month: currentMonth.toString().padStart(2, "0"),
-  //   };
-  // }
-
-  // _createYearSelect() {
-  //   const currentYear = new Date().getFullYear();
-  //   const years = Array.from(
-  //     { length: currentYear - 2019 },
-  //     (_, index) => 2020 + index
-  //   );
-
-  //   const select = new Select({
-  //     options: years.map((number) => number.toString()),
-  //     outlineWidth: 2,
-  //     duration: 0.2,
-  //   });
-
-  //   return select;
-  // }
-
-  // _createMonthSelect() {
-  //   const currentYear = new Date().getFullYear();
-  //   const selectedYear = parseInt(this._yearSelect.val());
-
-  //   const endMonth =
-  //     selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
-
-  //   const months = Array.from({ length: endMonth }, (_, index) =>
-  //     (index + 1).toString().padStart(2, "0")
-  //   );
-
-  //   const select = new Select({
-  //     options: months,
-  //     outlineWidth: 2,
-  //     duration: 0.2,
-  //   });
-
-  //   return select;
-  // }
-
-  // _resetMonthOptions() {
-  //   const currentYear = new Date().getFullYear();
-  //   const selectedYear = parseInt(this._yearSelect.val());
-
-  //   const endMonth =
-  //     selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
-
-  //   const months = Array.from({ length: endMonth }, (_, index) =>
-  //     (index + 1).toString().padStart(2, "0")
-  //   );
-
-  //   const select = this._monthSelect._select;
-  //   select.empty();
-
-  //   months.forEach((month) => {
-  //     select.append(`<option value="${month}">${month}</option>`);
-  //   });
-
-  //   select.val(select.children(":last").val());
-
-  //   return this;
-  // }
-
-  // _bindClickTimeline(btn) {
-  //   const tl = gsap
-  //     .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-  //     .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
-
-  //   btn.on("click", () => tl.restart());
-  // }
-
-  // _bindHoverTimelines(element, timelines) {
-  //   timelines.forEach((tl) => {
-  //     element.on("mouseenter", () => tl.play());
-  //     element.on("mouseleave", () => tl.reverse());
-  //   });
-  // }
+  _createOption(title, id) {
+    return $("<button>").addClass("sidebar-top-opt").text(title).attr("id", id);
+  }
 
   onSelect(handler) {
-    if (this._handlers.date) return this;
+    if (this._handler) return this;
 
-    const yearSelect = this._yearSelect.element;
-    const monthSelect = this._monthSelect.element;
-
-    const getDate = () => {
-      return { year: this._yearSelect.val(), month: this._monthSelect.val() };
+    this._handler = (e) => {
+      const id = $(e.target).attr("id");
+      handler(id);
     };
 
-    this._handlers.date = {
-      year: () => {
-        // 根據年份初始化月份
-        this._resetMonthOptions();
-
-        handler(getDate());
-      },
-      month: () => {
-        handler(getDate());
-      },
-    };
-
-    let lastMode = "normal";
-    this._handlers.click = {
-      task: () => {
-        if (lastMode !== "normal") handler(getDate());
-
-        lastMode = "normal";
-      },
-      inspiration: () => {
-        if (lastMode !== "inspiration") handler({ year: "0000", month: "00" });
-
-        lastMode = "inspiration";
-      },
-    };
-
-    yearSelect.on("change", this._handlers.date.year);
-    monthSelect.on("change", this._handlers.date.month);
-    this._taskBtn.on("click", this._handlers.click.task);
-    this._inspirationBtn.on("click", this._handlers.click.inspiration);
+    this.element.on("click", ".sidebar-top-opt", this._handler);
 
     return this;
   }
