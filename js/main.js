@@ -61,8 +61,10 @@ async function login() {
   $("#login-container").remove();
 }
 
-function createComponents() {
+function createBackground() {
   const waveBackground = new WaveBackground(-1);
+  waveBackground.show();
+
   const loadingIcon = {
     show: () =>
       gsap.to("#loading-container", {
@@ -78,6 +80,10 @@ function createComponents() {
       }),
   };
 
+  return { loadingIcon };
+}
+
+function createComponents() {
   Task.createStyle();
 
   const header = new Header();
@@ -85,25 +91,20 @@ function createComponents() {
   const sidebarBottom = new SidebarBottom();
 
   const copyPopup = new CopyPopup();
-  const tempList = new TempList();
-  const scrollBtns = new ScrollButtons();
+  const scrollButtons = new ScrollButtons();
 
   sidebarTop.appendTo("#sidebar-content");
   sidebarBottom.appendTo("#sidebar-content");
 
   copyPopup.appendTo("body");
-  tempList.appendTo("body");
-  scrollBtns.appendTo("body");
+  scrollButtons.appendTo("body");
 
   return {
-    waveBackground,
-    loadingIcon,
     header,
     sidebarTop,
     sidebarBottom,
     copyPopup,
-    tempList,
-    scrollBtns,
+    scrollButtons,
   };
 }
 
@@ -121,52 +122,43 @@ async function createContents(list) {
 }
 
 $(async function () {
-  //
-  // 創建組件
-  //
-  const {
-    waveBackground,
-    loadingIcon,
-    header,
-    sidebarTop,
-    sidebarBottom,
-    copyPopup,
-    tempList,
-    scrollBtns,
-  } = createComponents();
-  waveBackground.show();
-
-  //
-  // 等待登入
-  //
   await login();
-  $("body").css("pointerEvents", "none");
+
+  const { loadingIcon } = createBackground();
   loadingIcon.show();
+
+  $("body").css("pointerEvents", "none");
 
   //
   // 載入存檔
   //
   date = initDate();
   save = new Save();
+
   const content = await loadFile(SAVEPATH);
   const data = JSON.parse(base64ToString(content));
+
   Object.keys(data).forEach((date) => save.set(date, data[date]));
   save.update();
 
   //
-  // 事件監聽
+  // 創建組件與事件監聽
   //
+  const { header, sidebarTop, sidebarBottom, copyPopup, scrollButtons } =
+    createComponents();
+
   header.onInput((e) => {
     taskList.filterTasks(e);
   });
-  sidebarTop.onSelect(async (e) => {
+  sidebarTop.onSelect(async (id) => {
     $("body").css("pointerEvents", "none");
 
-    date = `${e.year}-${e.month}`;
-    if (e.year !== "0000") localStorage.setItem("date", date);
+    date = id;
 
-    header.reset();
+    if (!["0000-00", "1111-11"].includes(date))
+      localStorage.setItem("date", date);
 
+    await header.reset();
     await createContents(save.get(date));
 
     $("body").css("pointerEvents", "auto");
@@ -175,7 +167,7 @@ $(async function () {
     $("body").css("pointerEvents", "none");
 
     if (type === "save") {
-      showLoadingTl.play();
+      loadingIcon.show();
 
       const data = save.get("0");
       const str = JSON.stringify(data, null, 2);
@@ -183,25 +175,25 @@ $(async function () {
       await uploadFile(file, SAVEPATH);
       save.update();
 
-      showLoadingTl.reverse();
+      loadingIcon.hide();
     }
 
     if (type === "load") {
-      showLoadingTl.play();
+      loadingIcon.show();
 
       const content = await loadFile(SAVEPATH);
       const data = JSON.parse(base64ToString(content));
       Object.keys(data).forEach((date) => save.set(date, data[date]));
       save.update();
 
-      showLoadingTl.reverse();
+      loadingIcon.hide();
 
       await createContents(save.get(date));
     }
 
     $("body").css("pointerEvents", "auto");
   });
-  scrollBtns.onClick((type) => {
+  scrollButtons.onClick((type) => {
     const tasksContainer = $("#tasks-container");
 
     if (!tasksContainer) return;
@@ -238,27 +230,9 @@ $(async function () {
   });
 
   //
-  // 其他
+  // 開場動畫
   //
-  $(".pages-btn-container")
-    .find("input")
-    .on("change", function () {
-      if ($(this).is(":checked")) {
-        $(":root").css("--sidebar-page", 1);
-      } else {
-        $(":root").css("--sidebar-page", 0);
-      }
-    });
-
-  //
-  // 全局動畫
-  const hideLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.out" } })
-    .to("#loading-container", { autoAlpha: 0, duration: 0.3 }, "<");
-
-  const showLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.in" }, paused: true })
-    .to("#loading-container", { autoAlpha: 1, duration: 0.3 }, "<");
+  loadingIcon.hide();
 
   const showMenuTl = gsap
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
@@ -273,7 +247,7 @@ $(async function () {
     .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
     .to("body", {
       onStart: async () => {
-        scrollBtns.show();
+        scrollButtons.show();
         await createContents(save.get(date));
         $("body").css("pointerEvents", "auto");
       },
@@ -286,9 +260,5 @@ $(async function () {
     paused: true,
   });
 
-  opening
-    .add(hideLoadingTl)
-    .add(showMenuTl)
-    .add(showDefaultsComponentsTl, "<1.2")
-    .play();
+  opening.add(showMenuTl).add(showDefaultsComponentsTl, "<1.2").play();
 });
