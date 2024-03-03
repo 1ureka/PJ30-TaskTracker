@@ -20,7 +20,7 @@ class component {
 }
 
 /**
- * 這個類別提供創建和控制上下滾動按鈕的功能。
+ * 其他
  */
 class ScrollButtons extends component {
   /**
@@ -173,386 +173,353 @@ class ScrollButtons extends component {
   }
 }
 
-class SidebarBottom extends component {
+class CopyPopup extends component {
   constructor() {
     super();
 
     this._timelines = {};
-    this._timelines.show = {};
 
-    const container = $("<div>").addClass("sidebar-bottom-container");
-    const inner = $("<div>")
-      .addClass("sidebar-bottom-inner")
-      .appendTo(container);
-
-    const buttons = [
-      { id: "delete", icon: new DeleteIcon(), label: "刪除" },
-      { id: "clear", icon: new ClearIcon(), label: "清空" },
-      { id: "save", icon: new SaveIcon(), label: "儲存" },
-      { id: "load", icon: new LoadIcon(), label: "讀取" },
-    ];
-
-    buttons.forEach((config) => {
-      this._createBtns(config).appendTo(inner);
-    });
-
-    this._createVersionDisplay().appendTo(inner);
-
-    this.element = container;
+    this.element = this._create();
+    this._createTimelines();
   }
 
-  _createBtns(config) {
-    const btn = $("<button>").addClass("btn").data("type", config.id);
-
-    const timelines = [];
-
-    const icon = config.icon;
-    timelines.push(...icon.timelines);
-
-    const label = new DoubleColorLabel(config.label);
-    timelines.push(label.timeline);
-
-    btn.append(icon.elements[0], label.element);
-
-    timelines.push(
-      gsap.timeline({ paused: true }).to(btn.children(), {
-        y: "+=3",
-        duration: 0.25,
-        ease: "set1",
-      })
-    );
-
-    this._bindClickTimeline2(btn);
-    this._bindHoverTimelines(btn, timelines);
-
-    return btn;
-  }
-
-  _createVersionDisplay() {
+  _create() {
     const container = $("<div>")
-      .attr("id", "version-display")
-      .append($("<p>").text("版本： @2.1.0"));
+      .addClass("popup")
+      .text("已複製內文")
+      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
 
     return container;
   }
 
-  _bindClickTimeline(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+  _createTimelines() {
+    this._timelines.show = gsap
+      .timeline({ defaults: { ease: "set1" }, paused: true })
+      .from(this.element, {
+        ease: "back.out(2)",
+        duration: 0.3,
+        scale: 0.1,
+        autoAlpha: 0,
+      })
+      .to(
+        this.element,
+        { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
+        "<"
+      )
+      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
 
-    btn.on("click", () => tl.restart());
+    return this;
   }
 
-  _bindClickTimeline2(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn.children(), { y: "+=5", yoyo: true, repeat: 1 });
+  show(coordinate) {
+    gsap.set(this.element, coordinate);
 
-    btn.on("click", () => tl.restart());
+    this._timelines.show.restart();
+  }
+}
+
+/**
+ * 側邊欄
+ */
+class SidebarBottom extends component {
+  constructor() {
+    super();
+
+    const container = $("<section>").addClass("sidebar-bottom-container");
+    const inner = $("<div>").addClass("sidebar-bottom-inner");
+
+    const left = $("<div>")
+      .addClass("sidebar-bottom-flex")
+      .append(this._createAddBtn());
+
+    const right = $("<div>")
+      .addClass("sidebar-bottom-flex")
+      .append(this._createSaveBtn(), this._createLoadBtn());
+
+    inner.append(left, right);
+    inner.appendTo(container);
+
+    this.element = container;
   }
 
-  _bindHoverTimelines(btn, timelines) {
-    timelines.forEach((tl) => {
-      btn.on("mouseenter", () => tl.play());
-      btn.on("mouseleave", () => tl.reverse());
-    });
+  _createAddBtn() {
+    const icon = new AddIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-add-button")
+      .append(icon.elements[0], $("<p>").text(" 新 增 "));
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
+  }
+
+  _createSaveBtn() {
+    const icon = new SaveIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-save-button")
+      .append(icon.elements[0]);
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
+  }
+
+  _createLoadBtn() {
+    const icon = new LoadIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-load-button")
+      .append(icon.elements[0]);
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
   }
 
   onSelect(handler) {
     if (this._handler) return this;
 
-    let isDeleting = false;
-
-    const contextmenuHandler = (e) => {
-      e.preventDefault();
-      isDeleting = false;
-      handler("done");
-      $("body").off("contextmenu", contextmenuHandler);
-    };
-
     this._handler = async (e) => {
       const element = $(e.target);
-      let type = element.data("type");
+      const className = element.attr("class");
 
-      if (type === "delete") {
-        // 刪除鍵有兩種可能
-        if (isDeleting) {
-          // 退出刪除模式
-          isDeleting = false;
-          type = "done";
-          $("body").off("contextmenu", contextmenuHandler);
-        } else {
-          // 進入刪除模式
-          isDeleting = true;
-          $("body").on("contextmenu", contextmenuHandler);
-        }
-      } else if (type === "done") {
-        // 完成鍵只有一種可能，退出刪除模式
-        isDeleting = false;
-        $("body").off("contextmenu", contextmenuHandler);
-      }
+      const map = {
+        "sidebar-add-button": "add",
+        "sidebar-save-button": "save",
+        "sidebar-load-button": "load",
+      };
 
-      if (["delete", "done", "save", "load", "check"].includes(type))
-        handler(type);
+      handler(map[className]);
     };
 
-    this.element.on("click", this._handler);
+    this.element.on("click", "button", this._handler);
   }
 }
 
 class SidebarTop extends component {
-  constructor() {
+  constructor(list) {
     super();
 
     this._handlers = {};
 
-    this.element = this._create();
-  }
+    const section = $("<section>").addClass("sidebar-top-container");
+    const content = $("<div>").addClass("sidebar-top-content");
 
-  _create() {
-    const container = $("<div>").addClass("sidebar-top-container");
-
-    this._dateSelect = this._createDateSelect();
-    const btns = this._createBtns();
-
-    $("<div>")
-      .addClass("sidebar-top-nav-container")
-      .appendTo(container)
-      .append($("<div>").append(btns, this._dateSelect));
-
-    this._textarea = new TextArea({
-      placeholder: "新增工作",
-      width: 240,
-      height: 210,
-      outlineWidth: 2,
-      duration: 0.2,
+    list.forEach((config) => {
+      if (config.type === "seperator")
+        this._createSeperator(config.title).appendTo(content);
+      if (config.type === "option")
+        this._createOption(config.title).appendTo(content);
     });
 
-    this._textarea.appendTo(container);
-
-    const textEditor = new TextEditor(this._textarea._textarea, { delay: 10 });
-    textEditor.start({
-      "(": ")",
-      "[": "]",
-      "{": "}",
-      "<": ">",
-      '"': '"',
-      "'": "'",
-    });
-
-    this._categorySelect = new Select({
-      options: CATEGORISE,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    this._categorySelect.appendTo(container);
-
-    this._addBtn = this._createAddBtn().appendTo(container);
-
-    return container;
+    this.element = section.append(content);
   }
 
-  _createBtns() {
-    const create = () => {
-      const container = $("<div>").addClass("sidebar-top-btns-container");
+  _createSeperator(title) {}
 
-      const btns = ["工作", "靈感"].map((name) => {
-        const element = $("<button>");
+  _createOption(title) {}
 
-        const bulb = new Bulb(20, 20);
-        const bulbTL = bulb.createTimeline("#ea81af");
-        bulb.appendTo(element);
+  // _create() {
+  //   const container = $("<div>").addClass("sidebar-top-container");
 
-        const lable = new DoubleColorLabel(name);
-        lable.appendTo(element);
-        const labelTL = lable.timeline;
+  //   this._dateSelect = this._createDateSelect();
+  //   const btns = this._createBtns();
 
-        element.appendTo(container);
+  //   $("<div>")
+  //     .addClass("sidebar-top-nav-container")
+  //     .appendTo(container)
+  //     .append($("<div>").append(btns, this._dateSelect));
 
-        return { element, bulbTL, labelTL };
-      });
+  //   return container;
+  // }
 
-      return { container, btns };
-    };
+  // _createBtns() {
+  //   const create = () => {
+  //     const container = $("<div>").addClass("sidebar-top-btns-container");
 
-    const { container, btns } = create();
+  //     const btns = ["工作", "靈感"].map((name) => {
+  //       const element = $("<button>");
 
-    const bindTimeline = (btns) => {
-      btns.forEach((btn) => {
-        const hoverTls = [
-          btn.labelTL,
-          gsap
-            .timeline({ paused: true })
-            .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
-        ];
-        this._bindHoverTimelines(btn.element, hoverTls);
-      });
-    };
+  //       const bulb = new Bulb(20, 20);
+  //       const bulbTL = bulb.createTimeline("#ea81af");
+  //       bulb.appendTo(element);
 
-    bindTimeline(btns);
+  //       const lable = new DoubleColorLabel(name);
+  //       lable.appendTo(element);
+  //       const labelTL = lable.timeline;
 
-    const options = {
-      defaults: { ease: "set1", duration: 0.35 },
-      paused: true,
-    };
-    const tl = gsap
-      .timeline(options)
-      .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
+  //       element.appendTo(container);
 
-    const bindEvents = (container, btns) => {
-      container.on("click", "button", (e) => {
-        const index = $(e.target).index();
-        btns[index].bulbTL.play();
-        btns[1 - index].bulbTL.reverse();
+  //       return { element, bulbTL, labelTL };
+  //     });
 
-        index === 1 ? tl.play() : tl.reverse();
-      });
-    };
+  //     return { container, btns };
+  //   };
 
-    bindEvents(container, btns);
+  //   const { container, btns } = create();
 
-    btns[0].bulbTL.play();
+  //   const bindTimeline = (btns) => {
+  //     btns.forEach((btn) => {
+  //       const hoverTls = [
+  //         btn.labelTL,
+  //         gsap
+  //           .timeline({ paused: true })
+  //           .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
+  //       ];
+  //       this._bindHoverTimelines(btn.element, hoverTls);
+  //     });
+  //   };
 
-    this._taskBtn = btns[0].element;
-    this._inspirationBtn = btns[1].element;
+  //   bindTimeline(btns);
 
-    return container;
-  }
+  //   const options = {
+  //     defaults: { ease: "set1", duration: 0.35 },
+  //     paused: true,
+  //   };
+  //   const tl = gsap
+  //     .timeline(options)
+  //     .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
 
-  _createDateSelect() {
-    const container = $("<div>").addClass("date-select");
+  //   const bindEvents = (container, btns) => {
+  //     container.on("click", "button", (e) => {
+  //       const index = $(e.target).index();
+  //       btns[index].bulbTL.play();
+  //       btns[1 - index].bulbTL.reverse();
 
-    const timelines = [
-      gsap.timeline({ paused: true }).to(container, {
-        y: 3,
-        duration: 0.25,
-        ease: "set1",
-      }),
-    ];
+  //       index === 1 ? tl.play() : tl.reverse();
+  //     });
+  //   };
 
-    const icon = new CalendarIcon();
-    icon.appendTo(container);
-    timelines.push(...icon.timelines);
+  //   bindEvents(container, btns);
 
-    const { year, month } = this._getLocalStorageDate();
+  //   btns[0].bulbTL.play();
 
-    this._yearSelect = this._createYearSelect();
-    this._yearSelect.appendTo(container).val(year);
+  //   this._taskBtn = btns[0].element;
+  //   this._inspirationBtn = btns[1].element;
 
-    this._monthSelect = this._createMonthSelect();
-    this._monthSelect.appendTo(container).val(month);
+  //   return container;
+  // }
 
-    this._bindHoverTimelines(container, timelines);
+  // _createDateSelect() {
+  //   const container = $("<div>").addClass("date-select");
 
-    return container;
-  }
+  //   const timelines = [
+  //     gsap.timeline({ paused: true }).to(container, {
+  //       y: 3,
+  //       duration: 0.25,
+  //       ease: "set1",
+  //     }),
+  //   ];
 
-  _getLocalStorageDate() {
-    const localStorageDate = formatLocalStorageDate();
+  //   const icon = new CalendarIcon();
+  //   icon.appendTo(container);
+  //   timelines.push(...icon.timelines);
 
-    if (localStorageDate) return localStorageDate;
+  //   const { year, month } = this._getLocalStorageDate();
 
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
+  //   this._yearSelect = this._createYearSelect();
+  //   this._yearSelect.appendTo(container).val(year);
 
-    return {
-      year: currentYear,
-      month: currentMonth.toString().padStart(2, "0"),
-    };
-  }
+  //   this._monthSelect = this._createMonthSelect();
+  //   this._monthSelect.appendTo(container).val(month);
 
-  _createYearSelect() {
-    const currentYear = new Date().getFullYear();
-    const years = Array.from(
-      { length: currentYear - 2019 },
-      (_, index) => 2020 + index
-    );
+  //   this._bindHoverTimelines(container, timelines);
 
-    const select = new Select({
-      options: years.map((number) => number.toString()),
-      outlineWidth: 2,
-      duration: 0.2,
-    });
+  //   return container;
+  // }
 
-    return select;
-  }
+  // _getLocalStorageDate() {
+  //   const localStorageDate = formatLocalStorageDate();
 
-  _createMonthSelect() {
-    const currentYear = new Date().getFullYear();
-    const selectedYear = parseInt(this._yearSelect.val());
+  //   if (localStorageDate) return localStorageDate;
 
-    const endMonth =
-      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+  //   const currentYear = new Date().getFullYear();
+  //   const currentMonth = new Date().getMonth() + 1;
 
-    const months = Array.from({ length: endMonth }, (_, index) =>
-      (index + 1).toString().padStart(2, "0")
-    );
+  //   return {
+  //     year: currentYear,
+  //     month: currentMonth.toString().padStart(2, "0"),
+  //   };
+  // }
 
-    const select = new Select({
-      options: months,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
+  // _createYearSelect() {
+  //   const currentYear = new Date().getFullYear();
+  //   const years = Array.from(
+  //     { length: currentYear - 2019 },
+  //     (_, index) => 2020 + index
+  //   );
 
-    return select;
-  }
+  //   const select = new Select({
+  //     options: years.map((number) => number.toString()),
+  //     outlineWidth: 2,
+  //     duration: 0.2,
+  //   });
 
-  _resetMonthOptions() {
-    const currentYear = new Date().getFullYear();
-    const selectedYear = parseInt(this._yearSelect.val());
+  //   return select;
+  // }
 
-    const endMonth =
-      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
+  // _createMonthSelect() {
+  //   const currentYear = new Date().getFullYear();
+  //   const selectedYear = parseInt(this._yearSelect.val());
 
-    const months = Array.from({ length: endMonth }, (_, index) =>
-      (index + 1).toString().padStart(2, "0")
-    );
+  //   const endMonth =
+  //     selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
 
-    const select = this._monthSelect._select;
-    select.empty();
+  //   const months = Array.from({ length: endMonth }, (_, index) =>
+  //     (index + 1).toString().padStart(2, "0")
+  //   );
 
-    months.forEach((month) => {
-      select.append(`<option value="${month}">${month}</option>`);
-    });
+  //   const select = new Select({
+  //     options: months,
+  //     outlineWidth: 2,
+  //     duration: 0.2,
+  //   });
 
-    select.val(select.children(":last").val());
+  //   return select;
+  // }
 
-    return this;
-  }
+  // _resetMonthOptions() {
+  //   const currentYear = new Date().getFullYear();
+  //   const selectedYear = parseInt(this._yearSelect.val());
 
-  _createAddBtn() {
-    const btn = $("<button>").addClass("btn");
+  //   const endMonth =
+  //     selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
 
-    const label = new DoubleColorLabel("新增");
-    label.appendTo(btn);
+  //   const months = Array.from({ length: endMonth }, (_, index) =>
+  //     (index + 1).toString().padStart(2, "0")
+  //   );
 
-    this._bindClickTimeline(btn);
-    this._bindHoverTimelines(btn, [
-      label.timeline,
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
-    ]);
+  //   const select = this._monthSelect._select;
+  //   select.empty();
 
-    return btn;
-  }
+  //   months.forEach((month) => {
+  //     select.append(`<option value="${month}">${month}</option>`);
+  //   });
 
-  _bindClickTimeline(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+  //   select.val(select.children(":last").val());
 
-    btn.on("click", () => tl.restart());
-  }
+  //   return this;
+  // }
 
-  _bindHoverTimelines(element, timelines) {
-    timelines.forEach((tl) => {
-      element.on("mouseenter", () => tl.play());
-      element.on("mouseleave", () => tl.reverse());
-    });
-  }
+  // _bindClickTimeline(btn) {
+  //   const tl = gsap
+  //     .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
+  //     .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
+
+  //   btn.on("click", () => tl.restart());
+  // }
+
+  // _bindHoverTimelines(element, timelines) {
+  //   timelines.forEach((tl) => {
+  //     element.on("mouseenter", () => tl.play());
+  //     element.on("mouseleave", () => tl.reverse());
+  //   });
+  // }
 
   onSelect(handler) {
     if (this._handlers.date) return this;
@@ -597,25 +564,11 @@ class SidebarTop extends component {
 
     return this;
   }
-
-  onAdd(handler) {
-    if (this._handlers.add) return this;
-
-    this._handlers.add = () => {
-      const category = this._categorySelect.val();
-      const text = this._textarea.val();
-
-      if (text.trim()) handler({ category, text });
-    };
-
-    this._addBtn.on("click", this._handlers.add);
-  }
-
-  clearText() {
-    this._textarea.val("");
-  }
 }
 
+/**
+ * 標頭
+ */
 class Header extends component {
   constructor() {
     super();
@@ -711,6 +664,9 @@ class Header extends component {
   }
 }
 
+/**
+ * 內容
+ */
 class TaskList extends component {
   constructor(list) {
     super();
@@ -1077,50 +1033,5 @@ class TempList extends component {
     task.element.show(500);
 
     return this;
-  }
-}
-
-class CopyPopup extends component {
-  constructor() {
-    super();
-
-    this._timelines = {};
-
-    this.element = this._create();
-    this._createTimelines();
-  }
-
-  _create() {
-    const container = $("<div>")
-      .addClass("popup")
-      .text("已複製內文")
-      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
-
-    return container;
-  }
-
-  _createTimelines() {
-    this._timelines.show = gsap
-      .timeline({ defaults: { ease: "set1" }, paused: true })
-      .from(this.element, {
-        ease: "back.out(2)",
-        duration: 0.3,
-        scale: 0.1,
-        autoAlpha: 0,
-      })
-      .to(
-        this.element,
-        { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
-        "<"
-      )
-      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
-
-    return this;
-  }
-
-  show(coordinate) {
-    gsap.set(this.element, coordinate);
-
-    this._timelines.show.restart();
   }
 }
