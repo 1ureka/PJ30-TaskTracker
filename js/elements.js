@@ -1140,6 +1140,7 @@ class Task {
     // 主容器
     const container = $("<div>").addClass("task-container");
     container.data("info", JSON.stringify(config));
+    if (config._isCurrentMonth) container.addClass("task-current");
 
     // 上半部容器
     const infoContainer = $("<div>").addClass("task-info-container");
@@ -1177,6 +1178,12 @@ class Task {
 
   _createButtons() {
     return [
+      $("<button>")
+        .addClass("task-transfer-button")
+        .append(
+          $("<img>").attr("src", "icons/arrow.png"),
+          $("<span>").addClass("tip").text("轉移")
+        ),
       $("<button>")
         .addClass("task-edit-button")
         .append(

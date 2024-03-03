@@ -131,7 +131,6 @@
 .task-menu-container > .task-delete-button:hover {
   background-color: rgb(237, 56, 56);
 }
-
 /* copy icon */
 .task-copy-button > img:nth-child(2) {
   transform-origin: 15.64px 9.48px;
@@ -142,6 +141,20 @@
 /* edit icon */
 .task-edit-button:hover > img:first-child {
   rotate: -25deg;
+}
+/* edit icon */
+.task-current .task-transfer-button {
+  visibility: hidden;
+}
+.task-transfer-button:hover > img {
+  transition: all 0.3s ease-in;
+  translate: -1.5px;
+  animation: transfer-btn-swing 1s 0.3s infinite;
+}
+@keyframes transfer-btn-swing {
+  50% {
+    translate: 1.5px;
+  }
 }
 
 .task-p-container > p {
