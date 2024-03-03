@@ -1,6 +1,5 @@
 :root {
   --is-task-list-hovable: 1;
-  --is-task-list-deleting: 0;
   --is-task-menu-usable: auto;
 }
 
@@ -35,46 +34,6 @@
   box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
     rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
     rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
-
-  /* transition: background-color 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
-    translate 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
-    box-shadow 0.15s cubic-bezier(0.165, 0.84, 0.44, 1),
-    max-width 0.25s cubic-bezier(0.165, 0.84, 0.44, 1); */
-}
-/* .task-container:hover {
-  translate: 0px calc(var(--is-task-list-hovable) * 3px);
-  box-shadow: rgba(0, 0, 0, 0.75) 0px
-      calc(3px - var(--is-task-list-hovable) * 3px)
-      calc(4px - var(--is-task-list-hovable) * 4px),
-    rgba(0, 0, 0, 0.35) calc(5px - var(--is-task-list-hovable) * 3px)
-      calc(8px - var(--is-task-list-hovable) * 4px) 3px -3px,
-    rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
-    rgba(255, 255, 255, 0.3) calc(2px - var(--is-task-list-hovable) * 2px)
-      calc(5px - var(--is-task-list-hovable) * 5px) 3px -3px inset;
-  background-color: hsl(240, 5%, calc(15% + var(--is-task-list-hovable) * 7%));
-} */
-.task-container::after {
-  content: "";
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: 100%;
-  height: 100%;
-  border-radius: 5px 50px 50px 5px;
-  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
-    rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
-    rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
-  transform-origin: left;
-  scale: 0 1;
-  opacity: 0;
-  background-color: #ea81af;
-
-  transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s;
-}
-.task-container:hover::after {
-  opacity: 1;
-  border-radius: 5px;
-  scale: calc(var(--is-task-list-deleting));
 }
 
 .task-info-container {
@@ -145,11 +104,17 @@
   height: 25px;
   transition: all 0.35s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
+.task-menu-container > button > .tip {
+  width: max-content;
+}
 .task-menu-container > button:hover {
   background-color: hsl(240, 5%, 25%);
   box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 0px 2px,
     rgba(0, 0, 0, 0.8) 0px 4px 6px -1px,
     rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+}
+.task-menu-container > button:hover .tip {
+  opacity: 1;
 }
 .task-menu-container > button:active {
   translate: 0px 3px;
@@ -159,15 +124,23 @@
     rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
 }
 
+/* delete icon */
+.task-delete-button svg {
+  width: 44%;
+}
+.task-menu-container > .task-delete-button:hover {
+  background-color: rgb(237, 56, 56);
+}
+
 /* copy icon */
-.task-copy-button > img:last-child {
+.task-copy-button > img:nth-child(2) {
   transform-origin: 15.64px 9.48px;
 }
-.task-copy-button:hover > img:last-child {
+.task-copy-button:hover > img:nth-child(2) {
   rotate: 180deg;
 }
 /* edit icon */
-.task-edit-button:hover > img:last-child {
+.task-edit-button:hover > img:first-child {
   rotate: -25deg;
 }
 
@@ -204,54 +177,55 @@
   content: "";
   width: 100%;
   height: 2px;
+  transition: width 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
     rgba(0, 0, 0, 0.35) 10px 12px 3px -3px,
     rgba(255, 255, 255, 0.1) 2px 5px 10px -3px inset;
 }
-.separator::after {
+
+.separator > button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  content: "";
-  width: 100%;
-  height: 100%;
+  right: 0;
+  box-sizing: content-box;
+  width: 30px;
+  height: 30px;
+  padding: 2.5px;
+  border-radius: 5px;
+  box-shadow: none;
+  background-color: transparent;
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+
+  pointer-events: none;
+  translate: 15px;
   opacity: 0;
-  scale: 0 1;
-  transform-origin: left;
-  background-color: #ea81af;
-  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
-    rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
-    rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
 }
-.separator::after {
-  transition: opacity 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s,
-    scale 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s;
+.separator > button > * {
+  position: absolute;
+  pointer-events: none;
 }
-.separator:hover {
-  height: calc(15px + var(--is-task-list-deleting) * 30px);
+.separator > button > svg {
+  width: 44%;
 }
-.separator:hover::after {
-  opacity: var(--is-task-list-deleting);
-  scale: var(--is-task-list-deleting);
+.separator > button:hover {
+  background-color: rgb(237, 56, 56);
+}
+.separator > button:hover > .tip {
+  opacity: 1;
+}
+.separator > button:active {
+  translate: 0px 3px;
+  scale: 0.95;
 }
 
-/*  */
-/*  */
-
-.task-delete-icon {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  justify-content: flex-start;
-  box-sizing: border-box;
-  padding-left: 10px;
-  cursor: pointer;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s;
+.separator:hover::before {
+  width: calc(100% - 45px);
 }
-.task-container:hover .task-delete-icon,
-.separator:hover .task-delete-icon {
-  opacity: var(--is-task-list-deleting);
+.separator:hover > button {
+  pointer-events: auto;
+  translate: 0px;
+  opacity: 1;
 }
