@@ -237,31 +237,18 @@ $(async function () {
   //
   loadingIcon.hide();
 
-  const showMenuTl = gsap
-    .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
+  const opening = gsap
+    .timeline({ delay: 1, defaults: { ease: "power2.out", duration: 0.6 } })
     .to("#header, #sidebar", {
       x: 0,
       y: 0,
       autoAlpha: 1,
       stagger: 0.35,
+      onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
     });
 
-  const showDefaultsComponentsTl = gsap
-    .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
-    .to("body", {
-      onStart: async () => {
-        scrollButtons.show();
-        await createContents(save.get(date));
-        $("body").css("pointerEvents", "auto");
-      },
-      duration: 0.65,
-    });
+  await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
+  await Promise.all([scrollButtons.show(), createContents(save.get(date))]);
 
-  const opening = gsap.timeline({
-    onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
-    delay: 1,
-    paused: true,
-  });
-
-  opening.add(showMenuTl).add(showDefaultsComponentsTl, "<1.2").play();
+  $("body").css("pointerEvents", "auto");
 });
