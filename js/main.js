@@ -171,11 +171,6 @@ $(async function () {
 
     $("body").css("pointerEvents", "auto");
   });
-  sidebarTop.onAdd((config) => {
-    tempList.addTask(config);
-
-    sidebarTop.clearText();
-  });
   sidebarBottom.onSelect(async (type) => {
     $("body").css("pointerEvents", "none");
 

@@ -1,10 +1,6 @@
 @import url("sidebar-bottom.css");
 @import url("sidebar-top.css");
 
-:root {
-  --sidebar-page: 0;
-}
-
 #sidebar {
   position: fixed;
   left: 0;
@@ -26,8 +22,11 @@
   position: relative;
   overflow: hidden;
   width: 240px;
-  padding: 2px;
-  height: calc(100vh - 250px);
+  height: calc(100% - 125px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #title {
