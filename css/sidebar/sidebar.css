@@ -1,0 +1,53 @@
+@import url("sidebar-bottom.css");
+@import url("sidebar-top.css");
+
+#sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  padding: 10px;
+  padding-top: 30px;
+  box-shadow: rgba(0, 0, 0, 0.7) 1px 1px 2px 0px,
+    rgba(0, 0, 0, 0.5) 3px 1px 3px 1px;
+  z-index: 5;
+  /* init */
+  opacity: 0;
+  visibility: hidden;
+  translate: -270px 0px;
+}
+
+#sidebar-content {
+  position: relative;
+  overflow: hidden;
+  width: 240px;
+  height: calc(100% - 105px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+#title {
+  position: relative;
+  display: flex;
+}
+
+#title > #favicon {
+  position: relative;
+  width: 85px;
+  filter: drop-shadow(3px 3px 1px rgba(0, 0, 0, 0.5))
+    drop-shadow(6px 6px 1px rgba(0, 0, 0, 0.35));
+}
+
+#title > h1 {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 35px;
+  font-weight: 500;
+  text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.5), 6px 6px 1px rgba(0, 0, 0, 0.35);
+  margin: 0;
+}

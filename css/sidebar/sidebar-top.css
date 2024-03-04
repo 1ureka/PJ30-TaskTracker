@@ -1,0 +1,119 @@
+.sidebar-top-container {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 50px);
+  box-sizing: border-box;
+  padding: 45px 10px 45px 5px;
+
+  scrollbar-color: transparent transparent;
+  scrollbar-gutter: stable;
+  overflow-y: auto;
+  transition: scrollbar-color 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+#sidebar:hover .sidebar-top-container {
+  scrollbar-color: hsl(240, 5%, 25%) transparent;
+}
+.sidebar-top-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+}
+.sidebar-top-mask {
+  pointer-events: none;
+  z-index: 1;
+  position: absolute;
+  width: 220px;
+  height: calc(100% - 50px);
+  background: linear-gradient(
+    hsl(225, 7.5%, 5%),
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    hsla(225, 7.5%, 5%, 0.5),
+    hsl(225, 7.5%, 5%)
+  );
+}
+
+/*  */
+.sidebar-top-sep {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.sidebar-top-sep > span:first-child {
+  width: 20px;
+  height: 2px;
+  background-color: #bbb;
+}
+.sidebar-top-sep > span:last-child {
+  display: block;
+  flex-grow: 1;
+  width: auto;
+  height: 2px;
+  background-color: #bbb;
+}
+.sidebar-top-sep > p {
+  margin: 0;
+  font-size: 17px;
+}
+
+/*  */
+.sidebar-top-opt {
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-shadow: none;
+  background-color: transparent;
+  color: white;
+  transition: all 0.2s ease;
+}
+.sidebar-top-opt:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 3px 0px inset,
+    rgba(0, 0, 0, 0.15) 0px 3px 7px 3px inset;
+  background-color: #ea81af;
+  color: rgb(10, 10, 10);
+  font-weight: bold;
+}
+.sidebar-top-opt > * {
+  pointer-events: none;
+}
+.sidebar-top-opt.active {
+  pointer-events: none;
+  translate: 10px;
+  text-decoration: underline;
+}
+.sidebar-top-opt.active::after {
+  pointer-events: none;
+  position: absolute;
+  left: 10px;
+  content: "";
+  width: 20px;
+  height: 20px;
+  animation: active-swing 1.5s ease-in-out infinite;
+}
+@keyframes active-swing {
+  0% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+  100% {
+    transform: translateX(3px);
+  }
+}

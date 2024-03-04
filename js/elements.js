@@ -41,7 +41,7 @@ class IconInterface {
   }
 }
 
-class DeleteIcon extends IconInterface {
+class AddIcon extends IconInterface {
   constructor() {
     super();
   }
@@ -49,72 +49,9 @@ class DeleteIcon extends IconInterface {
   _createIcon() {
     const container = $("<div>").addClass("icon-container");
 
-    this._bin = $("<img>").attr("src", "icons/garbage bin.png");
-    this._cover = $("<img>").attr("src", "icons/garbage bin (cover).png");
+    this._plus = $("<img>").attr("src", "icons/add.png");
 
-    container.append(this._bin, this._cover);
-
-    this._linesContainer = $("<div>").css({
-      position: "absolute",
-      display: "flex",
-      width: "40px",
-      height: "40px",
-      clipPath: "inset(0px 0px 0px 25px)",
-    });
-
-    container.append(this._linesContainer);
-
-    this._lines = [];
-
-    for (let index = 0; index < 2; index++) {
-      for (let index = 1; index < 4; index++) {
-        this._lines.push(
-          $("<img>").attr("src", `icons/garbage bin (line${index}).png`)
-        );
-      }
-    }
-
-    this._lines = [...this._lines];
-
-    this._lines.forEach((element) => element.appendTo(this._linesContainer));
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-    const leftLines = this._lines.slice(0, 3);
-    const rightLines = this._lines.slice(3);
-
-    gsap.set(leftLines, { x: -20 });
-
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.1 })
-      .to(this._cover, { transformOrigin: "-5px 15px", rotate: -15 }, "<")
-      .to(leftLines, { x: 0, stagger: -0.067 }, "<")
-      .to(rightLines, { x: 20, stagger: -0.067 }, "<");
-
-    return [tl];
-  }
-}
-
-class DeleteIconB extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._frame = $("<img>")
-      .attr("src", "icons/delete (frame).png")
-      .css({ width: 40, height: 45 });
-    this._inner = $("<img>")
-      .attr("src", "icons/delete (inner).png")
-      .css({ width: 40, height: 45 });
-
-    container.append(this._frame, this._inner);
+    container.append(this._plus);
 
     return [container];
   }
@@ -122,55 +59,13 @@ class DeleteIconB extends IconInterface {
   _createTimeline() {
     const container = this.elements[0];
 
-    gsap.set(this._inner, { transformOrigin: "17px center" });
-
     const tl = gsap
-      .timeline({ defaults: { duration: 0.4, ease: "set1" }, paused: true })
-      .fromTo(this._inner, { rotate: 0 }, { rotate: 270 });
-
-    this._bindTimeline(tl);
-
-    return [tl];
-  }
-
-  _bindTimeline(tl) {
-    const container = this.elements[0];
-
-    container.on("mouseenter", () => tl.play());
-    container.on("mouseleave", () => tl.reverse());
-  }
-
-  addClass(className) {
-    this.elements[0].addClass(className);
-
-    return this;
-  }
-}
-
-class ClearIcon extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._broom = $("<img>").attr("src", "icons/broom.png");
-
-    container.append(this._broom);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    gsap.set(this._broom, { rotate: -90 });
-
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(container, { scale: 1.1 })
-      .to(this._broom, { rotate: 0 }, "<");
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
+      .to(container, { scale: 1.05 }, "<")
+      .to(this._plus, { rotateZ: 90 }, "<");
 
     return [tl];
   }
@@ -197,10 +92,12 @@ class SaveIcon extends IconInterface {
     const container = this.elements[0];
 
     gsap.set(this._frame2, { y: -40, rotateY: 180 });
-    gsap.set(container, { x: -3, y: 1 });
 
     const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
       .to(container, { scale: 1.05 }, "<")
       .to(this._frame1, { rotateY: 180, y: 40 }, "<")
       .to(this._frame2, { rotateY: 0, y: 0 }, "<")
@@ -243,7 +140,10 @@ class LoadIcon extends IconInterface {
     gsap.set(this._arrow2, { y: 40 });
 
     const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
+      .timeline({
+        defaults: { duration: 0.55, ease: "back.inOut(3)" },
+        paused: true,
+      })
       .to(this._arrow1, { y: -40 })
       .to(this._arrow2, { y: 0 }, "<")
       .to(container, { scale: 1.1 }, "<")
@@ -258,70 +158,6 @@ class LoadIcon extends IconInterface {
       );
 
     return [tl];
-  }
-}
-
-class CalendarIcon extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._frame = $("<img>")
-      .attr("src", "icons/calendar (frame).png")
-      .appendTo(container);
-
-    this._inners = Array.from({ length: 6 }, (_, index) =>
-      $("<img>").attr("src", `icons/calendar (inner${index + 1}).png`)
-    );
-
-    this._inners.forEach((inner) => inner.appendTo(container));
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    gsap.set(this._inners, {
-      autoAlpha: 0,
-    });
-
-    const t1 = gsap
-      .timeline({
-        defaults: { duration: 0.15, ease: "set1" },
-        paused: true,
-      })
-      .to(
-        this._inners,
-        {
-          stagger: 0.1,
-          autoAlpha: 1,
-        },
-        "<"
-      )
-      .to(
-        this._inners,
-        {
-          stagger: 0.1,
-          autoAlpha: 0,
-        },
-        "<0.4"
-      )
-      .timeScale(1.5);
-
-    const t2 = gsap
-      .timeline({
-        defaults: { duration: 0.3, ease: "set1" },
-        paused: true,
-      })
-      .to(container, {
-        scale: 1.1,
-      });
-
-    return [t1, t2];
   }
 }
 
@@ -382,72 +218,6 @@ class SearchIcon extends IconInterface {
       });
 
     return [t1];
-  }
-}
-
-class EraserIcon extends IconInterface {
-  constructor() {
-    super();
-
-    this._bindTimeline();
-  }
-
-  _createIcon() {
-    const container = $("<div>")
-      .addClass("icon-container")
-      .css({ clipPath: "none", pointerEvents: "auto", cursor: "pointer" });
-
-    this._line = $("<img>")
-      .attr("src", "icons/erase (line).png")
-      .appendTo(container);
-    this._eraser = $("<img>")
-      .attr("src", "icons/erase.png")
-      .appendTo(container);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    this._show = gsap
-      .timeline({
-        defaults: { duration: 0.15, ease: "set1" },
-        paused: true,
-      })
-      .fromTo(container, { autoAlpha: 0 }, { autoAlpha: 1 });
-
-    this._click = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(container, { scale: 0.5, yoyo: true, repeat: 1 });
-
-    this._hover = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .fromTo(this._eraser, { x: 10 }, { x: -5 });
-
-    return [];
-  }
-
-  _bindTimeline() {
-    const container = this.elements[0];
-
-    container.on("mouseenter", () => this._hover.play());
-    container.on("mouseleave", () => this._hover.reverse());
-    container.on("click", async () => {
-      this._click.restart();
-      await delay(150);
-
-      this._show.reverse();
-    });
-  }
-
-  show() {
-    this._show.play();
-  }
-
-  async hide() {
-    await delay(100);
-    this._show.reverse();
   }
 }
 
@@ -548,619 +318,9 @@ class CopyIcon extends IconInterface {
   }
 }
 
-class ArrowIcon extends IconInterface {
-  constructor() {
-    super();
-
-    this._bindTimeline();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    const container2 = $("<div>")
-      .addClass("icon-container")
-      .appendTo(container);
-
-    this._arrow = $("<img>").attr("src", "icons/top (arrow).png");
-    this._line = $("<img>").attr("src", "icons/top (line).png");
-
-    container2.append(this._arrow, this._line);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    this._timelines = {};
-
-    const container = this.elements[0];
-
-    this._timelines.click = () =>
-      gsap
-        .timeline({ defaults: { duration: 0.05, ease: "set1" } })
-        .to(container.children(), { scale: 0.65, yoyo: true, repeat: 1 });
-
-    this._timelines.hover = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(this._arrow, { y: -8 }, "<")
-      .to(this._line, { y: -1.5, scale: 1.25 }, "<0.05");
-
-    return [];
-  }
-
-  _bindTimeline() {
-    const container = this.elements[0];
-
-    container.on("click", () => this._timelines.click());
-    container.on("mouseover", () => this._timelines.hover.play());
-    container.on("mouseleave", () => this._timelines.hover.reverse());
-  }
-
-  addClass(className) {
-    this.elements[0].addClass(className);
-  }
-}
-
 //
 //
 //
-
-/**
- * DoubleColorLabel 類別用於創建具有雙色標籤效果的元素。
- * @class
- */
-class DoubleColorLabel {
-  /**
-   * DoubleColorLabel 類別的建構子。
-   * @constructor
-   * @param {string} - 標籤的初始文本內容。
-   */
-  constructor(text = "未定義") {
-    this._isAppendTo = false;
-    /**
-     * 元素的根容器。
-     * @type {jQuery}
-     */
-    this.element = this._create(text);
-    /**
-     * GSAP 時間軸，用於處理標籤的動畫效果。
-     * @type {TimelineMax}
-     */
-    this.timeline = this._createTimeline();
-  }
-
-  /**
-   * 私有方法，用於創建標籤元素。
-   * @private
-   * @param {string} text - 標籤的文本內容。
-   * @returns {jQuery} - 創建的標籤元素的 jQuery 物件。
-   */
-  _create(text) {
-    const container = $("<div>").addClass("label-container");
-
-    this._whiteLabel = $("<label>").text(text);
-    this._redLabel = $("<label>").text(text);
-
-    container.append(this._whiteLabel, this._redLabel);
-
-    return container;
-  }
-
-  /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {TimelineMax} - 創建的 GSAP 時間軸。
-   */
-  _createTimeline() {
-    gsap.set(this._redLabel, { y: -40 });
-
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-      .to(this._whiteLabel, { y: 40 })
-      .to(this._redLabel, { y: 0 }, "<");
-
-    return tl;
-  }
-
-  /**
-   * 公開方法，用於附加元素進DOM。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {DoubleColorLabel} - DoubleColorLabel 類別的實例。
-   */
-  appendTo(element) {
-    if (this._isAppendTo) return this;
-
-    this._isAppendTo = true;
-
-    this.element.appendTo($(element));
-
-    return this;
-  }
-}
-
-/**
- * Select 類別用於創建自定義樣式的下拉選單。
- * @class
- */
-class Select {
-  /**
-   * Select 類別的建構子。
-   * @constructor
-   * @param {Object} config - 選單的配置項。
-   * @param {Array<string>} config.options - 選單的選項。
-   * @param {number} config.outlineWidth - 選單輪廓的寬度。
-   * @param {number} config.duration - 選單動畫的持續時間。
-   */
-  constructor(config) {
-    this._isAppendTo = false;
-    /**
-     * 選單的根容器。
-     * @type {jQuery}
-     */
-    this.element = this._create(config);
-  }
-
-  /**
-   * 私有方法，用於創建選單元素。
-   * @private
-   * @param {Object} config - 選單的配置項。
-   * @param {Array<string>} config.options - 選單的選項。
-   * @param {number} config.outlineWidth - 選單輪廓的寬度。
-   * @param {number} config.duration - 選單動畫的持續時間。
-   * @returns {jQuery} - 創建的選單元素的 jQuery 物件。
-   */
-  _create(config) {
-    // 取出所需變數
-    this.options = config.options;
-    this.outlineWidth = config.outlineWidth;
-    this.duration = config.duration;
-
-    const container = $("<div>").addClass("select-container");
-
-    this._select = $("<select>").appendTo(container);
-
-    this.options.forEach((option) => {
-      $(`<option value="${option}">${option}</option>`).appendTo(this._select);
-    });
-
-    this._createOutline()._createTimeline()._bindTimeline();
-
-    return container;
-  }
-
-  /**
-   * 私有方法，用於創建選單的外框。
-   * @private
-   * @returns {Select} - Select 類別的實例。
-   */
-  _createOutline() {
-    // 創建所需元素
-    this._outlineContainer = $("<div>").css({
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
-    });
-
-    this._outline1 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        bottom: -1 * this.outlineWidth,
-        left: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._outline2 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        top: -1 * this.outlineWidth,
-        right: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._select.before(this._outlineContainer);
-
-    return this;
-  }
-
-  /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {Select} - Select 類別的實例。
-   */
-  _createTimeline() {
-    this._timeline = gsap
-      .timeline({
-        defaults: { duration: this.duration, ease: "set1" },
-        paused: true,
-      })
-      .to(this._outline1, {
-        width: `calc(100% + ${this.outlineWidth * 2}px)`,
-        height: `calc(100% + ${this.outlineWidth * 2}px)`,
-      })
-      .to(
-        this._outline2,
-        {
-          width: `calc(100% + ${this.outlineWidth * 2}px)`,
-          height: `calc(100% + ${this.outlineWidth * 2}px)`,
-        },
-        "<"
-      );
-
-    return this;
-  }
-
-  /**
-   * 私有方法，用於綁定事件和時間軸。
-   * @private
-   * @returns {Select} - Select 類別的實例。
-   */
-  _bindTimeline() {
-    const hoverElement = this._select;
-    const focusElement = this._select;
-
-    hoverElement.on("mouseover", () => {
-      this._timeline.play();
-    });
-    hoverElement.on("mouseleave", () => {
-      if (!focusElement.is(":focus")) this._timeline.reverse();
-    });
-    focusElement.on("focus", () => {
-      this._timeline.play();
-    });
-    focusElement.on("blur", () => {
-      this._timeline.reverse();
-    });
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於設置或獲取選中的值。
-   * @param {string} [value] - 要設置的值。如果未提供，則返回當前選中的值。
-   * @returns {string | Select} - Select 類別的實例。
-   */
-  val(value) {
-    if (!value) return this._select.val();
-
-    this._select.val(value);
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於附加元素進DOM。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {Select} - Select 類別的實例。
-   */
-  appendTo(element) {
-    if (this._isAppendTo) return this;
-
-    this._isAppendTo = true;
-
-    this.element.appendTo($(element));
-
-    return this;
-  }
-}
-
-/**
- * TextArea 類別用於創建具有自定義樣式的文字區域。
- * @class
- */
-class TextArea {
-  /**
-   * TextArea 類別的建構子。
-   * @constructor
-   * @param {Object} config - 文字區域的配置項。
-   * @param {number} config.width - 文字區域的寬度。
-   * @param {number} config.height - 文字區域的高度。
-   * @param {string} config.placeholder - 文字區域的預設提示文字。
-   * @param {number} config.outlineWidth - 文字區域輪廓的寬度。
-   * @param {number} config.duration - 文字區域動畫的持續時間。
-   */
-  constructor(config) {
-    this._isAppendTo = false;
-    /**
-     * 選單的根容器。
-     * @type {jQuery}
-     */
-    this.element = this._create(config);
-  }
-
-  /**
-   * 私有方法，用於創建文字區域元素。
-   * @private
-   * @param {Object} config - 文字區域的配置項。
-   * @returns {jQuery} - 創建的文字區域元素的 jQuery 物件。
-   */
-  _create(config) {
-    this.width = config.width;
-    this.height = config.height;
-    this.placeholder = config.placeholder;
-    this.outlineWidth = config.outlineWidth;
-    this.duration = config.duration;
-
-    const container = $("<div>")
-      .addClass("textarea-container")
-      .css({ width: this.width, height: this.height });
-
-    this._textarea = $("<textarea>")
-      .appendTo(container)
-      .attr("placeholder", this.placeholder);
-
-    this._createOutline()._createTimeline()._bindTimeline();
-
-    return container;
-  }
-
-  /**
-   * 私有方法，用於創建文字區域的輪廓。
-   * @private
-   * @returns {TextArea} - TextArea 類別的實例。
-   */
-  _createOutline() {
-    this._outlineContainer = $("<div>").css({
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
-    });
-
-    this._outline1 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        bottom: -1 * this.outlineWidth,
-        left: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._outline2 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        top: -1 * this.outlineWidth,
-        right: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._textarea.before(this._outlineContainer);
-
-    return this;
-  }
-
-  /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {TextArea} - TextArea 類別的實例。
-   */
-  _createTimeline() {
-    this._timeline = gsap
-      .timeline({
-        defaults: { duration: this.duration, ease: "set1" },
-        paused: true,
-      })
-      .to(this._outline1, {
-        width: `calc(100% + ${this.outlineWidth * 2}px)`,
-        height: `calc(100% + ${this.outlineWidth * 2}px)`,
-      })
-      .to(
-        this._outline2,
-        {
-          width: `calc(100% + ${this.outlineWidth * 2}px)`,
-          height: `calc(100% + ${this.outlineWidth * 2}px)`,
-        },
-        "<"
-      );
-
-    return this;
-  }
-
-  /**
-   * 私有方法，用於綁定事件和時間軸。
-   * @private
-   * @returns {TextArea} - TextArea 類別的實例。
-   */
-  _bindTimeline() {
-    const hoverElement = this._textarea;
-    const focusElement = this._textarea;
-
-    hoverElement.on("mouseover", () => {
-      this._timeline.play();
-    });
-    hoverElement.on("mouseleave", () => {
-      if (!focusElement.is(":focus")) this._timeline.reverse();
-    });
-    focusElement.on("focus", () => {
-      this._timeline.play();
-    });
-    focusElement.on("blur", () => {
-      this._timeline.reverse();
-    });
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於設置或獲取文字區域的值。
-   * @param {string} [value] - 要設置的值。如果未提供，則返回當前文字區域的值。
-   * @returns {TextArea} - TextArea 類別的實例。
-   */
-  val(value) {
-    if (!value && value !== "") return this._textarea.val();
-
-    this._textarea.val(value);
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於將文字區域元素附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {TextArea} - TextArea 類別的實例。
-   */
-  appendTo(element) {
-    if (this._isAppendTo) return this;
-
-    this._isAppendTo = true;
-
-    this.element.appendTo($(element));
-
-    return this;
-  }
-}
-
-/**
- * TextInput 類別用於創建具有自定義樣式的文字輸入框。
- * @class
- */
-class TextInput {
-  /**
-   * TextInput 類別的建構子。
-   * @constructor
-   * @param {Object} config - 文字輸入框的配置項。
-   * @param {number} config.width - 文字輸入框的寬度。
-   * @param {number} config.height - 文字輸入框的高度。
-   * @param {string} config.placeholder - 文字輸入框的預設提示文字。
-   * @param {number} config.outlineWidth - 文字輸入框輪廓的寬度。
-   * @param {number} config.duration - 文字輸入框動畫的持續時間。
-   */
-  constructor(config) {
-    this._isAppendTo = false;
-    /**
-     * 選單的根容器。
-     * @type {jQuery}
-     */
-    this.element = this._create(config);
-  }
-
-  /**
-   * 私有方法，用於創建文字輸入框元素。
-   * @private
-   * @param {Object} config - 文字輸入框的配置項。
-   * @returns {jQuery} - 創建的文字輸入框元素的 jQuery 物件。
-   */
-  _create(config) {
-    this.width = config.width;
-    this.height = config.height;
-    this.placeholder = config.placeholder;
-    this.outlineWidth = config.outlineWidth;
-    this.duration = config.duration;
-
-    const container = $("<div>")
-      .addClass("input-container")
-      .css({ width: this.width, height: this.height });
-
-    this._input = $("<input>")
-      .attr("type", "text")
-      .appendTo(container)
-      .attr("placeholder", this.placeholder);
-
-    this._createOutline()._createTimeline();
-
-    return container;
-  }
-
-  /**
-   * 私有方法，用於創建文字輸入框的輪廓。
-   * @private
-   * @returns {TextInput} - TextInput 類別的實例。
-   */
-  _createOutline() {
-    this._outlineContainer = $("<div>").css({
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      clipPath: `inset(-${this.outlineWidth}px round 5px)`,
-    });
-
-    this._outline1 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        bottom: -1 * this.outlineWidth,
-        left: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._outline2 = $("<div>")
-      .css({
-        position: "absolute",
-        backgroundColor: "white",
-        borderRadius: "5px",
-        top: -1 * this.outlineWidth,
-        right: -1 * this.outlineWidth,
-      })
-      .appendTo(this._outlineContainer);
-
-    this._input.before(this._outlineContainer);
-
-    return this;
-  }
-
-  /**
-   * 私有方法，用於創建 GSAP 時間軸。
-   * @private
-   * @returns {TextInput} - TextInput 類別的實例。
-   */
-  _createTimeline() {
-    this.timeline = gsap
-      .timeline({
-        defaults: { duration: this.duration, ease: "set1" },
-        paused: true,
-      })
-      .to(this._outline1, {
-        width: `calc(100% + ${this.outlineWidth * 2}px)`,
-        height: `calc(100% + ${this.outlineWidth * 2}px)`,
-      })
-      .to(
-        this._outline2,
-        {
-          width: `calc(100% + ${this.outlineWidth * 2}px)`,
-          height: `calc(100% + ${this.outlineWidth * 2}px)`,
-        },
-        "<"
-      );
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於設置或獲取文字輸入框的值。
-   * @param {string} [value] - 要設置的值。如果未提供，則返回當前文字輸入框的值。
-   * @returns {TextInput} - TextInput 類別的實例。
-   */
-  val(value) {
-    if (!value && value !== "") return this._input.val();
-
-    this._input.val(value);
-
-    return this;
-  }
-
-  /**
-   * 公開方法，用於將文字輸入框元素附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {TextInput} - TextInput 類別的實例。
-   */
-  appendTo(element) {
-    if (this._isAppendTo) return this;
-
-    this._isAppendTo = true;
-
-    this.element.appendTo($(element));
-
-    return this;
-  }
-}
 
 /**
  * Task 類別用於創建任務元素，包含刪除、分類、狀態和文字內容。
@@ -1188,11 +348,6 @@ class Task {
     // 主容器
     const container = $("<div>").addClass("task-container");
     container.data("info", JSON.stringify(config));
-
-    // 刪除模式
-    const deleteIcon = new DeleteIconB();
-    deleteIcon.appendTo(container);
-    deleteIcon.addClass("task-delete-icon");
 
     // 上半部容器
     const infoContainer = $("<div>").addClass("task-info-container");
@@ -1231,19 +386,57 @@ class Task {
   _createButtons() {
     return [
       $("<button>")
+        .addClass("task-transfer-button")
+        .append(
+          $("<img>").attr("src", "icons/arrow.png"),
+          $("<span>").addClass("tip").text("轉移")
+        ),
+      $("<button>")
         .addClass("task-edit-button")
-        .append($("<img>").attr("src", "icons/pencil.png")),
+        .append(
+          $("<img>").attr("src", "icons/pencil.png"),
+          $("<span>").addClass("tip").text("編輯")
+        ),
       $("<button>")
         .addClass("task-copy-button")
         .append(
           $("<img>").attr("src", "icons/copy (left).png"),
-          $("<img>").attr("src", "icons/copy (right).png")
+          $("<img>").attr("src", "icons/copy (right).png"),
+          $("<span>").addClass("tip").text("複製")
         ),
+      $("<button>")
+        .addClass("task-delete-button")
+        .append(this._createSVG(), $("<span>").addClass("tip").text("刪除")),
     ];
   }
 
+  _createSVG() {
+    return $(`
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 50 59"
+    ><path
+      fill="#B5BAC1"
+      d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"
+    ></path>
+    <path
+      fill="#B5BAC1"
+      d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"
+    ></path>
+    <path
+      fill="#B5BAC1"
+      d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z"
+      clip-rule="evenodd"
+      fill-rule="evenodd"
+    ></path>
+    <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
+    </svg>
+    `);
+  }
+
   _bindDeleteEvents() {
-    this.element.on("click", ".task-delete-icon", async () => {
+    this.element.on("click", ".task-delete-button", async () => {
       gsap.to(this.element, {
         duration: 0.1,
         ease: "set1",
@@ -1512,13 +705,41 @@ class Separator {
    * @returns {jQuery} - 創建的分隔線元素的 jQuery 物件。
    */
   _create() {
-    const separator = $("<div>").addClass("separator");
-
-    this._deleteIcon = new DeleteIconB();
-    this._deleteIcon.appendTo(separator);
-    this._deleteIcon.addClass("task-delete-icon");
+    const separator = $("<div>")
+      .addClass("separator")
+      .append(
+        $("<button>").append(
+          this._createSVG(),
+          $("<span>").addClass("tip").text("刪除")
+        )
+      );
 
     return separator;
+  }
+
+  _createSVG() {
+    return $(`
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 50 59"
+    ><path
+      fill="#B5BAC1"
+      d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"
+    ></path>
+    <path
+      fill="#B5BAC1"
+      d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"
+    ></path>
+    <path
+      fill="#B5BAC1"
+      d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z"
+      clip-rule="evenodd"
+      fill-rule="evenodd"
+    ></path>
+    <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
+    </svg>
+    `);
   }
 
   /**
@@ -1527,7 +748,7 @@ class Separator {
    * @returns {Separator} - Separator 類別的實例。
    */
   _bindDeleteEvents() {
-    this._deleteIcon.elements[0].on("click", async () => {
+    this.element.on("click", "button", async () => {
       gsap.to(this.element, {
         duration: 0.1,
         ease: "set1",
@@ -1567,93 +788,5 @@ class Separator {
    */
   destroy() {
     this.element.remove();
-  }
-}
-
-/**
- * Bulb 類別用於創建可控制顏色和強度的燈泡元素。
- * @class
- */
-class Bulb {
-  /**
-   * Bulb 類別的建構子。
-   * @constructor
-   * @param {number} width - 燈泡的寬度。
-   * @param {number} height - 燈泡的高度。
-   */
-  constructor(width, height) {
-    this._isAppendTo = false;
-
-    this.element = this._createBulb(width, height);
-  }
-
-  /**
-   * 私有方法，用於創建燈泡元素。
-   * @private
-   * @param {number} width - 燈泡的寬度。
-   * @param {number} height - 燈泡的高度。
-   * @returns {jQuery} - 燈泡元素的 jQuery 對象。
-   */
-  _createBulb(width, height) {
-    const container = $("<div>")
-      .addClass("bulb-container")
-      .css({
-        width: `${width + 20}px`,
-        height: `${height + 20}px`,
-      });
-
-    const bulb = $("<div>")
-      .addClass("bulb")
-      .css({ width: `${width}px`, height: `${height}px` });
-    const bulbFilter = $("<div>")
-      .addClass("bulb-filter")
-      .css({ width: `${width}px`, height: `${height}px` });
-
-    bulbFilter.appendTo(bulb);
-
-    bulb.appendTo(container);
-
-    return container;
-  }
-
-  /**
-   * 創建控制顏色和強度的動畫時間軸。
-   * @param {string} toColor - 目標顏色。
-   * @param {number} [toIntensity=1] - 目標強度，預設值為 1。
-   * @returns {gsap.timeline} - GSAP 時間軸對象。
-   */
-  createTimeline(toColor, toIntensity = 1) {
-    const i = toIntensity;
-    const c = toColor;
-
-    const bulb = this.element.find(".bulb");
-    const bulbFilter = this.element.find(".bulb-filter");
-
-    const tl = gsap
-      .timeline({
-        defaults: { duration: 0.2, ease: "set1" },
-        paused: true,
-      })
-      .to(bulb, { backgroundColor: c }, "<")
-      .to(bulbFilter, { filter: "blur(3px)" }, "<")
-      .to(bulb, { boxShadow: `0 0 20px ${i * 5}px ${c}` }, "<")
-      .to(bulb, { boxShadow: `0 0 20px 0px ${c}` });
-
-    return tl;
-  }
-
-  /**
-   * 公開方法，用於將元素附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {Bulb} - Bulb 類別的實例。
-   */
-  appendTo(element) {
-    if (this._isAppendTo) return this;
-
-    this._isAppendTo = true;
-
-    this.element.appendTo($(element));
-
-    return this;
   }
 }

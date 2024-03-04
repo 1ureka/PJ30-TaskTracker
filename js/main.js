@@ -1,11 +1,9 @@
-$(async function () {
-  const waveBackground = new WaveBackground(-1);
-  waveBackground.show();
-
-  await login();
-
-  main();
-});
+/** @type {TaskList} */
+let taskList;
+/** @type {"YYYY-MM"} */
+let date;
+/** @type {Save} */
+let save;
 
 async function login() {
   // 如果已經認證過則認證完成
@@ -63,84 +61,130 @@ async function login() {
   $("#login-container").remove();
 }
 
-async function main() {
-  $("body").css("pointerEvents", "none");
+function createBackground() {
+  const waveBackground = new WaveBackground(-1);
+  waveBackground.show();
 
-  //
-  // 初始化
-  //
-  const initDate = () => {
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const monthString = currentMonth.toString().padStart(2, "0");
-
-    return localStorage.getItem("date") || `${currentYear}-${monthString}`;
+  const loadingIcon = {
+    show: () =>
+      gsap.to("#loading-container", {
+        ease: "power2.in",
+        autoAlpha: 1,
+        duration: 0.3,
+      }),
+    hide: () =>
+      gsap.to("#loading-container", {
+        ease: "power2.out",
+        autoAlpha: 0,
+        duration: 0.3,
+      }),
   };
 
-  let date = initDate();
+  return { loadingIcon };
+}
 
-  gsap.to("#loading-container", {
-    ease: "power2.in",
-    autoAlpha: 1,
-    duration: 0.3,
+function createComponents() {
+  Task.createStyle();
+
+  const header = new Header();
+  const sidebarTop = new SidebarTop();
+  const sidebarBottom = new SidebarBottom();
+  const addMenu = new AddMenu();
+
+  const copyPopup = new CopyPopup();
+  const scrollButtons = new ScrollButtons();
+
+  sidebarTop.appendTo("#sidebar-content");
+  sidebarBottom.appendTo("#sidebar-content");
+  addMenu.appendTo("#content");
+
+  copyPopup.appendTo("body");
+  scrollButtons.appendTo("body");
+
+  sidebarTop.setActive(date);
+
+  Task.onCopy((coordinate) => {
+    copyPopup.show(coordinate);
   });
+
+  return {
+    header,
+    sidebarTop,
+    sidebarBottom,
+    addMenu,
+    scrollButtons,
+  };
+}
+
+async function createContents(list) {
+  if (taskList) await taskList.remove();
+
+  $("#content").toggleClass("current-month", isCurrentMonth(date));
+
+  taskList = new TaskList(list);
+
+  taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
+  taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
+
+  await delay(350);
+
+  await taskList.show();
+}
+
+$(async function () {
+  const { loadingIcon } = createBackground();
+
+  await login();
+
+  loadingIcon.show();
+
+  $("body").css("pointerEvents", "none");
 
   //
   // 載入存檔
   //
-  const save = new Save();
+  date = initDate();
+  save = new Save();
+
   const content = await loadFile(SAVEPATH);
   const data = JSON.parse(base64ToString(content));
+
   Object.keys(data).forEach((date) => save.set(date, data[date]));
   save.update();
 
   //
-  // header
+  // 創建組件與事件監聽
   //
-  const header = new Header();
-  header.onInput((e) => taskList.filterTasks(e));
+  const { header, sidebarTop, sidebarBottom, addMenu, scrollButtons } =
+    createComponents();
 
-  //
-  // sidebar
-  //
-  const sidebarTop = new SidebarTop();
-  const sidebarBottom = new SidebarBottom();
-  sidebarTop.appendTo("#sidebar-content");
-  sidebarBottom.appendTo("#sidebar-content");
-
-  $(".pages-btn-container")
-    .find("input")
-    .on("change", function () {
-      if ($(this).is(":checked")) {
-        $(":root").css("--sidebar-page", 1);
-      } else {
-        $(":root").css("--sidebar-page", 0);
-      }
-    });
-
-  sidebarTop.onSelect(async (e) => {
+  header.onInput((e) => {
+    taskList.filterTasks(e);
+  });
+  sidebarTop.onSelect(async (id) => {
     $("body").css("pointerEvents", "none");
 
-    date = `${e.year}-${e.month}`;
-    if (e.year !== "0000") localStorage.setItem("date", date);
+    date = id;
 
-    header.reset();
+    if (!["0000-00", "1111-11"].includes(date))
+      localStorage.setItem("date", date);
 
+    sidebarTop.setActive(date);
+    await header.reset();
     await createContents(save.get(date));
+    scrollButtons.bindEvents(taskList.getList());
+
     $("body").css("pointerEvents", "auto");
   });
-
-  sidebarTop.onAdd((config) => {
-    tempList.addTask(config);
-
-    sidebarTop.clearText();
-  });
-
   sidebarBottom.onSelect(async (type) => {
     $("body").css("pointerEvents", "none");
 
+    if (type === "add") {
+      addMenu.show();
+    }
+
     if (type === "save") {
-      showLoadingTl.play();
+      loadingIcon.show();
 
       const data = save.get("0");
       const str = JSON.stringify(data, null, 2);
@@ -148,148 +192,44 @@ async function main() {
       await uploadFile(file, SAVEPATH);
       save.update();
 
-      showLoadingTl.reverse();
+      loadingIcon.hide();
     }
 
     if (type === "load") {
-      showLoadingTl.play();
+      loadingIcon.show();
 
       const content = await loadFile(SAVEPATH);
       const data = JSON.parse(base64ToString(content));
       Object.keys(data).forEach((date) => save.set(date, data[date]));
       save.update();
 
-      showLoadingTl.reverse();
+      loadingIcon.hide();
 
       await createContents(save.get(date));
-    }
-
-    if (type === "delete") {
-      taskList.switchMode("delete");
-      sidebarBottom.showDoneBtn();
-    }
-
-    if (type === "done") {
-      taskList.switchMode("normal");
-      sidebarBottom.hideDownBtn();
-    }
-
-    if (type === "check") {
-      await taskList.clear();
     }
 
     $("body").css("pointerEvents", "auto");
   });
 
-  $("<label>")
-    .attr("id", "delete-mode-label")
-    .text("刪除模式")
-    .appendTo("#sidebar")
-    .slideToggle();
-
   //
-  // aside
+  // 開場動畫
   //
+  loadingIcon.hide();
 
-  const copyPopup = new CopyPopup();
-  copyPopup.appendTo("body");
-  const tempList = new TempList();
-  tempList.appendTo("body");
-  const scrollBtns = new ScrollButtons();
-  scrollBtns.appendTo("body").onClick((type) => {
-    const tasksContainer = $("#tasks-container");
-
-    if (!tasksContainer) return;
-
-    // 根據容許值判斷現在畫面是否已在目標工作項目
-    const isAtTask = (taskTop) => {
-      const tolerance = window.innerHeight / 2.5;
-      const currentTop = $("#content").scrollTop();
-
-      return Math.abs(currentTop - taskTop) <= tolerance;
-    };
-
-    const { index, taskTop } = findFirstUnfinished(taskList.getList());
-    const currentTop = $("#content").scrollTop();
-    let targetTop;
-
-    if (index === -1) {
-      targetTop = type === "down" ? tasksContainer.height() : 0;
-      // 若index === -1，代表沒有找到目標工作或是清單為空，則滑動至底/頂部
-    } else if (type === "down") {
-      // 判斷是否要滑動至底部 (目前畫面是否已在目標工作項目範圍 或是 下方)
-      const isGoingToBottom = isAtTask(taskTop) || currentTop > taskTop;
-      targetTop = isGoingToBottom ? tasksContainer.height() : taskTop;
-    } else if (type === "up") {
-      // 判斷是否要滑動至頂部 (目前畫面是否已在目標工作項目範圍 或是 上方)
-      const isGoingToTop = isAtTask(taskTop) || currentTop < taskTop;
-      targetTop = isGoingToTop ? 0 : taskTop;
-    }
-
-    $("#content").animate({ scrollTop: targetTop }, 500);
-  });
-
-  //
-  // content
-  //
-  Task.createStyle();
-  Task.onCopy((coordinate) => copyPopup.show(coordinate));
-
-  /** @type {TaskList} */
-  let taskList;
-
-  const createContents = async (list) => {
-    if (taskList) await taskList.remove();
-
-    taskList = new TaskList(list);
-
-    taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
-    taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
-
-    await delay(350);
-
-    await taskList.show();
-  };
-
-  //
-  // 全局動畫
-  const hideLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.out" } })
-    .to("#loading-container", { autoAlpha: 0, duration: 0.3 }, "<");
-
-  const showLoadingTl = gsap
-    .timeline({ defaults: { ease: "power2.in" }, paused: true })
-    .to("#loading-container", { autoAlpha: 1, duration: 0.3 }, "<");
-
-  const showMenuTl = gsap
-    .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
+  const opening = gsap
+    .timeline({ delay: 1, defaults: { ease: "power2.out", duration: 0.6 } })
     .to("#header, #sidebar", {
       x: 0,
       y: 0,
       autoAlpha: 1,
       stagger: 0.35,
+      onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
     });
 
-  const showDefaultsComponentsTl = gsap
-    .timeline({ defaults: { ease: "power2.out", duration: 0.6 } })
-    .to("body", {
-      onStart: async () => {
-        scrollBtns.show();
-        await createContents(save.get(date));
-        $("body").css("pointerEvents", "auto");
-      },
-      duration: 0.65,
-    });
+  await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
+  await Promise.all([scrollButtons.show(), createContents(save.get(date))]);
 
-  const opening = gsap.timeline({
-    onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
-    delay: 1,
-    paused: true,
-  });
+  scrollButtons.bindEvents(taskList.getList());
 
-  opening
-    .add(hideLoadingTl)
-    .add(showMenuTl)
-    .add(showDefaultsComponentsTl, "<1.2")
-    .play();
-}
+  $("body").css("pointerEvents", "auto");
+});

@@ -1,0 +1,12 @@
+@import url("content-task.css");
+@import url("content-add-menu.css");
+
+#content {
+  position: fixed;
+  top: 0;
+  left: 260px;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
