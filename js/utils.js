@@ -438,8 +438,12 @@ class Save {
    * @returns {Save} - Save 類別的實例。
    */
   set(date, list, isInit = false) {
-    if (this._isCurrentMonth(date))
+    if (this._isCurrentMonth(date)) {
       list.forEach((value) => (value._isCurrentMonth = true));
+    } else {
+      list.forEach((value) => (value._isCurrentMonth = false));
+    }
+
     this._currentSave[date] = list;
 
     if (isInit) {
