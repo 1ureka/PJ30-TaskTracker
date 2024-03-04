@@ -116,6 +116,8 @@ function createComponents() {
 async function createContents(list) {
   if (taskList) await taskList.remove();
 
+  $("#content").toggleClass("current-month", isCurrentMonth(date));
+
   taskList = new TaskList(list);
 
   taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件

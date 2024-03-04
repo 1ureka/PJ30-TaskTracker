@@ -182,10 +182,7 @@
 .task-edit-button:hover > img:first-child {
   rotate: -25deg;
 }
-/* edit icon */
-.task-current .task-transfer-button {
-  visibility: hidden;
-}
+/* transfer icon */
 .task-transfer-button:hover > img {
   transition: all 0.3s ease-in;
   translate: -1.5px;
@@ -281,4 +278,10 @@
   pointer-events: auto;
   translate: 0px;
   opacity: 1;
+}
+
+/*  */
+
+#content.current-month .task-transfer-button {
+  visibility: hidden;
 }

@@ -355,21 +355,6 @@ class Save {
   }
 
   /**
-   * 私有方法，用於判斷YYYY-MM是否為當前日期。
-   * @param {string} dateString
-   * @returns {boolean}
-   */
-  _isCurrentMonth(dateString) {
-    const inputDate = new Date(dateString + "-01"); // 添加 "-01" 表示日期為該月的第一天
-    const currentDate = new Date();
-
-    return (
-      inputDate.getFullYear() === currentDate.getFullYear() &&
-      inputDate.getMonth() === currentDate.getMonth()
-    );
-  }
-
-  /**
    * 私有方法，用於初始化保存數據。
    * @private
    */
@@ -438,12 +423,6 @@ class Save {
    * @returns {Save} - Save 類別的實例。
    */
   set(date, list, isInit = false) {
-    if (this._isCurrentMonth(date)) {
-      list.forEach((value) => (value._isCurrentMonth = true));
-    } else {
-      list.forEach((value) => (value._isCurrentMonth = false));
-    }
-
     this._currentSave[date] = list;
 
     if (isInit) {
@@ -521,6 +500,21 @@ function initDate() {
   const monthString = currentMonth.toString().padStart(2, "0");
 
   return localStorage.getItem("date") || `${currentYear}-${monthString}`;
+}
+
+/**
+ * 用於判斷YYYY-MM是否為當前日期。
+ * @param {string} dateString
+ * @returns {boolean}
+ */
+function isCurrentMonth(dateString) {
+  const inputDate = new Date(dateString + "-01"); // 添加 "-01" 表示日期為該月的第一天
+  const currentDate = new Date();
+
+  return (
+    inputDate.getFullYear() === currentDate.getFullYear() &&
+    inputDate.getMonth() === currentDate.getMonth()
+  );
 }
 
 /**

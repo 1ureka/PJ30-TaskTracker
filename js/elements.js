@@ -1175,7 +1175,6 @@ class Task {
     // 主容器
     const container = $("<div>").addClass("task-container");
     container.data("info", JSON.stringify(config));
-    if (config._isCurrentMonth) container.addClass("task-current");
 
     // 上半部容器
     const infoContainer = $("<div>").addClass("task-info-container");
