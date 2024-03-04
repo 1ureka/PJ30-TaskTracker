@@ -590,9 +590,17 @@ class AddMenu extends component {
       },
       animation: 150,
       sort: false,
-      onStart: () => this.element.addClass("start-drag"),
-      onEnd: () => this.element.removeClass("start-drag"),
-      onRemove: () => reset(),
+      onStart: () => {
+        this.element.addClass("start-drag");
+      },
+      onEnd: (e) => {
+        if (e.to === e.from) this.element.removeClass("start-drag");
+      },
+      onRemove: async () => {
+        reset();
+        await this.hide();
+        this.element.removeClass("start-drag");
+      },
     });
 
     this.element.on("task-edit-focus", ".task-container", () => {
