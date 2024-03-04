@@ -194,10 +194,12 @@
   }
 }
 
+.task-p-container * {
+  margin: 0;
+}
 .task-p-container > p {
   white-space: pre-wrap;
   text-wrap: pretty;
-  margin: 0;
   font-size: 19px;
   transition: width cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s;
 }
