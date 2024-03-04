@@ -103,12 +103,15 @@ function createComponents() {
 
   sidebarTop.setActive(date);
 
+  Task.onCopy((coordinate) => {
+    copyPopup.show(coordinate);
+  });
+
   return {
     header,
     sidebarTop,
     sidebarBottom,
     addMenu,
-    copyPopup,
     scrollButtons,
   };
 }
@@ -152,14 +155,8 @@ $(async function () {
   //
   // 創建組件與事件監聽
   //
-  const {
-    header,
-    sidebarTop,
-    sidebarBottom,
-    addMenu,
-    copyPopup,
-    scrollButtons,
-  } = createComponents();
+  const { header, sidebarTop, sidebarBottom, addMenu, scrollButtons } =
+    createComponents();
 
   header.onInput((e) => {
     taskList.filterTasks(e);
@@ -175,6 +172,7 @@ $(async function () {
     sidebarTop.setActive(date);
     await header.reset();
     await createContents(save.get(date));
+    scrollButtons.bindEvents(taskList.getList());
 
     $("body").css("pointerEvents", "auto");
   });
@@ -212,41 +210,6 @@ $(async function () {
 
     $("body").css("pointerEvents", "auto");
   });
-  scrollButtons.onClick((type) => {
-    const tasksContainer = $("#tasks-container");
-
-    if (!tasksContainer) return;
-
-    // 根據容許值判斷現在畫面是否已在目標工作項目
-    const isAtTask = (taskTop) => {
-      const tolerance = window.innerHeight / 2.5;
-      const currentTop = $("#content").scrollTop();
-
-      return Math.abs(currentTop - taskTop) <= tolerance;
-    };
-
-    const { index, taskTop } = findFirstUnfinished(taskList.getList());
-    const currentTop = $("#content").scrollTop();
-    let targetTop;
-
-    if (index === -1) {
-      targetTop = type === "down" ? tasksContainer.height() : 0;
-      // 若index === -1，代表沒有找到目標工作或是清單為空，則滑動至底/頂部
-    } else if (type === "down") {
-      // 判斷是否要滑動至底部 (目前畫面是否已在目標工作項目範圍 或是 下方)
-      const isGoingToBottom = isAtTask(taskTop) || currentTop > taskTop;
-      targetTop = isGoingToBottom ? tasksContainer.height() : taskTop;
-    } else if (type === "up") {
-      // 判斷是否要滑動至頂部 (目前畫面是否已在目標工作項目範圍 或是 上方)
-      const isGoingToTop = isAtTask(taskTop) || currentTop < taskTop;
-      targetTop = isGoingToTop ? 0 : taskTop;
-    }
-
-    $("#content").animate({ scrollTop: targetTop }, 500);
-  });
-  Task.onCopy((coordinate) => {
-    copyPopup.show(coordinate);
-  });
 
   //
   // 開場動畫
@@ -265,6 +228,8 @@ $(async function () {
 
   await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
   await Promise.all([scrollButtons.show(), createContents(save.get(date))]);
+
+  scrollButtons.bindEvents(taskList.getList());
 
   $("body").css("pointerEvents", "auto");
 });

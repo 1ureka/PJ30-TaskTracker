@@ -23,20 +23,12 @@ class component {
  * 其他
  */
 class ScrollButtons extends component {
-  /**
-   * 建構一個新的 `ScrollButtons` 實例。@constructor
-   */
   constructor() {
     super();
     this._timelines = {};
-    this._handlers = {};
-
     this.isShow = false;
 
-    /**
-     * 包含上下滾動按鈕的 jQuery 物件。
-     * @type {jQuery}
-     */
+    /** 包含上下滾動按鈕的 jQuery 物件。 @type {jQuery} */
     const container = $("<div>").addClass("scroll-buttons-container");
 
     this._up = this._createScrollButton("up");
@@ -48,13 +40,7 @@ class ScrollButtons extends component {
 
     this._createTimelines();
   }
-
-  /**
-   * 創建上下滾動按鈕。
-   * @private
-   * @param {string} type - 按鈕類型，可以是 "up" 或 "down"。
-   * @returns {jQuery} - 上下滾動按鈕的 jQuery 物件。
-   */
+  /** 創建上下滾動按鈕。 @private @param {string} type - 按鈕類型，可以是 "up" 或 "down"。  */
   _createScrollButton(type) {
     const button = $("<button>").addClass("scroll-button").addClass(type);
     const icon = new ScrollIcon();
@@ -79,12 +65,6 @@ class ScrollButtons extends component {
     return button;
   }
 
-  /**
-   * 將時間軸綁定到按鈕的不同事件。
-   * @param {jQuery} button - 要綁定的按鈕元素。
-   * @param {TimelineMax[]} hover - 滑鼠進入時觸發的時間軸陣列。
-   * @param {TimelineMax} click - 按鈕點擊時觸發的時間軸。
-   */
   _bindTimeline(button, hover, click) {
     button.on("mouseenter", () => {
       hover.forEach((tl) => {
@@ -99,12 +79,7 @@ class ScrollButtons extends component {
 
     button.on("click", () => click.restart());
   }
-
-  /**
-   * 創建並初始化上滾動按鈕的時間軸效果。
-   * @private
-   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
-   */
+  /** 創建並初始化上滾動按鈕的時間軸效果。@private */
   _createTimelines() {
     this._timelines.show = gsap
       .timeline({
@@ -120,31 +95,51 @@ class ScrollButtons extends component {
 
     return this;
   }
+  /** 綁定上下按鈕功能 @param {Array} list  TaskList.getList()返回值*/
+  bindEvents(list) {
+    if (this._scrollUp) {
+      this._up.off("click", this._scrollUp);
+      this._down.off("click", this._scrollDown);
+    }
 
-  /**
-   * 設置點擊事件處理函式，當上滾動或下滾動按鈕被點擊時觸發。
-   * @param {function} handler - 點擊事件處理函式，傳遞一個字串參數，代表點擊的按鈕類型 ("up" 或 "down")。
-   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
-   */
-  onClick(handler) {
-    if (this._handlers.up || this._handlers.down) return this;
+    const init = () => {
+      const { index, taskTop } = findFirstUnfinished(list);
+      const currentTop = $("#content").scrollTop();
 
-    this._handlers.up = () => {
-      handler("up");
+      const tolerance = window.innerHeight / 2.5;
+      const isAtTask = Math.abs(currentTop - taskTop) <= tolerance;
+
+      return { index, taskTop, currentTop, isAtTask };
     };
-    this._handlers.down = () => {
-      handler("down");
+
+    this._scrollUp = () => {
+      const { index, taskTop, currentTop, isAtTask } = init();
+      let targetTop = 0;
+
+      if (index !== -1) {
+        const isGoingToTop = isAtTask || currentTop < taskTop;
+        targetTop = isGoingToTop ? 0 : taskTop;
+      }
+
+      $("#content").animate({ scrollTop: targetTop }, 500);
     };
 
-    this._up.on("click", this._handlers.up);
-    this._down.on("click", this._handlers.down);
+    this._scrollDown = () => {
+      const { index, taskTop, currentTop, isAtTask } = init();
+      let targetTop = $("#tasks-container").height();
 
-    return this;
+      if (index !== -1) {
+        const isGoingToBottom = isAtTask || currentTop > taskTop;
+        targetTop = isGoingToBottom ? $("#tasks-container").height() : taskTop;
+      }
+
+      $("#content").animate({ scrollTop: targetTop }, 500);
+    };
+
+    this._up.on("click", this._scrollUp);
+    this._down.on("click", this._scrollDown);
   }
 
-  /**
-   * 顯示上滾動按鈕。
-   */
   show() {
     if (this.isShow) return this;
 
@@ -154,9 +149,6 @@ class ScrollButtons extends component {
     return this;
   }
 
-  /**
-   * 隱藏上滾動按鈕。
-   */
   async hide() {
     if (!this.isShow) return this;
 
