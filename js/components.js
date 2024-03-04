@@ -497,6 +497,141 @@ class Header extends component {
 /**
  * 內容
  */
+class AddMenu extends component {
+  constructor() {
+    super();
+
+    const container = $("<div>").addClass("add-menu-container");
+    container.append(this._createIntro(), this._createContent("工作塊"));
+
+    this.element = container;
+
+    this._bindEvents();
+
+    this._tl = this._createTimelines();
+  }
+
+  _createIntro() {
+    this._select = new CustomSelect(["工作塊", "分割線"]);
+
+    return $("<div>")
+      .addClass("add-menu-intro")
+      .append($("<p>").text("新增一個"), this._select.element);
+  }
+
+  _createContent(type) {
+    if (this.element) {
+      this._content.children().remove();
+      this._content = this.element.find(".add-menu-content");
+    } else {
+      this._content = $("<div>").addClass("add-menu-content");
+    }
+
+    let content;
+
+    switch (type) {
+      case "工作塊":
+        content = new Task({
+          category: "未分類",
+          status: "U",
+          text: "\n按下編輯按鈕開始撰寫\n\n按下刪除按鈕並重新選擇來重置\n\n長按拖曳以插入至清單中\n",
+          _isCurrentMonth: true,
+        });
+        break;
+      case "分割線":
+        content = new Separator();
+        break;
+    }
+
+    content.appendTo(this._content);
+    return this._content;
+  }
+
+  _createTimelines() {
+    return gsap
+      .timeline({ paused: true })
+      .fromTo(
+        this.element,
+        { autoAlpha: 0, filter: "blur(10px)" },
+        { autoAlpha: 1, filter: "blur(0px)" }
+      );
+  }
+
+  _bindEvents() {
+    this._select.onChange(() => {
+      const type = this._select.getVal();
+      this._createContent(type);
+    });
+
+    this._sortable = new Sortable(this._content[0], {
+      group: {
+        name: "shared",
+        put: false,
+      },
+      animation: 150,
+      sort: false,
+      onStart: () => {
+        console.log("start");
+        this.element.addClass("start-drag");
+      },
+      onEnd: () => {
+        console.log("end");
+        this.element.removeClass("start-drag");
+      },
+    });
+
+    this.element.on("task-edit-focus", ".task-container", () =>
+      this._sortable.option("disabled", true)
+    );
+    this.element.on("task-edit-blur", ".task-container", () =>
+      this._sortable.option("disabled", false)
+    );
+  }
+
+  async show() {
+    if (this._inAnimate || this._isShow) return this;
+    this._inAnimate = true;
+    this._isShow = true;
+
+    this._createContent(this._select.getVal());
+
+    this._tl.play();
+    this._tl.eventCallback("onComplete", null);
+    await new Promise((resolve) => {
+      this._tl.eventCallback("onComplete", resolve);
+    });
+
+    this._contextmenuHandler = (e) => {
+      e.preventDefault();
+      this.hide();
+    };
+
+    $(document).on("contextmenu", this._contextmenuHandler);
+
+    this._inAnimate = false;
+
+    return this;
+  }
+
+  async hide() {
+    if (this._inAnimate || !this._isShow) return this;
+    this._inAnimate = true;
+    this._isShow = false;
+
+    this._tl.reverse();
+    this._tl.eventCallback("onReverseComplete", null);
+    await new Promise((resolve) => {
+      this._tl.eventCallback("onReverseComplete", resolve);
+    });
+
+    $(document).off("contextmenu", this._contextmenuHandler);
+
+    this._inAnimate = false;
+
+    return this;
+  }
+}
+
 class TaskList extends component {
   constructor(list) {
     super();
@@ -567,7 +702,7 @@ class TaskList extends component {
       this._sortable.option("disabled", true);
     };
 
-    this._handlers._inner2 = async () => {
+    this._handlers._inner2 = () => {
       this._sortable.option("disabled", false);
     };
 
@@ -735,133 +870,5 @@ class TaskList extends component {
       ease: "set1",
       duration: 0.2,
     });
-  }
-}
-
-class TempList extends component {
-  constructor() {
-    super();
-
-    this._timelines = {};
-
-    this._isOpen = false;
-
-    this.element = this._create();
-    this._createTimelines()._bindEvents();
-  }
-
-  _create() {
-    const container = $("<div>").addClass("temp-list-container");
-
-    const icon = new ArrowIcon();
-    icon.appendTo(container).addClass("temp-list-icon");
-    this._icon = icon.elements[0];
-
-    const scroller = $("<div>")
-      .addClass("temp-list-scroller")
-      .appendTo(container);
-
-    const list = $("<div>").addClass("temp-list").appendTo(scroller);
-    this._list = list;
-
-    this._sortable = new Sortable(list[0], {
-      group: {
-        name: "shared",
-        put: false,
-      },
-      animation: 150,
-      sort: false,
-    });
-
-    return container;
-  }
-
-  _createTimelines() {
-    this._timelines.show = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
-      .fromTo(this.element.children(), { autoAlpha: 0 }, { autoAlpha: 1 });
-
-    this._timelines.open = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
-      .fromTo(this.element, { y: 230 }, { y: 0 })
-      .to(this._icon, { y: 55, scaleY: -1 }, "<");
-
-    return this;
-  }
-
-  _bindEvents() {
-    this.element.on("mouseover", () => {
-      this.show();
-    });
-    this.element.on("mouseleave", () => {
-      if (!this._isOpen) this.hide();
-    });
-
-    this._sortable.option("onStart", () => {
-      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
-    });
-    this._sortable.option("onEnd", () => {
-      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
-
-      if (this._list.children().length === 0) this.close().hide();
-    });
-
-    this.element.on("click", ".temp-list-icon", async () => {
-      await delay(100);
-      if (this._isOpen) {
-        this.close().hide();
-      } else {
-        this.open();
-      }
-    });
-
-    return this;
-  }
-
-  open() {
-    this._timelines.open.play();
-
-    this._isOpen = true;
-
-    return this;
-  }
-
-  close() {
-    this._timelines.open.reverse();
-
-    this._isOpen = false;
-
-    return this;
-  }
-
-  show() {
-    this._timelines.show.play();
-
-    return this;
-  }
-
-  hide() {
-    this._timelines.show.reverse();
-
-    return this;
-  }
-
-  addTask(config) {
-    this.show().open();
-
-    const create = (config) => {
-      if (config.text === "--") return new Separator();
-
-      config.status = "U";
-      return new Task(config);
-    };
-
-    const task = create(config);
-
-    task.element.hide();
-    task.appendTo(this._list);
-    task.element.show(500);
-
-    return this;
   }
 }
