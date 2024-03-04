@@ -1,0 +1,82 @@
+.sidebar-bottom-container {
+  position: relative;
+  width: 100%;
+  border-radius: 5px;
+  border-bottom-left-radius: 25px;
+  box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
+    rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
+    rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
+  transition: left 0.5s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+.sidebar-bottom-container > .sidebar-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  clip-path: inset(0px round 5px 5px 5px 25px);
+}
+.sidebar-bottom-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.sidebar-bottom-flex:first-child {
+  width: 120px;
+  height: 50px;
+  clip-path: inset(0px round 5px 0px 0px 25px);
+}
+.sidebar-bottom-flex:last-child {
+  width: calc(100% - 120px);
+  height: 50px;
+}
+
+.sidebar-bottom-inner button > * {
+  pointer-events: none;
+}
+.sidebar-bottom-inner button {
+  border-radius: 0px;
+  box-shadow: none;
+  background-color: transparent;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
+    box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.sidebar-bottom-inner .sidebar-add-button {
+  position: relative;
+  width: 100%;
+  gap: 5px;
+}
+.sidebar-bottom-inner .sidebar-save-button {
+  --filter-setting: brightness(0.65);
+  backdrop-filter: var(--filter-setting);
+}
+
+.sidebar-bottom-inner .icon-container {
+  width: 35px;
+  height: 35px;
+}
+.sidebar-add-button > .icon-container {
+  width: 28px;
+  height: 28px;
+}
+.sidebar-add-button > p {
+  margin: 0;
+  color: white;
+  font-size: 22px;
+  text-decoration-line: underline;
+}
+
+.sidebar-bottom-inner button:hover {
+  background-color: hsl(210, 5%, 25%);
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 3px 0px inset,
+    rgba(0, 0, 0, 0.15) 0px 3px 7px 3px inset;
+}
+.sidebar-bottom-inner button:active {
+  background-color: #ea81af;
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 3px 0px inset,
+    rgba(0, 0, 0, 0.35) 0px 3px 7px 3px inset;
+}

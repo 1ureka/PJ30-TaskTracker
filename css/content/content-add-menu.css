@@ -1,0 +1,51 @@
+.add-menu-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 260px;
+  right: 0;
+  background-color: transparent;
+  backdrop-filter: blur(10px) brightness(0.5);
+  transition: 0.3s ease-in-out;
+  transition-property: left;
+}
+.add-menu-container.start-drag {
+  left: calc(260px + 50%);
+}
+.add-menu-intro {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+.add-menu-intro > p {
+  margin: 0;
+  font-size: 25px;
+  color: white;
+  text-shadow: black 0px 0px 20px, black 0px 0px 50px;
+}
+.add-menu-intro > .custom-select {
+  scale: 1.1;
+}
+.add-menu-content {
+  min-width: 35%;
+  min-height: 20%;
+  max-height: 50%;
+  padding: 80px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: hsl(225, 7.5%, 5%) transparent;
+}
+.add-menu-content > .task-container {
+  background-color: hsl(225, 7.5%, 5%);
+}
+
+#content .add-menu-container .task-transfer-button,
+#content .add-menu-container .task-copy-button {
+  display: none;
+}

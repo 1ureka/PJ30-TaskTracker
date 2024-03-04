@@ -29,11 +29,8 @@
 
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
     <script>
-      gsap.registerPlugin(ScrollTrigger);
-
       gsap.registerPlugin(CustomEase);
 
       CustomEase.create("set1", "0.455, 0.03, 0.515, 0.955");
@@ -99,17 +96,6 @@
         <h1 lang="en">Task Tracker</h1>
       </div>
       <div id="sidebar-content"></div>
-      <div class="pages-btn-container">
-        <label class="switch btn-color-mode-switch">
-          <input value="1" id="color_mode" name="color_mode" type="checkbox" />
-          <label
-            class="btn-color-mode-switch-inner"
-            data-off="1"
-            data-on="2"
-            for="color_mode"
-          ></label>
-        </label>
-      </div>
     </div>
 
     <div id="content">

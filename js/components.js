@@ -20,23 +20,15 @@ class component {
 }
 
 /**
- * 這個類別提供創建和控制上下滾動按鈕的功能。
+ * 其他
  */
 class ScrollButtons extends component {
-  /**
-   * 建構一個新的 `ScrollButtons` 實例。@constructor
-   */
   constructor() {
     super();
     this._timelines = {};
-    this._handlers = {};
-
     this.isShow = false;
 
-    /**
-     * 包含上下滾動按鈕的 jQuery 物件。
-     * @type {jQuery}
-     */
+    /** 包含上下滾動按鈕的 jQuery 物件。 @type {jQuery} */
     const container = $("<div>").addClass("scroll-buttons-container");
 
     this._up = this._createScrollButton("up");
@@ -48,13 +40,7 @@ class ScrollButtons extends component {
 
     this._createTimelines();
   }
-
-  /**
-   * 創建上下滾動按鈕。
-   * @private
-   * @param {string} type - 按鈕類型，可以是 "up" 或 "down"。
-   * @returns {jQuery} - 上下滾動按鈕的 jQuery 物件。
-   */
+  /** 創建上下滾動按鈕。 @private @param {string} type - 按鈕類型，可以是 "up" 或 "down"。  */
   _createScrollButton(type) {
     const button = $("<button>").addClass("scroll-button").addClass(type);
     const icon = new ScrollIcon();
@@ -79,12 +65,6 @@ class ScrollButtons extends component {
     return button;
   }
 
-  /**
-   * 將時間軸綁定到按鈕的不同事件。
-   * @param {jQuery} button - 要綁定的按鈕元素。
-   * @param {TimelineMax[]} hover - 滑鼠進入時觸發的時間軸陣列。
-   * @param {TimelineMax} click - 按鈕點擊時觸發的時間軸。
-   */
   _bindTimeline(button, hover, click) {
     button.on("mouseenter", () => {
       hover.forEach((tl) => {
@@ -99,12 +79,7 @@ class ScrollButtons extends component {
 
     button.on("click", () => click.restart());
   }
-
-  /**
-   * 創建並初始化上滾動按鈕的時間軸效果。
-   * @private
-   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
-   */
+  /** 創建並初始化上滾動按鈕的時間軸效果。@private */
   _createTimelines() {
     this._timelines.show = gsap
       .timeline({
@@ -120,31 +95,51 @@ class ScrollButtons extends component {
 
     return this;
   }
+  /** 綁定上下按鈕功能 @param {Array} list  TaskList.getList()返回值*/
+  bindEvents(list) {
+    if (this._scrollUp) {
+      this._up.off("click", this._scrollUp);
+      this._down.off("click", this._scrollDown);
+    }
 
-  /**
-   * 設置點擊事件處理函式，當上滾動或下滾動按鈕被點擊時觸發。
-   * @param {function} handler - 點擊事件處理函式，傳遞一個字串參數，代表點擊的按鈕類型 ("up" 或 "down")。
-   * @returns {ScrollButtons} - 回傳 `ScrollButtons` 實例，以便進行方法鏈結。
-   */
-  onClick(handler) {
-    if (this._handlers.up || this._handlers.down) return this;
+    const init = () => {
+      const { index, taskTop } = findFirstUnfinished(list);
+      const currentTop = $("#content").scrollTop();
 
-    this._handlers.up = () => {
-      handler("up");
+      const tolerance = window.innerHeight / 2.5;
+      const isAtTask = Math.abs(currentTop - taskTop) <= tolerance;
+
+      return { index, taskTop, currentTop, isAtTask };
     };
-    this._handlers.down = () => {
-      handler("down");
+
+    this._scrollUp = () => {
+      const { index, taskTop, currentTop, isAtTask } = init();
+      let targetTop = 0;
+
+      if (index !== -1) {
+        const isGoingToTop = isAtTask || currentTop < taskTop;
+        targetTop = isGoingToTop ? 0 : taskTop;
+      }
+
+      $("#content").animate({ scrollTop: targetTop }, 500);
     };
 
-    this._up.on("click", this._handlers.up);
-    this._down.on("click", this._handlers.down);
+    this._scrollDown = () => {
+      const { index, taskTop, currentTop, isAtTask } = init();
+      let targetTop = $("#tasks-container").height();
 
-    return this;
+      if (index !== -1) {
+        const isGoingToBottom = isAtTask || currentTop > taskTop;
+        targetTop = isGoingToBottom ? $("#tasks-container").height() : taskTop;
+      }
+
+      $("#content").animate({ scrollTop: targetTop }, 500);
+    };
+
+    this._up.on("click", this._scrollUp);
+    this._down.on("click", this._scrollDown);
   }
 
-  /**
-   * 顯示上滾動按鈕。
-   */
   show() {
     if (this.isShow) return this;
 
@@ -154,9 +149,6 @@ class ScrollButtons extends component {
     return this;
   }
 
-  /**
-   * 隱藏上滾動按鈕。
-   */
   async hide() {
     if (!this.isShow) return this;
 
@@ -173,256 +165,131 @@ class ScrollButtons extends component {
   }
 }
 
-class SidebarBottom extends component {
+class CopyPopup extends component {
   constructor() {
     super();
 
     this._timelines = {};
-    this._timelines.show = {};
 
     this.element = this._create();
-
-    this._createTimelines()._bindTimeline();
+    this._createTimelines();
   }
 
   _create() {
-    const container = $("<div>").addClass("sidebar-bottom-container");
-    const inner = $("<div>")
-      .addClass("sidebar-bottom-inner")
-      .appendTo(container);
-
-    const buttons = [
-      { id: "delete", icon: new DeleteIcon(), label: "刪除" },
-      { id: "clear", icon: new ClearIcon(), label: "清空" },
-      { id: "save", icon: new SaveIcon(), label: "儲存" },
-      { id: "load", icon: new LoadIcon(), label: "讀取" },
-    ];
-
-    buttons.forEach((config) => {
-      this._createBtns(config).appendTo(inner);
-    });
-
-    this._doneBtn = this._createExtraBtn().appendTo(container);
-    this._createClearCheck().appendTo(container);
-    this._createVersionDisplay().appendTo(inner);
-
-    return container;
-  }
-
-  _createBtns(config) {
-    const btn = $("<button>").addClass("btn").data("type", config.id);
-
-    const timelines = [];
-
-    const icon = config.icon;
-    timelines.push(...icon.timelines);
-
-    const label = new DoubleColorLabel(config.label);
-    timelines.push(label.timeline);
-
-    btn.append(icon.elements[0], label.element);
-
-    timelines.push(
-      gsap.timeline({ paused: true }).to(btn.children(), {
-        y: "+=3",
-        duration: 0.25,
-        ease: "set1",
-      })
-    );
-
-    this._bindClickTimeline2(btn);
-    this._bindHoverTimelines(btn, timelines);
-
-    return btn;
-  }
-
-  _createExtraBtn() {
-    const btn = $("<button>").addClass("done").data("type", "done");
-
-    const timelines = [
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.05 }),
-    ];
-
-    const label = new DoubleColorLabel("完成");
-    timelines.push(label.timeline);
-
-    btn.append(label.element);
-
-    this._bindClickTimeline(btn);
-    this._bindHoverTimelines(btn, timelines);
-
-    return btn;
-  }
-
-  _createVersionDisplay() {
     const container = $("<div>")
-      .attr("id", "version-display")
-      .append($("<p>").text("版本： @2.1.0"));
+      .addClass("popup")
+      .text("已複製內文")
+      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
 
     return container;
   }
 
-  _createClearCheck() {
-    this._clearCheck = {};
-
-    this._clearCheck.element = $("<div>").addClass("popup").css({
-      justifyContent: "space-around",
-      width: "160px",
-      flexWrap: "wrap",
-      flexDirection: "row",
-      zIndex: 99,
-    });
-
-    this._clearCheck.yes = $("<button>").data("type", "check").css({
-      boxShadow: "none",
-      textDecoration: "underline",
-    });
-
-    const label1 = new DoubleColorLabel("確定");
-    label1.appendTo(this._clearCheck.yes);
-    this._bindHoverTimelines(this._clearCheck.yes, [label1.timeline]);
-    this._bindClickTimeline(this._clearCheck.yes);
-
-    this._clearCheck.no = $("<button>").data("type", "cancel").css({
-      boxShadow: "none",
-      textDecoration: "underline",
-    });
-
-    const label2 = new DoubleColorLabel("取消");
-    label2.appendTo(this._clearCheck.no);
-    this._bindHoverTimelines(this._clearCheck.no, [label2.timeline]);
-    this._bindClickTimeline(this._clearCheck.no);
-
-    this._clearCheck.element.append(
-      $("<p>").text("確定要清空嗎"),
-      this._clearCheck.yes,
-      this._clearCheck.no
-    );
-
-    return this._clearCheck.element;
-  }
-
-  _bindClickTimeline(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
-
-    btn.on("click", () => tl.restart());
-  }
-
-  _bindClickTimeline2(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn.children(), { y: "+=5", yoyo: true, repeat: 1 });
-
-    btn.on("click", () => tl.restart());
-  }
-
-  _bindHoverTimelines(btn, timelines) {
-    timelines.forEach((tl) => {
-      btn.on("mouseenter", () => tl.play());
-      btn.on("mouseleave", () => tl.reverse());
-    });
-  }
-
-  // 製作"直接"關於該組件的時間軸
   _createTimelines() {
-    this._timelines.show.done = gsap
-      .timeline({ defaults: { duration: 0.35 }, paused: true })
-      .fromTo(
-        this._doneBtn,
-        {
-          scale: 0.5,
-          autoAlpha: 0,
-        },
-        {
-          ease: "back.out(4.5)",
-          scale: 1,
-          autoAlpha: 1,
-        }
-      );
-
-    this._timelines.show.clear = gsap
-      .timeline({ defaults: { duration: 0.35 }, paused: true })
-      .from(this._clearCheck.element, {
+    this._timelines.show = gsap
+      .timeline({ defaults: { ease: "set1" }, paused: true })
+      .from(this.element, {
         ease: "back.out(2)",
+        duration: 0.3,
         scale: 0.1,
         autoAlpha: 0,
-      });
+      })
+      .to(
+        this.element,
+        { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
+        "<"
+      )
+      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
 
     return this;
   }
 
-  // 綁定"直接"關於該組件的時間軸
-  _bindTimeline() {
-    this.element.on("click", async (e) => {
-      const element = $(e.target);
-      const type = element.data("type");
+  show(coordinate) {
+    gsap.set(this.element, coordinate);
 
-      const t1 = this._timelines.show.clear;
-      if (type === "clear") {
-        if (t1.paused()) {
-          t1.play();
-        } else {
-          t1.reversed(!t1.reversed());
-        }
-      } else if (["cancel", "check"].includes(type)) {
-        await delay(100);
-        t1.reverse();
-      }
-    });
+    this._timelines.show.restart();
+  }
+}
+
+/**
+ * 側邊欄
+ */
+class SidebarBottom extends component {
+  constructor() {
+    super();
+
+    const container = $("<section>").addClass("sidebar-bottom-container");
+    const inner = $("<div>").addClass("sidebar-bottom-inner");
+
+    const left = $("<div>")
+      .addClass("sidebar-bottom-flex")
+      .append(this._createAddBtn());
+
+    const right = $("<div>")
+      .addClass("sidebar-bottom-flex")
+      .append(this._createSaveBtn(), this._createLoadBtn());
+
+    inner.append(left, right);
+    inner.appendTo(container);
+
+    this.element = container;
   }
 
-  showDoneBtn() {
-    this._timelines.show.done.play();
+  _createAddBtn() {
+    const icon = new AddIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-add-button")
+      .append(icon.elements[0], $("<p>").text(" 新 增 "));
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
   }
 
-  async hideDownBtn() {
-    await delay(100);
-    this._timelines.show.done.reverse();
+  _createSaveBtn() {
+    const icon = new SaveIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-save-button")
+      .append(icon.elements[0]);
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
+  }
+
+  _createLoadBtn() {
+    const icon = new LoadIcon();
+    const tl = icon.timelines[0];
+    const btn = $("<button>")
+      .addClass("sidebar-load-button")
+      .append(icon.elements[0]);
+
+    btn.on("mouseenter", () => tl.play());
+    btn.on("mouseleave", () => tl.reverse());
+
+    return btn;
   }
 
   onSelect(handler) {
     if (this._handler) return this;
 
-    let isDeleting = false;
-
-    const contextmenuHandler = (e) => {
-      e.preventDefault();
-      isDeleting = false;
-      handler("done");
-      $("body").off("contextmenu", contextmenuHandler);
-    };
-
     this._handler = async (e) => {
       const element = $(e.target);
-      let type = element.data("type");
+      const className = element.attr("class");
 
-      if (type === "delete") {
-        // 刪除鍵有兩種可能
-        if (isDeleting) {
-          // 退出刪除模式
-          isDeleting = false;
-          type = "done";
-          $("body").off("contextmenu", contextmenuHandler);
-        } else {
-          // 進入刪除模式
-          isDeleting = true;
-          $("body").on("contextmenu", contextmenuHandler);
-        }
-      } else if (type === "done") {
-        // 完成鍵只有一種可能，退出刪除模式
-        isDeleting = false;
-        $("body").off("contextmenu", contextmenuHandler);
-      }
+      const map = {
+        "sidebar-add-button": "add",
+        "sidebar-save-button": "save",
+        "sidebar-load-button": "load",
+      };
 
-      if (["delete", "done", "save", "load", "check"].includes(type))
-        handler(type);
+      handler(map[className]);
     };
 
-    this.element.on("click", this._handler);
+    this.element.on("click", "button", this._handler);
   }
 }
 
@@ -430,317 +297,100 @@ class SidebarTop extends component {
   constructor() {
     super();
 
-    this._handlers = {};
+    const section = $("<section>").addClass("sidebar-top-container");
+    const content = $("<nav>").addClass("sidebar-top-content");
 
-    this.element = this._create();
-  }
+    const navList = this._createList();
 
-  _create() {
-    const container = $("<div>").addClass("sidebar-top-container");
-
-    this._dateSelect = this._createDateSelect();
-    const btns = this._createBtns();
-
-    $("<div>")
-      .addClass("sidebar-top-nav-container")
-      .appendTo(container)
-      .append($("<div>").append(btns, this._dateSelect));
-
-    this._textarea = new TextArea({
-      placeholder: "新增工作",
-      width: 240,
-      height: 210,
-      outlineWidth: 2,
-      duration: 0.2,
+    navList.forEach((config) => {
+      if (config.type === "separator")
+        this._createSeparator(config.title).appendTo(content);
+      if (config.type === "option")
+        this._createOption(config.title, config.id).appendTo(content);
     });
 
-    this._textarea.appendTo(container);
+    const mask = $("<div>")
+      .addClass("sidebar-top-mask")
+      .appendTo("#sidebar-content");
 
-    const textEditor = new TextEditor(this._textarea._textarea, { delay: 10 });
-    textEditor.start({
-      "(": ")",
-      "[": "]",
-      "{": "}",
-      "<": ">",
-      '"': '"',
-      "'": "'",
-    });
+    const styleTag = document.createElement("style");
+    document.head.appendChild(styleTag);
+    styleTag.sheet.insertRule(`
+      .sidebar-top-opt.active::after {
+        background: url("icons/play.png");
+        background-size: 20px 20px;
+      }
+      `);
 
-    this._categorySelect = new Select({
-      options: CATEGORISE,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    this._categorySelect.appendTo(container);
-
-    this._addBtn = this._createAddBtn().appendTo(container);
-
-    return container;
+    this.element = section.append(content);
   }
 
-  _createBtns() {
-    const create = () => {
-      const container = $("<div>").addClass("sidebar-top-btns-container");
-
-      const btns = ["工作", "靈感"].map((name) => {
-        const element = $("<button>");
-
-        const bulb = new Bulb(20, 20);
-        const bulbTL = bulb.createTimeline("#ea81af");
-        bulb.appendTo(element);
-
-        const lable = new DoubleColorLabel(name);
-        lable.appendTo(element);
-        const labelTL = lable.timeline;
-
-        element.appendTo(container);
-
-        return { element, bulbTL, labelTL };
-      });
-
-      return { container, btns };
-    };
-
-    const { container, btns } = create();
-
-    const bindTimeline = (btns) => {
-      btns.forEach((btn) => {
-        const hoverTls = [
-          btn.labelTL,
-          gsap
-            .timeline({ paused: true })
-            .to(btn.element.children(), { duration: 0.25, ease: "set1", y: 3 }),
-        ];
-        this._bindHoverTimelines(btn.element, hoverTls);
-      });
-    };
-
-    bindTimeline(btns);
-
-    const options = {
-      defaults: { ease: "set1", duration: 0.35 },
-      paused: true,
-    };
-    const tl = gsap
-      .timeline(options)
-      .to(this._dateSelect, { autoAlpha: 0, height: 0, padding: 0 });
-
-    const bindEvents = (container, btns) => {
-      container.on("click", "button", (e) => {
-        const index = $(e.target).index();
-        btns[index].bulbTL.play();
-        btns[1 - index].bulbTL.reverse();
-
-        index === 1 ? tl.play() : tl.reverse();
-      });
-    };
-
-    bindEvents(container, btns);
-
-    btns[0].bulbTL.play();
-
-    this._taskBtn = btns[0].element;
-    this._inspirationBtn = btns[1].element;
-
-    return container;
-  }
-
-  _createDateSelect() {
-    const container = $("<div>").addClass("date-select");
-
-    const timelines = [
-      gsap.timeline({ paused: true }).to(container, {
-        y: 3,
-        duration: 0.25,
-        ease: "set1",
-      }),
+  _createList() {
+    const navList = [
+      { type: "separator", title: "其他" },
+      { type: "option", title: "靈感", id: "0000-00" },
+      { type: "option", title: "檢討與筆記", id: "1111-11" },
     ];
 
-    const icon = new CalendarIcon();
-    icon.appendTo(container);
-    timelines.push(...icon.timelines);
+    // 取得當前年份和月份
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // 月份是從0開始的，所以需要加1
 
-    const { year, month } = this._getLocalStorageDate();
+    // 設定起始年份
+    const startYear = 2020;
 
-    this._yearSelect = this._createYearSelect();
-    this._yearSelect.appendTo(container).val(year);
+    // 生成年份範圍
+    for (let year = currentYear; year >= startYear; year--) {
+      navList.push({ type: "separator", title: `${year}年` });
 
-    this._monthSelect = this._createMonthSelect();
-    this._monthSelect.appendTo(container).val(month);
+      // 生成月份
+      const endMonth = year === currentYear ? currentMonth : 12;
+      for (let month = endMonth; month >= 1; month--) {
+        const monthString = month < 10 ? `0${month}` : `${month}`;
+        const id = `${year}-${monthString}`;
+        const title = `${year}年${month}月`;
+        navList.push({ type: "option", title, id });
+      }
+    }
 
-    this._bindHoverTimelines(container, timelines);
-
-    return container;
+    return navList;
   }
 
-  _getLocalStorageDate() {
-    const localStorageDate = formatLocalStorageDate();
-
-    if (localStorageDate) return localStorageDate;
-
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-
-    return {
-      year: currentYear,
-      month: currentMonth.toString().padStart(2, "0"),
-    };
-  }
-
-  _createYearSelect() {
-    const currentYear = new Date().getFullYear();
-    const years = Array.from(
-      { length: currentYear - 2019 },
-      (_, index) => 2020 + index
+  _createSeparator(title) {
+    return $("<div>").addClass("sidebar-top-sep").append(
+      $("<span>").addClass("sidebar-top-sep-1"), // 固定寬度 whatever
+      $("<p>").text(title), // 自動寬度 inline-block
+      $("<span>").addClass("sidebar-top-sep-2") // 剩下寬度 block或flex-grow
     );
-
-    const select = new Select({
-      options: years.map((number) => number.toString()),
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    return select;
   }
 
-  _createMonthSelect() {
-    const currentYear = new Date().getFullYear();
-    const selectedYear = parseInt(this._yearSelect.val());
-
-    const endMonth =
-      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
-
-    const months = Array.from({ length: endMonth }, (_, index) =>
-      (index + 1).toString().padStart(2, "0")
-    );
-
-    const select = new Select({
-      options: months,
-      outlineWidth: 2,
-      duration: 0.2,
-    });
-
-    return select;
+  _createOption(title, id) {
+    return $("<button>").addClass("sidebar-top-opt").text(title).attr("id", id);
   }
 
-  _resetMonthOptions() {
-    const currentYear = new Date().getFullYear();
-    const selectedYear = parseInt(this._yearSelect.val());
-
-    const endMonth =
-      selectedYear === currentYear ? new Date().getMonth() + 1 : 12;
-
-    const months = Array.from({ length: endMonth }, (_, index) =>
-      (index + 1).toString().padStart(2, "0")
-    );
-
-    const select = this._monthSelect._select;
-    select.empty();
-
-    months.forEach((month) => {
-      select.append(`<option value="${month}">${month}</option>`);
-    });
-
-    select.val(select.children(":last").val());
-
-    return this;
-  }
-
-  _createAddBtn() {
-    const btn = $("<button>").addClass("btn");
-
-    const label = new DoubleColorLabel("新增");
-    label.appendTo(btn);
-
-    this._bindClickTimeline(btn);
-    this._bindHoverTimelines(btn, [
-      label.timeline,
-      gsap
-        .timeline({ defaults: { duration: 0.2, ease: "set1" }, paused: true })
-        .to(btn, { scale: 1.1 }),
-    ]);
-
-    return btn;
-  }
-
-  _bindClickTimeline(btn) {
-    const tl = gsap
-      .timeline({ defaults: { duration: 0.1, ease: "set1" }, paused: true })
-      .to(btn, { scale: 0.7, yoyo: true, repeat: 1 });
-
-    btn.on("click", () => tl.restart());
-  }
-
-  _bindHoverTimelines(element, timelines) {
-    timelines.forEach((tl) => {
-      element.on("mouseenter", () => tl.play());
-      element.on("mouseleave", () => tl.reverse());
-    });
+  setActive(id) {
+    $(".sidebar-top-opt.active").removeClass("active");
+    $(`#${id}`).addClass("active");
   }
 
   onSelect(handler) {
-    if (this._handlers.date) return this;
+    if (this._handler) return this;
 
-    const yearSelect = this._yearSelect.element;
-    const monthSelect = this._monthSelect.element;
-
-    const getDate = () => {
-      return { year: this._yearSelect.val(), month: this._monthSelect.val() };
+    this._handler = (e) => {
+      const id = $(e.target).attr("id");
+      handler(id);
     };
 
-    this._handlers.date = {
-      year: () => {
-        // 根據年份初始化月份
-        this._resetMonthOptions();
-
-        handler(getDate());
-      },
-      month: () => {
-        handler(getDate());
-      },
-    };
-
-    let lastMode = "normal";
-    this._handlers.click = {
-      task: () => {
-        if (lastMode !== "normal") handler(getDate());
-
-        lastMode = "normal";
-      },
-      inspiration: () => {
-        if (lastMode !== "inspiration") handler({ year: "0000", month: "00" });
-
-        lastMode = "inspiration";
-      },
-    };
-
-    yearSelect.on("change", this._handlers.date.year);
-    monthSelect.on("change", this._handlers.date.month);
-    this._taskBtn.on("click", this._handlers.click.task);
-    this._inspirationBtn.on("click", this._handlers.click.inspiration);
+    this.element.on("click", ".sidebar-top-opt", this._handler);
 
     return this;
   }
-
-  onAdd(handler) {
-    if (this._handlers.add) return this;
-
-    this._handlers.add = () => {
-      const category = this._categorySelect.val();
-      const text = this._textarea.val();
-
-      if (text.trim()) handler({ category, text });
-    };
-
-    this._addBtn.on("click", this._handlers.add);
-  }
-
-  clearText() {
-    this._textarea.val("");
-  }
 }
 
+/**
+ * 標頭
+ */
 class Header extends component {
   constructor() {
     super();
@@ -836,6 +486,174 @@ class Header extends component {
   }
 }
 
+/**
+ * 內容
+ */
+class AddMenu extends component {
+  constructor() {
+    super();
+
+    this._CATEGORY = "未分類";
+    this._TEXT =
+      "\n按下編輯按鈕開始撰寫\n\n按下刪除按鈕並重新選擇來重置\n\n長按拖曳以插入至清單中\n";
+
+    this._category = this._CATEGORY;
+    this._text = this._TEXT;
+
+    const container = $("<div>").addClass("add-menu-container");
+    container.append(this._createIntro(), this._createContent("工作塊"));
+    this.element = container;
+
+    this._bindEvents();
+    this._tl = this._createTimelines();
+  }
+
+  _createIntro() {
+    this._select = new CustomSelect(["工作塊", "分割線"]);
+
+    return $("<div>")
+      .addClass("add-menu-intro")
+      .append($("<p>").text("新增一個"), this._select.element);
+  }
+
+  _createContent(type) {
+    if (this.element) {
+      this._content.children().remove();
+      this._content = this.element.find(".add-menu-content");
+    } else {
+      this._content = $("<div>").addClass("add-menu-content");
+    }
+
+    let content;
+
+    switch (type) {
+      case "工作塊":
+        content = new Task({
+          category: this._category,
+          status: "U",
+          text: this._text,
+        });
+        break;
+      case "分割線":
+        content = new Separator();
+        break;
+    }
+
+    content.appendTo(this._content);
+    return this._content;
+  }
+
+  _createTimelines() {
+    return gsap
+      .timeline({ paused: true })
+      .fromTo(
+        this.element,
+        { autoAlpha: 0, filter: "blur(10px)" },
+        { autoAlpha: 1, filter: "blur(0px)" }
+      );
+  }
+
+  _bindEvents() {
+    // menu
+    this._select.onChange(() => {
+      const type = this._select.getVal();
+      this._createContent(type);
+    });
+
+    // content
+    const reset = () => {
+      this._category = this._CATEGORY;
+      this._text = this._TEXT;
+    };
+    const clear = () => {
+      if (this._text === this._TEXT) this.element.find("textarea").val("");
+    };
+    const memorize = () => {
+      const element = this.element.find(".task-container");
+      const info = JSON.parse(element.data("info"));
+      this._category = info.category;
+      this._text = info.text;
+    };
+
+    this._sortable = new Sortable(this._content[0], {
+      group: {
+        name: "shared",
+        put: false,
+      },
+      animation: 150,
+      sort: false,
+      onStart: () => {
+        this.element.addClass("start-drag");
+      },
+      onEnd: (e) => {
+        if (e.to === e.from) this.element.removeClass("start-drag");
+      },
+      onRemove: async () => {
+        reset();
+        await this.hide();
+        this.element.removeClass("start-drag");
+      },
+    });
+
+    this.element.on("task-edit-focus", ".task-container", () => {
+      clear();
+      this._sortable.option("disabled", true);
+    });
+    this.element.on("task-edit-blur", ".task-container", () => {
+      this._sortable.option("disabled", false);
+    });
+    this.element.on("task-change", ".task-container", () => {
+      memorize();
+    });
+    this.element.on("task-delete", ".task-container", () => {
+      reset();
+    });
+  }
+
+  async show() {
+    if (this._inAnimate || this._isShow) return this;
+    this._inAnimate = true;
+    this._isShow = true;
+
+    this._createContent(this._select.getVal());
+
+    this._tl.play();
+    this._tl.eventCallback("onComplete", null);
+    await new Promise((resolve) => {
+      this._tl.eventCallback("onComplete", resolve);
+    });
+
+    this._contextmenuHandler = (e) => {
+      e.preventDefault();
+      this.hide();
+    };
+
+    $(document).on("contextmenu", this._contextmenuHandler);
+
+    this._inAnimate = false;
+
+    return this;
+  }
+
+  async hide() {
+    if (this._inAnimate || !this._isShow) return this;
+    this._inAnimate = true;
+    this._isShow = false;
+
+    this._tl.reverse();
+    this._tl.eventCallback("onReverseComplete", null);
+    await new Promise((resolve) => {
+      this._tl.eventCallback("onReverseComplete", resolve);
+    });
+
+    $(document).off("contextmenu", this._contextmenuHandler);
+
+    this._inAnimate = false;
+
+    return this;
+  }
+}
+
 class TaskList extends component {
   constructor(list) {
     super();
@@ -844,12 +662,10 @@ class TaskList extends component {
     this._timelines = {};
 
     this.isShow = false;
-    this.mode = "normal";
 
     this.element = this._create(list);
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
-    $(".task-delete-icon").css("pointerEvents", "none");
   }
 
   _create(list) {
@@ -908,8 +724,7 @@ class TaskList extends component {
       this._sortable.option("disabled", true);
     };
 
-    this._handlers._inner2 = async () => {
-      if (this.mode === "delete") return;
+    this._handlers._inner2 = () => {
       this._sortable.option("disabled", false);
     };
 
@@ -999,19 +814,6 @@ class TaskList extends component {
     return this;
   }
 
-  async clear() {
-    await this.hide();
-
-    this.element
-      .children()
-      .get()
-      .forEach((element) => $(element).remove());
-
-    this._handlers.change();
-
-    return this;
-  }
-
   async remove() {
     await this.hide();
 
@@ -1023,40 +825,6 @@ class TaskList extends component {
     this.element.off();
     this._sortable.destroy();
     Object.keys(this).forEach((key) => (this[key] = null));
-  }
-
-  switchMode(mode) {
-    if (this.mode === mode) return this;
-
-    if (mode === "normal") {
-      this.mode = "normal";
-
-      this._sortable.option("disabled", false);
-      $(".task-container").css("cursor", "default");
-      $(".task-delete-icon").css("pointerEvents", "none");
-
-      $("#delete-mode-label").slideToggle(500);
-
-      $(":root").css({
-        "--is-task-list-deleting": 0,
-        "--is-task-list-hovable": 1,
-      });
-    } else if (mode === "delete") {
-      this.mode = "delete";
-
-      this._sortable.option("disabled", true);
-      $(".task-container").css("cursor", "pointer");
-      $(".task-delete-icon").css("pointerEvents", "auto");
-
-      $("#delete-mode-label").slideToggle(500);
-
-      $(":root").css({
-        "--is-task-list-deleting": 1,
-        "--is-task-list-hovable": 0,
-      });
-    }
-
-    return this;
   }
 
   filterTasks(criteria) {
@@ -1124,178 +892,5 @@ class TaskList extends component {
       ease: "set1",
       duration: 0.2,
     });
-  }
-}
-
-class TempList extends component {
-  constructor() {
-    super();
-
-    this._timelines = {};
-
-    this._isOpen = false;
-
-    this.element = this._create();
-    this._createTimelines()._bindEvents();
-  }
-
-  _create() {
-    const container = $("<div>").addClass("temp-list-container");
-
-    const icon = new ArrowIcon();
-    icon.appendTo(container).addClass("temp-list-icon");
-    this._icon = icon.elements[0];
-
-    const scroller = $("<div>")
-      .addClass("temp-list-scroller")
-      .appendTo(container);
-
-    const list = $("<div>").addClass("temp-list").appendTo(scroller);
-    this._list = list;
-
-    this._sortable = new Sortable(list[0], {
-      group: {
-        name: "shared",
-        put: false,
-      },
-      animation: 150,
-      sort: false,
-    });
-
-    return container;
-  }
-
-  _createTimelines() {
-    this._timelines.show = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
-      .fromTo(this.element.children(), { autoAlpha: 0 }, { autoAlpha: 1 });
-
-    this._timelines.open = gsap
-      .timeline({ defaults: { ease: "set1", duration: 0.5 }, paused: true })
-      .fromTo(this.element, { y: 230 }, { y: 0 })
-      .to(this._icon, { y: 55, scaleY: -1 }, "<");
-
-    return this;
-  }
-
-  _bindEvents() {
-    this.element.on("mouseover", () => {
-      this.show();
-    });
-    this.element.on("mouseleave", () => {
-      if (!this._isOpen) this.hide();
-    });
-
-    this._sortable.option("onStart", () => {
-      document.documentElement.style.setProperty("--is-task-list-hovable", "0");
-    });
-    this._sortable.option("onEnd", () => {
-      document.documentElement.style.setProperty("--is-task-list-hovable", "1");
-
-      if (this._list.children().length === 0) this.close().hide();
-    });
-
-    this.element.on("click", ".temp-list-icon", async () => {
-      await delay(100);
-      if (this._isOpen) {
-        this.close().hide();
-      } else {
-        this.open();
-      }
-    });
-
-    return this;
-  }
-
-  open() {
-    this._timelines.open.play();
-
-    this._isOpen = true;
-
-    return this;
-  }
-
-  close() {
-    this._timelines.open.reverse();
-
-    this._isOpen = false;
-
-    return this;
-  }
-
-  show() {
-    this._timelines.show.play();
-
-    return this;
-  }
-
-  hide() {
-    this._timelines.show.reverse();
-
-    return this;
-  }
-
-  addTask(config) {
-    this.show().open();
-
-    const create = (config) => {
-      if (config.text === "--") return new Separator();
-
-      config.status = "U";
-      return new Task(config);
-    };
-
-    const task = create(config);
-
-    task.element.hide();
-    task.appendTo(this._list);
-    task.element.show(500);
-
-    return this;
-  }
-}
-
-class CopyPopup extends component {
-  constructor() {
-    super();
-
-    this._timelines = {};
-
-    this.element = this._create();
-    this._createTimelines();
-  }
-
-  _create() {
-    const container = $("<div>")
-      .addClass("popup")
-      .text("已複製內文")
-      .css({ pointerEvents: "none", padding: 7, fontSize: 18 });
-
-    return container;
-  }
-
-  _createTimelines() {
-    this._timelines.show = gsap
-      .timeline({ defaults: { ease: "set1" }, paused: true })
-      .from(this.element, {
-        ease: "back.out(2)",
-        duration: 0.3,
-        scale: 0.1,
-        autoAlpha: 0,
-      })
-      .to(
-        this.element,
-        { ease: "power3.out", duration: 0.3, autoAlpha: 1 },
-        "<"
-      )
-      .to(this.element, { delay: 0.5, duration: 1, autoAlpha: 0 });
-
-    return this;
-  }
-
-  show(coordinate) {
-    gsap.set(this.element, coordinate);
-
-    this._timelines.show.restart();
   }
 }

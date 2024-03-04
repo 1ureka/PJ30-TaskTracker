@@ -1,9 +1,7 @@
 @import url("global.css");
-@import url("color.css");
 
-@import url("loading/style.css");
-@import url("header/style.css");
-@import url("sidebar/style.css");
-@import url("content/style.css");
-@import url("aside/style.css");
-@import url("login/style.css");
+@import url("other/other.css");
+@import url("popup/popup.css");
+@import url("header/header.css");
+@import url("sidebar/sidebar.css");
+@import url("content/content.css");
