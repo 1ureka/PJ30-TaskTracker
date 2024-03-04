@@ -501,13 +501,18 @@ class AddMenu extends component {
   constructor() {
     super();
 
+    this._CATEGORY = "未分類";
+    this._TEXT =
+      "\n按下編輯按鈕開始撰寫\n\n按下刪除按鈕並重新選擇來重置\n\n長按拖曳以插入至清單中\n";
+
+    this._category = this._CATEGORY;
+    this._text = this._TEXT;
+
     const container = $("<div>").addClass("add-menu-container");
     container.append(this._createIntro(), this._createContent("工作塊"));
-
     this.element = container;
 
     this._bindEvents();
-
     this._tl = this._createTimelines();
   }
 
@@ -532,10 +537,9 @@ class AddMenu extends component {
     switch (type) {
       case "工作塊":
         content = new Task({
-          category: "未分類",
+          category: this._category,
           status: "U",
-          text: "\n按下編輯按鈕開始撰寫\n\n按下刪除按鈕並重新選擇來重置\n\n長按拖曳以插入至清單中\n",
-          _isCurrentMonth: true,
+          text: this._text,
         });
         break;
       case "分割線":
@@ -558,10 +562,26 @@ class AddMenu extends component {
   }
 
   _bindEvents() {
+    // menu
     this._select.onChange(() => {
       const type = this._select.getVal();
       this._createContent(type);
     });
+
+    // content
+    const reset = () => {
+      this._category = this._CATEGORY;
+      this._text = this._TEXT;
+    };
+    const clear = () => {
+      if (this._text === this._TEXT) this.element.find("textarea").val("");
+    };
+    const memorize = () => {
+      const element = this.element.find(".task-container");
+      const info = JSON.parse(element.data("info"));
+      this._category = info.category;
+      this._text = info.text;
+    };
 
     this._sortable = new Sortable(this._content[0], {
       group: {
@@ -570,22 +590,24 @@ class AddMenu extends component {
       },
       animation: 150,
       sort: false,
-      onStart: () => {
-        console.log("start");
-        this.element.addClass("start-drag");
-      },
-      onEnd: () => {
-        console.log("end");
-        this.element.removeClass("start-drag");
-      },
+      onStart: () => this.element.addClass("start-drag"),
+      onEnd: () => this.element.removeClass("start-drag"),
+      onRemove: () => reset(),
     });
 
-    this.element.on("task-edit-focus", ".task-container", () =>
-      this._sortable.option("disabled", true)
-    );
-    this.element.on("task-edit-blur", ".task-container", () =>
-      this._sortable.option("disabled", false)
-    );
+    this.element.on("task-edit-focus", ".task-container", () => {
+      clear();
+      this._sortable.option("disabled", true);
+    });
+    this.element.on("task-edit-blur", ".task-container", () => {
+      this._sortable.option("disabled", false);
+    });
+    this.element.on("task-change", ".task-container", () => {
+      memorize();
+    });
+    this.element.on("task-delete", ".task-container", () => {
+      reset();
+    });
   }
 
   async show() {
