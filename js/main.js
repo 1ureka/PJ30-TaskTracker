@@ -89,12 +89,14 @@ function createComponents() {
   const header = new Header();
   const sidebarTop = new SidebarTop();
   const sidebarBottom = new SidebarBottom();
+  const addMenu = new AddMenu();
 
   const copyPopup = new CopyPopup();
   const scrollButtons = new ScrollButtons();
 
   sidebarTop.appendTo("#sidebar-content");
   sidebarBottom.appendTo("#sidebar-content");
+  addMenu.appendTo("#content");
 
   copyPopup.appendTo("body");
   scrollButtons.appendTo("body");
@@ -105,6 +107,7 @@ function createComponents() {
     header,
     sidebarTop,
     sidebarBottom,
+    addMenu,
     copyPopup,
     scrollButtons,
   };
@@ -124,9 +127,10 @@ async function createContents(list) {
 }
 
 $(async function () {
+  const { loadingIcon } = createBackground();
+
   await login();
 
-  const { loadingIcon } = createBackground();
   loadingIcon.show();
 
   $("body").css("pointerEvents", "none");
@@ -146,8 +150,14 @@ $(async function () {
   //
   // 創建組件與事件監聽
   //
-  const { header, sidebarTop, sidebarBottom, copyPopup, scrollButtons } =
-    createComponents();
+  const {
+    header,
+    sidebarTop,
+    sidebarBottom,
+    addMenu,
+    copyPopup,
+    scrollButtons,
+  } = createComponents();
 
   header.onInput((e) => {
     taskList.filterTasks(e);
@@ -168,6 +178,10 @@ $(async function () {
   });
   sidebarBottom.onSelect(async (type) => {
     $("body").css("pointerEvents", "none");
+
+    if (type === "add") {
+      addMenu.show();
+    }
 
     if (type === "save") {
       loadingIcon.show();
