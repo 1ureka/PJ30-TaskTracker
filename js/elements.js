@@ -344,7 +344,7 @@ class Task {
     this._bindCopyEvents();
     this._bindHoverEvents();
   }
-
+  /** @private */
   _create(config) {
     // 主容器
     const container = $("<div>").addClass("task-container");
@@ -373,13 +373,13 @@ class Task {
 
     return container;
   }
-
+  /** @private */
   _createAddMenu() {
     return $("<section>")
       .addClass("task-add-container")
       .append($("<button>").append($("<img>").attr("src", "icons/add.png")));
   }
-
+  /** @private */
   _createTags(category, status) {
     return [
       $("<span>")
@@ -392,7 +392,7 @@ class Task {
         .text(`•${STATUSMAP[status]}`),
     ];
   }
-
+  /** @private */
   _createButtons() {
     return [
       $("<button>")
@@ -419,7 +419,7 @@ class Task {
         .append(this._createSVG(), $("<span>").addClass("tip").text("刪除")),
     ];
   }
-
+  /** @private */
   _createSVG() {
     return $(`
     <svg
@@ -444,7 +444,7 @@ class Task {
     </svg>
     `);
   }
-
+  /** @private */
   _bindAddEvents() {
     this.element.on("click", ".task-add-container > button", (e) => {
       const buttons = this.element.find(".task-add-container > button").get();
@@ -476,7 +476,7 @@ class Task {
       });
     });
   }
-
+  /** @private */
   _bindDeleteEvents() {
     this.element.on("click", ".task-delete-button", async () => {
       gsap.to(this.element, {
@@ -495,7 +495,7 @@ class Task {
       });
     });
   }
-
+  /** @private */
   _bindTagsEvents() {
     const tags = this.element.find(".task-tag");
 
@@ -585,7 +585,7 @@ class Task {
       });
     });
   }
-
+  /** @private */
   _bindTextEvents() {
     let textarea;
 
@@ -655,7 +655,7 @@ class Task {
       );
     });
   }
-
+  /** @private */
   _bindCopyEvents() {
     this.element.on("click", ".task-copy-button", () => {
       const info = JSON.parse(this.element.data("info"));
@@ -665,7 +665,7 @@ class Task {
 
     return this;
   }
-
+  /** @private */
   _bindHoverEvents() {
     this.element.on("mouseover", (e) => {
       if (
@@ -730,22 +730,13 @@ class Task {
  * @class
  */
 class Separator {
-  /**
-   * Separator 類別的建構子。
-   * @constructor
-   */
   constructor() {
     this._isAppendTo = false;
 
     this.element = this._create();
     this._bindDeleteEvents();
   }
-
-  /**
-   * 私有方法，用於創建分隔線元素。
-   * @private
-   * @returns {jQuery} - 創建的分隔線元素的 jQuery 物件。
-   */
+  /** @private @returns {jQuery}*/
   _create() {
     const separator = $("<div>")
       .addClass("separator")
@@ -758,7 +749,7 @@ class Separator {
 
     return separator;
   }
-
+  /** @private */
   _createSVG() {
     return $(`
     <svg
@@ -783,12 +774,7 @@ class Separator {
     </svg>
     `);
   }
-
-  /**
-   * 私有方法，綁定刪除相關事件。
-   * @private
-   * @returns {Separator} - Separator 類別的實例。
-   */
+  /** @private */
   _bindDeleteEvents() {
     this.element.on("click", "button", async () => {
       gsap.to(this.element, {
@@ -809,12 +795,7 @@ class Separator {
 
     return this;
   }
-
-  /**
-   * 公開方法，用於將分隔線元素附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {Separator} - Separator 類別的實例。
-   */
+  /** @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。 */
   appendTo(element) {
     if (this._isAppendTo) return this;
 
@@ -825,9 +806,6 @@ class Separator {
     return this;
   }
 
-  /**
-   * 公開方法，用於銷毀 Separator 類別的實例。
-   */
   destroy() {
     this.element.remove();
   }
