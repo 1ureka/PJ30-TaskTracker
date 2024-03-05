@@ -667,7 +667,7 @@ class TaskList extends component {
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
   }
-
+  /**  @param {Array} list   */
   _create(list) {
     const container = $("#tasks-container");
 
@@ -676,6 +676,15 @@ class TaskList extends component {
 
       return new Task(config);
     });
+
+    if (instances.length === 0)
+      instances.push(
+        new Task({
+          category: "未分類",
+          status: "U",
+          text: "這是預設工作區，如果你想要它是空的，請刪除此工作塊。",
+        })
+      );
 
     instances.forEach((instance) => {
       instance.appendTo(container);
@@ -723,9 +732,14 @@ class TaskList extends component {
     this._handlers._inner1 = () => {
       this._sortable.option("disabled", true);
     };
-
     this._handlers._inner2 = () => {
       this._sortable.option("disabled", false);
+    };
+    this._handlers._inner3 = (e, type) => {
+      console.log(e.target, type);
+    };
+    this._handlers._inner4 = (e, type) => {
+      console.log(e.target, type);
     };
 
     this.element.on(
@@ -738,6 +752,12 @@ class TaskList extends component {
       ".task-container",
       this._handlers._inner2
     );
+    this.element.on(
+      "task-add-right",
+      ".task-container",
+      this._handlers._inner3
+    );
+    this.element.on("task-add-left", ".task-container", this._handlers._inner4);
 
     return this;
   }
@@ -748,23 +768,30 @@ class TaskList extends component {
     const list = elements.map((element) => {
       element = $(element);
 
-      if (element.attr("class") === "separator") return { type: "separator" };
+      if (element.hasClass("separator")) return { type: "separator" };
 
-      return JSON.parse(element.data("info"));
+      if (element.hasClass("task-container"))
+        return JSON.parse(element.data("info"));
+
+      return null;
     });
 
-    return list;
+    return list.filter((element) => element);
   }
 
   onChange(handler) {
     if (this._handlers.change) return this;
 
     this._handlers.change = async (e) => {
-      if (e.type === "task-delete") await delay(100);
+      if (["task-delete", "task-add-left", "task-add-right"].includes(e.type))
+        await delay(100);
+
       const list = this.getList();
       handler(list);
     };
 
+    this.element.on("task-add-left", ".task-container", this._handlers.change);
+    this.element.on("task-add-right", ".task-container", this._handlers.change);
     this.element.on("task-change", ".task-container", this._handlers.change);
     this.element.on("task-delete", ".task-container", this._handlers.change);
     this.element.on("task-delete", ".separator", this._handlers.change);

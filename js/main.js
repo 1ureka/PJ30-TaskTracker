@@ -129,6 +129,7 @@ async function createContents(list) {
   await delay(350);
 
   await taskList.show();
+  save.set(date, taskList.getList());
 }
 
 $(async function () {
