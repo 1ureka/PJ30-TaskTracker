@@ -308,6 +308,7 @@ class Task {
 
     // 綁定各種事件
     this._bindAddEvents();
+    this._bindTransferEvents();
     this._bindDeleteEvents();
     this._bindTagsEvents();
     this._bindTextEvents();
@@ -443,6 +444,25 @@ class Task {
       select.on("blur", async () => {
         await delay(350);
         select.remove();
+      });
+    });
+  }
+  /** @private */
+  _bindTransferEvents() {
+    this.element.on("click", ".task-transfer-button", async () => {
+      gsap.to(this.element, {
+        duration: 0.1,
+        ease: "set1",
+        y: "+=5",
+        yoyo: true,
+        repeat: 1,
+      });
+
+      await delay(100);
+
+      this.element.fadeOut(500, () => {
+        this.element.trigger("task-transfer");
+        this.destroy();
       });
     });
   }
