@@ -603,8 +603,8 @@ class TaskList extends component {
     } else if (type === "工作塊") {
       content = new Task({
         category: "未分類",
+        text: "新的塊",
         status: "U",
-        text: "\n",
       });
     }
     gsap.fromTo(content.element, { autoAlpha: 0 }, { autoAlpha: 1 });
