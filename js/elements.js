@@ -41,36 +41,6 @@ class IconInterface {
   }
 }
 
-class AddIcon extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._plus = $("<img>").attr("src", "icons/add.png");
-
-    container.append(this._plus);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    const tl = gsap
-      .timeline({
-        defaults: { duration: 0.55, ease: "back.inOut(3)" },
-        paused: true,
-      })
-      .to(container, { scale: 1.05 }, "<")
-      .to(this._plus, { rotateZ: 90 }, "<");
-
-    return [tl];
-  }
-}
-
 class SaveIcon extends IconInterface {
   constructor() {
     super();

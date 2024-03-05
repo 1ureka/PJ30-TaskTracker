@@ -220,29 +220,27 @@ class SidebarBottom extends component {
     const container = $("<section>").addClass("sidebar-bottom-container");
     const inner = $("<div>").addClass("sidebar-bottom-inner");
 
-    const left = $("<div>")
-      .addClass("sidebar-bottom-flex")
-      .append(this._createAddBtn());
+    inner.append(
+      this._createAddBtn(),
+      this._createSaveBtn(),
+      this._createLoadBtn()
+    );
 
-    const right = $("<div>")
-      .addClass("sidebar-bottom-flex")
-      .append(this._createSaveBtn(), this._createLoadBtn());
-
-    inner.append(left, right);
     inner.appendTo(container);
 
     this.element = container;
   }
   /** @private */
   _createAddBtn() {
-    const icon = new AddIcon();
-    const tl = icon.timelines[0];
-    const btn = $("<button>")
-      .addClass("sidebar-add-button")
-      .append(icon.elements[0], $("<p>").text(" 新 增 "));
-
-    btn.on("mouseenter", () => tl.play());
-    btn.on("mouseleave", () => tl.reverse());
+    const btn = $("<label>")
+      .addClass("hamburger")
+      .append(
+        $("<input>").attr("type", "checkbox"),
+        $(`<svg viewBox="0 0 32 32">
+          <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+          <path class="line" d="M7 16 27 16"></path>
+          </svg>`)
+      );
 
     return btn;
   }
