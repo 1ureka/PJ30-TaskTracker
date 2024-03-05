@@ -661,6 +661,24 @@ class TaskList extends component {
     this._sortable.option("onSort", this._handlers.sort);
   }
 
+  onTransfer(handler) {
+    if (this._handlers.transfer) return this;
+
+    this._handlers.transfer = async (e) => {
+      const info = $(e.target).data("info");
+      await delay(100);
+      const list = this.getList();
+
+      handler(list, JSON.parse(info));
+    };
+
+    this.element.on(
+      "task-transfer",
+      ".task-container",
+      this._handlers.transfer
+    );
+  }
+
   async show() {
     if (this.isShow) return this;
 
