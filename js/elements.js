@@ -41,36 +41,6 @@ class IconInterface {
   }
 }
 
-class AddIcon extends IconInterface {
-  constructor() {
-    super();
-  }
-
-  _createIcon() {
-    const container = $("<div>").addClass("icon-container");
-
-    this._plus = $("<img>").attr("src", "icons/add.png");
-
-    container.append(this._plus);
-
-    return [container];
-  }
-
-  _createTimeline() {
-    const container = this.elements[0];
-
-    const tl = gsap
-      .timeline({
-        defaults: { duration: 0.55, ease: "back.inOut(3)" },
-        paused: true,
-      })
-      .to(container, { scale: 1.05 }, "<")
-      .to(this._plus, { rotateZ: 90 }, "<");
-
-    return [tl];
-  }
-}
-
 class SaveIcon extends IconInterface {
   constructor() {
     super();
@@ -337,13 +307,14 @@ class Task {
     this.element = this._create(config);
 
     // 綁定各種事件
+    this._bindAddEvents();
     this._bindDeleteEvents();
     this._bindTagsEvents();
     this._bindTextEvents();
     this._bindCopyEvents();
     this._bindHoverEvents();
   }
-
+  /** @private */
   _create(config) {
     // 主容器
     const container = $("<div>").addClass("task-container");
@@ -367,9 +338,18 @@ class Task {
       .append($("<p>").text(config.text))
       .appendTo(container);
 
+    // 文檔劉以外
+    container.append(this._createAddMenu(), this._createAddMenu());
+
     return container;
   }
-
+  /** @private */
+  _createAddMenu() {
+    return $("<section>")
+      .addClass("task-add-container")
+      .append($("<button>").append($("<img>").attr("src", "icons/add.png")));
+  }
+  /** @private */
   _createTags(category, status) {
     return [
       $("<span>")
@@ -382,7 +362,7 @@ class Task {
         .text(`•${STATUSMAP[status]}`),
     ];
   }
-
+  /** @private */
   _createButtons() {
     return [
       $("<button>")
@@ -409,7 +389,7 @@ class Task {
         .append(this._createSVG(), $("<span>").addClass("tip").text("刪除")),
     ];
   }
-
+  /** @private */
   _createSVG() {
     return $(`
     <svg
@@ -434,7 +414,39 @@ class Task {
     </svg>
     `);
   }
+  /** @private */
+  _bindAddEvents() {
+    this.element.on("click", ".task-add-container > button", (e) => {
+      const buttons = this.element.find(".task-add-container > button").get();
+      const index = buttons.indexOf(e.target);
+      const select = $("<div>").addClass("task-options popup");
 
+      ["工作塊", "分割線"].forEach((category) =>
+        select.append($("<div>").addClass("task-option").text(category))
+      );
+
+      select.one("click", ".task-option", (e) => {
+        const option = $(e.target).text();
+        if (index === 0) this.element.trigger("task-add-left", [option]);
+        if (index === 1) this.element.trigger("task-add-right", [option]);
+        select.blur();
+      });
+
+      if ($(window).height() - e.clientY < 300) {
+        gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
+      } else {
+        gsap.set(select, { top: e.clientY + 20, left: e.clientX });
+      }
+
+      select.attr("tabindex", "0").appendTo("body").focus();
+
+      select.on("blur", async () => {
+        await delay(350);
+        select.remove();
+      });
+    });
+  }
+  /** @private */
   _bindDeleteEvents() {
     this.element.on("click", ".task-delete-button", async () => {
       gsap.to(this.element, {
@@ -453,7 +465,7 @@ class Task {
       });
     });
   }
-
+  /** @private */
   _bindTagsEvents() {
     const tags = this.element.find(".task-tag");
 
@@ -482,7 +494,7 @@ class Task {
         select.blur();
       });
 
-      if (e.clientY > window.innerHeight / 2) {
+      if ($(window).height() - e.clientY < 300) {
         gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
       } else {
         gsap.set(select, { top: e.clientY + 20, left: e.clientX });
@@ -529,7 +541,7 @@ class Task {
         select.blur();
       });
 
-      if (e.clientY > window.innerHeight / 2) {
+      if ($(window).height() - e.clientY < 300) {
         gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
       } else {
         gsap.set(select, { top: e.clientY + 20, left: e.clientX });
@@ -543,7 +555,7 @@ class Task {
       });
     });
   }
-
+  /** @private */
   _bindTextEvents() {
     let textarea;
 
@@ -613,7 +625,7 @@ class Task {
       );
     });
   }
-
+  /** @private */
   _bindCopyEvents() {
     this.element.on("click", ".task-copy-button", () => {
       const info = JSON.parse(this.element.data("info"));
@@ -623,7 +635,7 @@ class Task {
 
     return this;
   }
-
+  /** @private */
   _bindHoverEvents() {
     this.element.on("mouseover", (e) => {
       if (
@@ -688,22 +700,13 @@ class Task {
  * @class
  */
 class Separator {
-  /**
-   * Separator 類別的建構子。
-   * @constructor
-   */
   constructor() {
     this._isAppendTo = false;
 
     this.element = this._create();
     this._bindDeleteEvents();
   }
-
-  /**
-   * 私有方法，用於創建分隔線元素。
-   * @private
-   * @returns {jQuery} - 創建的分隔線元素的 jQuery 物件。
-   */
+  /** @private @returns {jQuery}*/
   _create() {
     const separator = $("<div>")
       .addClass("separator")
@@ -716,7 +719,7 @@ class Separator {
 
     return separator;
   }
-
+  /** @private */
   _createSVG() {
     return $(`
     <svg
@@ -741,12 +744,7 @@ class Separator {
     </svg>
     `);
   }
-
-  /**
-   * 私有方法，綁定刪除相關事件。
-   * @private
-   * @returns {Separator} - Separator 類別的實例。
-   */
+  /** @private */
   _bindDeleteEvents() {
     this.element.on("click", "button", async () => {
       gsap.to(this.element, {
@@ -767,12 +765,7 @@ class Separator {
 
     return this;
   }
-
-  /**
-   * 公開方法，用於將分隔線元素附加到指定的 DOM 元素。
-   * @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。
-   * @returns {Separator} - Separator 類別的實例。
-   */
+  /** @param {string|HTMLElement|jQuery} element - 要附加到的 DOM 元素。 */
   appendTo(element) {
     if (this._isAppendTo) return this;
 
@@ -783,9 +776,6 @@ class Separator {
     return this;
   }
 
-  /**
-   * 公開方法，用於銷毀 Separator 類別的實例。
-   */
   destroy() {
     this.element.remove();
   }

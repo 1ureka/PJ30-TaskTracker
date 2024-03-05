@@ -1,43 +1,30 @@
 .sidebar-bottom-container {
+  align-self: center;
   position: relative;
-  width: 100%;
+  width: 90%;
   border-radius: 5px;
-  border-bottom-left-radius: 25px;
+  transition: left 0.5s cubic-bezier(0.39, 0.575, 0.565, 1);
   box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 4px,
     rgba(0, 0, 0, 0.35) 5px 8px 3px -3px, rgba(0, 0, 0, 0.45) 0px -2px 0px inset,
     rgba(255, 255, 255, 0.3) 2px 5px 3px -3px inset;
-  transition: left 0.5s cubic-bezier(0.39, 0.575, 0.565, 1);
 }
 .sidebar-bottom-container > .sidebar-bottom-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  clip-path: inset(0px round 5px 5px 5px 25px);
-}
-.sidebar-bottom-flex {
-  display: flex;
   justify-content: center;
-  align-items: center;
-}
-.sidebar-bottom-flex:first-child {
-  width: 120px;
-  height: 50px;
-  clip-path: inset(0px round 5px 0px 0px 25px);
-}
-.sidebar-bottom-flex:last-child {
-  width: calc(100% - 120px);
-  height: 50px;
+  width: 100%;
+  height: 45px;
+  clip-path: inset(0px round 5px 5px 5px 5px);
 }
 
-.sidebar-bottom-inner button > * {
+.sidebar-bottom-inner > * > * {
   pointer-events: none;
 }
-.sidebar-bottom-inner button {
+.sidebar-bottom-inner > * {
   border-radius: 0px;
   box-shadow: none;
   background-color: transparent;
-  width: 50%;
+  width: calc(100% / 3);
   height: 100%;
   display: flex;
   justify-content: center;
@@ -45,38 +32,63 @@
   transition: background-color 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
     box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-.sidebar-bottom-inner .sidebar-add-button {
-  position: relative;
-  width: 100%;
-  gap: 5px;
-}
 .sidebar-bottom-inner .sidebar-save-button {
-  --filter-setting: brightness(0.65);
-  backdrop-filter: var(--filter-setting);
+  backdrop-filter: brightness(0.65);
 }
-
 .sidebar-bottom-inner .icon-container {
   width: 35px;
   height: 35px;
 }
-.sidebar-add-button > .icon-container {
-  width: 28px;
-  height: 28px;
-}
-.sidebar-add-button > p {
-  margin: 0;
-  color: white;
-  font-size: 22px;
-  text-decoration-line: underline;
-}
 
-.sidebar-bottom-inner button:hover {
+.sidebar-bottom-inner > *:hover {
   background-color: hsl(210, 5%, 25%);
   box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 3px 0px inset,
     rgba(0, 0, 0, 0.15) 0px 3px 7px 3px inset;
 }
-.sidebar-bottom-inner button:active {
+.sidebar-bottom-inner > *:active {
   background-color: #ea81af;
   box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 3px 0px inset,
     rgba(0, 0, 0, 0.35) 0px 3px 7px 3px inset;
+}
+
+/*  */
+
+.hamburger {
+  cursor: pointer;
+}
+.hamburger input {
+  display: none;
+}
+.hamburger svg {
+  /* The size of the SVG defines the overall size */
+  height: 37px;
+  transition: all 600ms cubic-bezier(0.4, 0, 0.2, 1),
+    scale 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hamburger .line {
+  fill: none;
+  stroke: white;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  transition: all 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hamburger .line-top-bottom {
+  stroke-dasharray: 12 63;
+}
+.hamburger:hover > svg {
+  scale: 1.35;
+}
+.hamburger:hover .line {
+  stroke-width: 2;
+}
+.hamburger input:checked + svg > .line {
+  stroke: rgb(237, 56, 56);
+}
+.hamburger input:checked + svg {
+  transform: rotate(-45deg);
+}
+.hamburger input:checked + svg .line-top-bottom {
+  stroke-dasharray: 20 300;
+  stroke-dashoffset: -32.42;
 }

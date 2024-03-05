@@ -89,14 +89,12 @@ function createComponents() {
   const header = new Header();
   const sidebarTop = new SidebarTop();
   const sidebarBottom = new SidebarBottom();
-  const addMenu = new AddMenu();
 
   const copyPopup = new CopyPopup();
   const scrollButtons = new ScrollButtons();
 
   sidebarTop.appendTo("#sidebar-content");
   sidebarBottom.appendTo("#sidebar-content");
-  addMenu.appendTo("#content");
 
   copyPopup.appendTo("body");
   scrollButtons.appendTo("body");
@@ -107,13 +105,7 @@ function createComponents() {
     copyPopup.show(coordinate);
   });
 
-  return {
-    header,
-    sidebarTop,
-    sidebarBottom,
-    addMenu,
-    scrollButtons,
-  };
+  return { header, sidebarTop, sidebarBottom, scrollButtons };
 }
 
 async function createContents(list) {
@@ -129,6 +121,7 @@ async function createContents(list) {
   await delay(350);
 
   await taskList.show();
+  save.set(date, taskList.getList());
 }
 
 $(async function () {
@@ -155,7 +148,7 @@ $(async function () {
   //
   // 創建組件與事件監聽
   //
-  const { header, sidebarTop, sidebarBottom, addMenu, scrollButtons } =
+  const { header, sidebarTop, sidebarBottom, scrollButtons } =
     createComponents();
 
   header.onInput((e) => {
@@ -178,10 +171,6 @@ $(async function () {
   });
   sidebarBottom.onSelect(async (type) => {
     $("body").css("pointerEvents", "none");
-
-    if (type === "add") {
-      addMenu.show();
-    }
 
     if (type === "save") {
       loadingIcon.show();

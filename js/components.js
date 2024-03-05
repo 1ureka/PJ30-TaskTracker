@@ -64,7 +64,7 @@ class ScrollButtons extends component {
 
     return button;
   }
-
+  /** @private */
   _bindTimeline(button, hover, click) {
     button.on("mouseenter", () => {
       hover.forEach((tl) => {
@@ -174,7 +174,7 @@ class CopyPopup extends component {
     this.element = this._create();
     this._createTimelines();
   }
-
+  /** @private */
   _create() {
     const container = $("<div>")
       .addClass("popup")
@@ -183,7 +183,7 @@ class CopyPopup extends component {
 
     return container;
   }
-
+  /** @private */
   _createTimelines() {
     this._timelines.show = gsap
       .timeline({ defaults: { ease: "set1" }, paused: true })
@@ -220,33 +220,31 @@ class SidebarBottom extends component {
     const container = $("<section>").addClass("sidebar-bottom-container");
     const inner = $("<div>").addClass("sidebar-bottom-inner");
 
-    const left = $("<div>")
-      .addClass("sidebar-bottom-flex")
-      .append(this._createAddBtn());
+    inner.append(
+      this._createAddBtn(),
+      this._createSaveBtn(),
+      this._createLoadBtn()
+    );
 
-    const right = $("<div>")
-      .addClass("sidebar-bottom-flex")
-      .append(this._createSaveBtn(), this._createLoadBtn());
-
-    inner.append(left, right);
     inner.appendTo(container);
 
     this.element = container;
   }
-
+  /** @private */
   _createAddBtn() {
-    const icon = new AddIcon();
-    const tl = icon.timelines[0];
-    const btn = $("<button>")
-      .addClass("sidebar-add-button")
-      .append(icon.elements[0], $("<p>").text(" 新 增 "));
-
-    btn.on("mouseenter", () => tl.play());
-    btn.on("mouseleave", () => tl.reverse());
+    const btn = $("<label>")
+      .addClass("hamburger")
+      .append(
+        $("<input>").attr("type", "checkbox"),
+        $(`<svg viewBox="0 0 32 32">
+          <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+          <path class="line" d="M7 16 27 16"></path>
+          </svg>`)
+      );
 
     return btn;
   }
-
+  /** @private */
   _createSaveBtn() {
     const icon = new SaveIcon();
     const tl = icon.timelines[0];
@@ -259,7 +257,7 @@ class SidebarBottom extends component {
 
     return btn;
   }
-
+  /** @private */
   _createLoadBtn() {
     const icon = new LoadIcon();
     const tl = icon.timelines[0];
@@ -324,7 +322,7 @@ class SidebarTop extends component {
 
     this.element = section.append(content);
   }
-
+  /** @private */
   _createList() {
     const navList = [
       { type: "separator", title: "其他" },
@@ -356,7 +354,7 @@ class SidebarTop extends component {
 
     return navList;
   }
-
+  /** @private */
   _createSeparator(title) {
     return $("<div>").addClass("sidebar-top-sep").append(
       $("<span>").addClass("sidebar-top-sep-1"), // 固定寬度 whatever
@@ -364,7 +362,7 @@ class SidebarTop extends component {
       $("<span>").addClass("sidebar-top-sep-2") // 剩下寬度 block或flex-grow
     );
   }
-
+  /** @private */
   _createOption(title, id) {
     return $("<button>").addClass("sidebar-top-opt").text(title).attr("id", id);
   }
@@ -399,7 +397,7 @@ class Header extends component {
 
     this._create();
   }
-
+  /** @private */
   _create() {
     this.element = $("#header");
 
@@ -427,7 +425,7 @@ class Header extends component {
 
     return this;
   }
-
+  /** @private */
   _createSearchInput() {
     const container = $("<div>").addClass("search-input-container");
     container.html(
@@ -443,7 +441,7 @@ class Header extends component {
 
     return container;
   }
-
+  /** @private */
   _createCategorySelect() {
     const container = $("<div>").addClass("category-select");
 
@@ -452,7 +450,7 @@ class Header extends component {
 
     return container;
   }
-
+  /** @private */
   _bindHoverTimelines(element, timelines) {
     timelines.forEach((tl) => {
       element.on("mouseenter", () => tl.play());
@@ -489,171 +487,6 @@ class Header extends component {
 /**
  * 內容
  */
-class AddMenu extends component {
-  constructor() {
-    super();
-
-    this._CATEGORY = "未分類";
-    this._TEXT =
-      "\n按下編輯按鈕開始撰寫\n\n按下刪除按鈕並重新選擇來重置\n\n長按拖曳以插入至清單中\n";
-
-    this._category = this._CATEGORY;
-    this._text = this._TEXT;
-
-    const container = $("<div>").addClass("add-menu-container");
-    container.append(this._createIntro(), this._createContent("工作塊"));
-    this.element = container;
-
-    this._bindEvents();
-    this._tl = this._createTimelines();
-  }
-
-  _createIntro() {
-    this._select = new CustomSelect(["工作塊", "分割線"]);
-
-    return $("<div>")
-      .addClass("add-menu-intro")
-      .append($("<p>").text("新增一個"), this._select.element);
-  }
-
-  _createContent(type) {
-    if (this.element) {
-      this._content.children().remove();
-      this._content = this.element.find(".add-menu-content");
-    } else {
-      this._content = $("<div>").addClass("add-menu-content");
-    }
-
-    let content;
-
-    switch (type) {
-      case "工作塊":
-        content = new Task({
-          category: this._category,
-          status: "U",
-          text: this._text,
-        });
-        break;
-      case "分割線":
-        content = new Separator();
-        break;
-    }
-
-    content.appendTo(this._content);
-    return this._content;
-  }
-
-  _createTimelines() {
-    return gsap
-      .timeline({ paused: true })
-      .fromTo(
-        this.element,
-        { autoAlpha: 0, filter: "blur(10px)" },
-        { autoAlpha: 1, filter: "blur(0px)" }
-      );
-  }
-
-  _bindEvents() {
-    // menu
-    this._select.onChange(() => {
-      const type = this._select.getVal();
-      this._createContent(type);
-    });
-
-    // content
-    const reset = () => {
-      this._category = this._CATEGORY;
-      this._text = this._TEXT;
-    };
-    const clear = () => {
-      if (this._text === this._TEXT) this.element.find("textarea").val("");
-    };
-    const memorize = () => {
-      const element = this.element.find(".task-container");
-      const info = JSON.parse(element.data("info"));
-      this._category = info.category;
-      this._text = info.text;
-    };
-
-    this._sortable = new Sortable(this._content[0], {
-      group: {
-        name: "shared",
-        put: false,
-      },
-      animation: 150,
-      sort: false,
-      onStart: () => {
-        this.element.addClass("start-drag");
-      },
-      onEnd: (e) => {
-        if (e.to === e.from) this.element.removeClass("start-drag");
-      },
-      onRemove: async () => {
-        reset();
-        await this.hide();
-        this.element.removeClass("start-drag");
-      },
-    });
-
-    this.element.on("task-edit-focus", ".task-container", () => {
-      clear();
-      this._sortable.option("disabled", true);
-    });
-    this.element.on("task-edit-blur", ".task-container", () => {
-      this._sortable.option("disabled", false);
-    });
-    this.element.on("task-change", ".task-container", () => {
-      memorize();
-    });
-    this.element.on("task-delete", ".task-container", () => {
-      reset();
-    });
-  }
-
-  async show() {
-    if (this._inAnimate || this._isShow) return this;
-    this._inAnimate = true;
-    this._isShow = true;
-
-    this._createContent(this._select.getVal());
-
-    this._tl.play();
-    this._tl.eventCallback("onComplete", null);
-    await new Promise((resolve) => {
-      this._tl.eventCallback("onComplete", resolve);
-    });
-
-    this._contextmenuHandler = (e) => {
-      e.preventDefault();
-      this.hide();
-    };
-
-    $(document).on("contextmenu", this._contextmenuHandler);
-
-    this._inAnimate = false;
-
-    return this;
-  }
-
-  async hide() {
-    if (this._inAnimate || !this._isShow) return this;
-    this._inAnimate = true;
-    this._isShow = false;
-
-    this._tl.reverse();
-    this._tl.eventCallback("onReverseComplete", null);
-    await new Promise((resolve) => {
-      this._tl.eventCallback("onReverseComplete", resolve);
-    });
-
-    $(document).off("contextmenu", this._contextmenuHandler);
-
-    this._inAnimate = false;
-
-    return this;
-  }
-}
-
 class TaskList extends component {
   constructor(list) {
     super();
@@ -667,7 +500,7 @@ class TaskList extends component {
     gsap.set(this.element.children(), { autoAlpha: 0 });
     this._bindEvents();
   }
-
+  /**  @param {Array} list   */
   _create(list) {
     const container = $("#tasks-container");
 
@@ -677,12 +510,20 @@ class TaskList extends component {
       return new Task(config);
     });
 
+    if (instances.length === 0)
+      instances.push(
+        new Task({
+          category: "未分類",
+          status: "U",
+          text: "這是預設工作區，如果你想要它是空的，請刪除此工作塊。",
+        })
+      );
+
     instances.forEach((instance) => {
       instance.appendTo(container);
     });
 
     this._sortable = new Sortable(container[0], {
-      group: "shared",
       animation: 150,
       onStart: () => {
         document.documentElement.style.setProperty(
@@ -700,7 +541,7 @@ class TaskList extends component {
 
     return container;
   }
-
+  /** @private */
   _createTimelines() {
     this._timelines.show = gsap
       .timeline({ defaults: { ease: "set1" }, paused: true })
@@ -718,14 +559,19 @@ class TaskList extends component {
 
     return this;
   }
-
+  /** @private */
   _bindEvents() {
     this._handlers._inner1 = () => {
       this._sortable.option("disabled", true);
     };
-
     this._handlers._inner2 = () => {
       this._sortable.option("disabled", false);
+    };
+    this._handlers._inner3 = (e, type) => {
+      this._addTask(e, type, "after");
+    };
+    this._handlers._inner4 = (e, type) => {
+      this._addTask(e, type, "before");
     };
 
     this.element.on(
@@ -738,8 +584,34 @@ class TaskList extends component {
       ".task-container",
       this._handlers._inner2
     );
+    this.element.on(
+      "task-add-right",
+      ".task-container",
+      this._handlers._inner3
+    );
+    this.element.on("task-add-left", ".task-container", this._handlers._inner4);
 
     return this;
+  }
+
+  _addTask(e, type, position) {
+    let content;
+    if (type === "分割線") {
+      content = new Separator();
+    } else if (type === "工作塊") {
+      content = new Task({
+        category: "未分類",
+        text: "新的塊",
+        status: "U",
+      });
+    }
+    gsap.fromTo(content.element, { autoAlpha: 0 }, { autoAlpha: 1 });
+
+    if (position === "after") {
+      $(e.target).after(content.element);
+    } else if (position === "before") {
+      $(e.target).before(content.element);
+    }
   }
 
   getList() {
@@ -748,23 +620,30 @@ class TaskList extends component {
     const list = elements.map((element) => {
       element = $(element);
 
-      if (element.attr("class") === "separator") return { type: "separator" };
+      if (element.hasClass("separator")) return { type: "separator" };
 
-      return JSON.parse(element.data("info"));
+      if (element.hasClass("task-container"))
+        return JSON.parse(element.data("info"));
+
+      return null;
     });
 
-    return list;
+    return list.filter((element) => element);
   }
 
   onChange(handler) {
     if (this._handlers.change) return this;
 
     this._handlers.change = async (e) => {
-      if (e.type === "task-delete") await delay(100);
+      if (["task-delete", "task-add-left", "task-add-right"].includes(e.type))
+        await delay(100);
+
       const list = this.getList();
       handler(list);
     };
 
+    this.element.on("task-add-left", ".task-container", this._handlers.change);
+    this.element.on("task-add-right", ".task-container", this._handlers.change);
     this.element.on("task-change", ".task-container", this._handlers.change);
     this.element.on("task-delete", ".task-container", this._handlers.change);
     this.element.on("task-delete", ".separator", this._handlers.change);
