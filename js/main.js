@@ -117,6 +117,15 @@ async function createContents(list) {
 
   taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
   taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
+  taskList.onTransfer((list, info) => {
+    const currentList = list;
+    const targetList = save.get(getCurrentDate());
+
+    targetList.push(info);
+
+    save.set(date, currentList);
+    save.set(getCurrentDate(), targetList);
+  });
 
   await delay(350);
 

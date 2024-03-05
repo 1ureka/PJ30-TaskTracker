@@ -118,9 +118,11 @@ class Save {
    * @returns {Object|Array} - 保存數據對象或列表數據。
    */
   get(date = "0") {
-    if (date === "0") return this._currentSave;
+    const output = lodash.cloneDeep(this._currentSave);
 
-    return this._currentSave[date];
+    if (date === "0") return output;
+
+    return output[date];
   }
 
   /**
@@ -165,30 +167,32 @@ function delay(ms) {
 }
 
 /**
- * 如果本地存儲中存在日期，則返回存儲的日期；否則，返回當前年份和月份的組合，格式為 'YYYY-MM'。
- * @returns {string} 初始日期，格式為 'YYYY-MM'。
+ * 返回當前年份和月份的組合，格式為 'YYYY-MM'。
+ * @returns {"YYYY-MM"} 日期，格式為 'YYYY-MM'。
  */
-function initDate() {
+function getCurrentDate() {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   const monthString = currentMonth.toString().padStart(2, "0");
 
-  return localStorage.getItem("date") || `${currentYear}-${monthString}`;
+  return `${currentYear}-${monthString}`;
+}
+
+/**
+ * 如果本地存儲中存在日期，則返回存儲的日期；否則，返回當前年份和月份的組合，格式為 'YYYY-MM'。
+ * @returns {"YYYY-MM"} 初始日期，格式為 'YYYY-MM'。
+ */
+function initDate() {
+  return localStorage.getItem("date") || getCurrentDate();
 }
 
 /**
  * 用於判斷YYYY-MM是否為當前日期。
- * @param {string} dateString
+ * @param {"YYYY-MM"} dateString
  * @returns {boolean}
  */
 function isCurrentMonth(dateString) {
-  const inputDate = new Date(dateString + "-01"); // 添加 "-01" 表示日期為該月的第一天
-  const currentDate = new Date();
-
-  return (
-    inputDate.getFullYear() === currentDate.getFullYear() &&
-    inputDate.getMonth() === currentDate.getMonth()
-  );
+  return dateString === getCurrentDate();
 }
 
 /**
