@@ -337,6 +337,7 @@ class Task {
     this.element = this._create(config);
 
     // 綁定各種事件
+    this._bindAddEvents();
     this._bindDeleteEvents();
     this._bindTagsEvents();
     this._bindTextEvents();
@@ -367,7 +368,16 @@ class Task {
       .append($("<p>").text(config.text))
       .appendTo(container);
 
+    // 文檔劉以外
+    container.append(this._createAddMenu(), this._createAddMenu());
+
     return container;
+  }
+
+  _createAddMenu() {
+    return $("<section>")
+      .addClass("task-add-container")
+      .append($("<button>").append($("<img>").attr("src", "icons/add.png")));
   }
 
   _createTags(category, status) {
@@ -435,6 +445,38 @@ class Task {
     `);
   }
 
+  _bindAddEvents() {
+    this.element.on("click", ".task-add-container > button", (e) => {
+      const buttons = this.element.find(".task-add-container > button").get();
+      const index = buttons.indexOf(e.target);
+      const select = $("<div>").addClass("task-options popup");
+
+      ["工作塊", "分割線"].forEach((category) =>
+        select.append($("<div>").addClass("task-option").text(category))
+      );
+
+      select.one("click", ".task-option", (e) => {
+        const option = $(e.target).text();
+        if (index === 0) this.element.trigger("task-add-left", [option]);
+        if (index === 1) this.element.trigger("task-add-right", [option]);
+        select.blur();
+      });
+
+      if ($(window).height() - e.clientY < 300) {
+        gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
+      } else {
+        gsap.set(select, { top: e.clientY + 20, left: e.clientX });
+      }
+
+      select.attr("tabindex", "0").appendTo("body").focus();
+
+      select.on("blur", async () => {
+        await delay(350);
+        select.remove();
+      });
+    });
+  }
+
   _bindDeleteEvents() {
     this.element.on("click", ".task-delete-button", async () => {
       gsap.to(this.element, {
@@ -482,7 +524,7 @@ class Task {
         select.blur();
       });
 
-      if (e.clientY > window.innerHeight / 2) {
+      if ($(window).height() - e.clientY < 300) {
         gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
       } else {
         gsap.set(select, { top: e.clientY + 20, left: e.clientX });
@@ -529,7 +571,7 @@ class Task {
         select.blur();
       });
 
-      if (e.clientY > window.innerHeight / 2) {
+      if ($(window).height() - e.clientY < 300) {
         gsap.set(select, { top: e.clientY - 20, left: e.clientX, y: "-100%" });
       } else {
         gsap.set(select, { top: e.clientY + 20, left: e.clientX });
