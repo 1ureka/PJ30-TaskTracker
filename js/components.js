@@ -95,15 +95,15 @@ class ScrollButtons extends component {
 
     return this;
   }
-  /** 綁定上下按鈕功能 @param {Array} list  TaskList.getList()返回值*/
-  bindEvents(list) {
+  /** 綁定上下按鈕功能 @param {TaskList} taskList*/
+  setScrollTarget(taskList) {
     if (this._scrollUp) {
       this._up.off("click", this._scrollUp);
       this._down.off("click", this._scrollDown);
     }
 
     const init = () => {
-      const { index, taskTop } = findFirstUnfinished(list);
+      const { index, taskTop } = findFirstUnfinished(taskList.getList());
       const currentTop = $("#content").scrollTop();
 
       const tolerance = window.innerHeight / 2.5;
@@ -126,11 +126,11 @@ class ScrollButtons extends component {
 
     this._scrollDown = () => {
       const { index, taskTop, currentTop, isAtTask } = init();
-      let targetTop = $("#tasks-container").height();
+      let targetTop = taskList.element.height();
 
       if (index !== -1) {
         const isGoingToBottom = isAtTask || currentTop > taskTop;
-        targetTop = isGoingToBottom ? $("#tasks-container").height() : taskTop;
+        targetTop = isGoingToBottom ? taskList.element.height() : taskTop;
       }
 
       $("#content").animate({ scrollTop: targetTop }, 500);
@@ -401,13 +401,11 @@ class Header extends component {
   _create() {
     this.element = $("#header");
 
-    const bar = $("<div>").addClass("filter-bar");
-
     const input = this._createSearchInput();
     const select = this._createCategorySelect();
-    bar.append(input, select);
+    this.element.append(input, select);
 
-    bar
+    this.element
       .on("mouseenter", (e) => {
         const except = $(e.target).filter(
           ".custom-select-options, .custom-select-option"
@@ -420,8 +418,6 @@ class Header extends component {
       .on("mouseleave", (e) => {
         select.css("pointerEvents", "none");
       });
-
-    this.element.append(bar);
 
     return this;
   }
@@ -614,6 +610,17 @@ class TaskList extends component {
     }
   }
 
+  _tagLarge() {
+    this.element
+      .find(".task-container")
+      .toArray()
+      .forEach(function (element) {
+        const isTall =
+          $(element).find(".task-p-container")[0].scrollHeight > 350;
+        $(element).toggleClass("task-tall", isTall);
+      });
+  }
+
   getList() {
     const elements = this.element.children().get();
 
@@ -635,6 +642,8 @@ class TaskList extends component {
     if (this._handlers.change) return this;
 
     this._handlers.change = async (e) => {
+      this._tagLarge();
+
       if (["task-delete", "task-add-left", "task-add-right"].includes(e.type))
         await delay(100);
 
@@ -684,6 +693,7 @@ class TaskList extends component {
 
     this.isShow = true;
     this._createTimelines();
+    this._tagLarge();
     this._timelines.show.play();
 
     this._timelines.show.eventCallback("onComplete", null);
