@@ -610,6 +610,17 @@ class TaskList extends component {
     }
   }
 
+  _tagLarge() {
+    this.element
+      .find(".task-container")
+      .toArray()
+      .forEach(function (element) {
+        const isTall =
+          $(element).find(".task-p-container")[0].scrollHeight > 350;
+        $(element).toggleClass("task-tall", isTall);
+      });
+  }
+
   getList() {
     const elements = this.element.children().get();
 
@@ -631,6 +642,8 @@ class TaskList extends component {
     if (this._handlers.change) return this;
 
     this._handlers.change = async (e) => {
+      this._tagLarge();
+
       if (["task-delete", "task-add-left", "task-add-right"].includes(e.type))
         await delay(100);
 
@@ -680,6 +693,7 @@ class TaskList extends component {
 
     this.isShow = true;
     this._createTimelines();
+    this._tagLarge();
     this._timelines.show.play();
 
     this._timelines.show.eventCallback("onComplete", null);
