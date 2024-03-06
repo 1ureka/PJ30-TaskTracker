@@ -307,6 +307,7 @@ class Task {
     this.element = this._create(config);
 
     // 綁定各種事件
+    this._bindExpandEvents();
     this._bindAddEvents();
     this._bindTransferEvents();
     this._bindDeleteEvents();
@@ -340,9 +341,20 @@ class Task {
       .appendTo(container);
 
     // 文檔劉以外
-    container.append(this._createAddMenu(), this._createAddMenu());
+    container.append(
+      this._createAddMenu(),
+      this._createAddMenu(),
+      this._createExpandButton()
+    );
 
     return container;
+  }
+  /** @private */
+  _createExpandButton() {
+    return $(`<label class="task-expand">
+    <input type="checkbox">
+      <svg viewBox="0 0 512 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="chevron-down"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg>
+  </label>`);
   }
   /** @private */
   _createAddMenu() {
@@ -414,6 +426,14 @@ class Task {
     <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
     </svg>
     `);
+  }
+  /** @private */
+  _bindExpandEvents() {
+    this.element.find(`input[type="checkbox"]`).on("change", function () {
+      $(this)
+        .parents(".task-container")
+        .toggleClass("task-open", $(this).is(":checked"));
+    });
   }
   /** @private */
   _bindAddEvents() {
@@ -588,11 +608,12 @@ class Task {
       // 停止選單編輯行為
       $(":root").css("--is-task-list-hovable", "0");
       $(":root").css("--is-task-menu-usable", "none");
+      this.element.toggleClass("task-editing", true);
 
       // 創建一個 textarea 元素
       textarea = $("<textarea></textarea>")
         .val(this._info.text)
-        .css("width", p.width())
+        .css("width", p.innerWidth())
         .css("height", p.height() + 10);
       const currentHeight = textarea.height();
 
@@ -636,27 +657,33 @@ class Task {
       // 恢復選單編輯行為
       $(":root").css("--is-task-list-hovable", "1");
       $(":root").css("--is-task-menu-usable", "auto");
+      this.element.toggleClass("task-editing", false);
 
       this.element.trigger("task-edit-blur");
     });
 
     this.element.on("input", "textarea", (e) => {
-      const currentHeight = textarea.height();
+      const currentHeight = textarea[0].scrollHeight;
       const scrollTop = $("#content").scrollTop();
 
       gsap.set(textarea, { height: "auto" });
       const targetHeight = textarea[0].scrollHeight;
 
-      gsap.fromTo(
-        textarea,
-        { height: currentHeight },
-        {
-          ease: "set1",
-          duration: 0.1,
-          height: targetHeight,
-          onUpdate: () => $("#content").scrollTop(scrollTop),
-        }
-      );
+      if (currentHeight !== targetHeight) {
+        gsap.fromTo(
+          textarea,
+          { height: currentHeight },
+          {
+            ease: "set1",
+            duration: 0.1,
+            height: targetHeight,
+            onUpdate: () => $("#content").scrollTop(scrollTop),
+          }
+        );
+      } else {
+        gsap.set(textarea, { height: currentHeight });
+        $("#content").scrollTop(scrollTop);
+      }
     });
   }
   /** @private */
