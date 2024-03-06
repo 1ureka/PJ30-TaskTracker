@@ -26,6 +26,8 @@
   flex-direction: column;
   gap: 7px;
   position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 12px 15px 15px 15px;
   border-radius: 5px;
   cursor: default;
@@ -197,10 +199,10 @@
 /*  */
 /*  */
 
-.task-p-container * {
-  margin: 0;
+.task-p-container hr {
+  width: 100%;
 }
-.task-p-container > p {
+.task-p-container p {
   white-space: pre-wrap;
   text-wrap: pretty;
   font-size: 19px;
@@ -213,6 +215,18 @@
   background: rgba(255, 255, 255, 0.1);
   box-shadow: 0px 0px 0px #0e0e0e, 0px 0px 0px rgb(95 94 94 / 25%),
     inset 1.5px 1.5px 3px #0e0e0e, inset -1.5px -1.5px 3px #5f5e5e;
+}
+.markdown-body {
+  background-color: transparent;
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+}
+.markdown-body .markdown-alert {
+  padding: 0 1em;
+}
+.markdown-body :is(h1, h2, h3, h4) {
+  border-bottom: none;
 }
 
 /*  */
