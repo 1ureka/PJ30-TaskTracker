@@ -123,6 +123,7 @@ async function createContents(list) {
   if (TASKLIST) await TASKLIST.remove();
 
   $("#content").toggleClass("current-month", isCurrentMonth(DATE));
+  $("#content").toggleClass("is-note-page", DATE === "1111-11");
 
   TASKLIST = new TaskList(list);
 
