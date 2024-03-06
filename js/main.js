@@ -4,6 +4,7 @@
 /** @type {SidebarTop}    */ let SIDEBAR_TOP;
 /** @type {SidebarBottom} */ let SIDEBAR_BOTTOM;
 /** @type {ScrollButtons} */ let SCROLL_BUTTONS;
+/**                       */ let LOADICON;
 
 // var
 /** @type {"YYYY-MM"} */ let DATE = initDate();
@@ -82,7 +83,7 @@ function createBackground() {
   const waveBackground = new WaveBackground(-1);
   waveBackground.show();
 
-  const loadingIcon = {
+  LOADICON = {
     show: () =>
       gsap.to("#loading-container", {
         ease: "power2.in",
@@ -96,8 +97,6 @@ function createBackground() {
         duration: 0.3,
       }),
   };
-
-  return { loadingIcon };
 }
 
 function createComponents() {
@@ -166,7 +165,7 @@ function bindEvents() {
     interact.disable();
 
     if (type === "save") {
-      loadingIcon.show();
+      LOADICON.show();
 
       const data = SAVE.get("0");
       const str = JSON.stringify(data, null, 2);
@@ -174,18 +173,18 @@ function bindEvents() {
       await uploadFile(file, SAVEPATH);
       SAVE.update();
 
-      loadingIcon.hide();
+      LOADICON.hide();
     }
 
     if (type === "load") {
-      loadingIcon.show();
+      LOADICON.show();
 
       const content = await loadFile(SAVEPATH);
       const data = JSON.parse(base64ToString(content));
       Object.keys(data).forEach((date) => SAVE.set(date, data[date]));
       SAVE.update();
 
-      loadingIcon.hide();
+      LOADICON.hide();
 
       await createContents(SAVE.get(DATE));
     }
@@ -195,11 +194,11 @@ function bindEvents() {
 }
 
 $(async function () {
-  const { loadingIcon } = createBackground();
+  createBackground();
 
   await login();
 
-  loadingIcon.show();
+  LOADICON.show();
   interact.disable();
 
   await loadSave();
@@ -207,7 +206,7 @@ $(async function () {
   createComponents();
   bindEvents();
 
-  loadingIcon.hide();
+  LOADICON.hide();
 
   const opening = gsap
     .timeline({ delay: 1, defaults: { ease: "power2.out", duration: 0.6 } })
