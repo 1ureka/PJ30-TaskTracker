@@ -142,6 +142,7 @@ async function createContents(list) {
 
   await TASKLIST.show();
   SAVE.set(DATE, TASKLIST.getList());
+  SCROLL_BUTTONS.setScrollTarget(TASKLIST);
 }
 
 function bindEvents() {
@@ -157,7 +158,6 @@ function bindEvents() {
 
     await HEADER.reset();
     await createContents(SAVE.get(DATE));
-    SCROLL_BUTTONS.setScrollTarget(TASKLIST);
 
     interact.enable();
   });
@@ -221,6 +221,5 @@ $(async function () {
   await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
   await Promise.all([SCROLL_BUTTONS.show(), createContents(SAVE.get(DATE))]);
 
-  SCROLL_BUTTONS.setScrollTarget(TASKLIST);
   interact.enable();
 });
