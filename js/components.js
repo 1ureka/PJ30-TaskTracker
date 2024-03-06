@@ -95,15 +95,15 @@ class ScrollButtons extends component {
 
     return this;
   }
-  /** 綁定上下按鈕功能 @param {Array} list  TaskList.getList()返回值*/
-  bindEvents(list) {
+  /** 綁定上下按鈕功能 @param {TaskList} taskList*/
+  setScrollTarget(taskList) {
     if (this._scrollUp) {
       this._up.off("click", this._scrollUp);
       this._down.off("click", this._scrollDown);
     }
 
     const init = () => {
-      const { index, taskTop } = findFirstUnfinished(list);
+      const { index, taskTop } = findFirstUnfinished(taskList.getList());
       const currentTop = $("#content").scrollTop();
 
       const tolerance = window.innerHeight / 2.5;
@@ -126,11 +126,11 @@ class ScrollButtons extends component {
 
     this._scrollDown = () => {
       const { index, taskTop, currentTop, isAtTask } = init();
-      let targetTop = $("#tasks-container").height();
+      let targetTop = taskList.element.height();
 
       if (index !== -1) {
         const isGoingToBottom = isAtTask || currentTop > taskTop;
-        targetTop = isGoingToBottom ? $("#tasks-container").height() : taskTop;
+        targetTop = isGoingToBottom ? taskList.element.height() : taskTop;
       }
 
       $("#content").animate({ scrollTop: targetTop }, 500);

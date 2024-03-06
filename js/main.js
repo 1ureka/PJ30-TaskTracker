@@ -1,9 +1,18 @@
-/** @type {TaskList} */
-let taskList;
-/** @type {"YYYY-MM"} */
-let date;
-/** @type {Save} */
-let save;
+// component
+/** @type {TaskList}      */ let TASKLIST;
+/** @type {Header}        */ let HEADER;
+/** @type {SidebarTop}    */ let SIDEBAR_TOP;
+/** @type {SidebarBottom} */ let SIDEBAR_BOTTOM;
+/** @type {ScrollButtons} */ let SCROLL_BUTTONS;
+
+// var
+/** @type {"YYYY-MM"} */ let DATE = initDate();
+/** @type {Save}      */ let SAVE = new Save();
+
+interact = {
+  disable: () => $("body").css("pointerEvents", "none"),
+  enable: () => $("body").css("pointerEvents", "auto"),
+};
 
 async function login() {
   // 如果已經認證過則認證完成
@@ -61,6 +70,14 @@ async function login() {
   $("#login-container").remove();
 }
 
+async function loadSave() {
+  const content = await loadFile(SAVEPATH);
+  const data = JSON.parse(base64ToString(content));
+
+  Object.keys(data).forEach((date) => SAVE.set(date, data[date]));
+  SAVE.update();
+}
+
 function createBackground() {
   const waveBackground = new WaveBackground(-1);
   waveBackground.show();
@@ -86,109 +103,76 @@ function createBackground() {
 function createComponents() {
   Task.createStyle();
 
-  const header = new Header();
-  const sidebarTop = new SidebarTop();
-  const sidebarBottom = new SidebarBottom();
+  HEADER = new Header();
+  SIDEBAR_TOP = new SidebarTop();
+  SIDEBAR_BOTTOM = new SidebarBottom();
+  SCROLL_BUTTONS = new ScrollButtons();
+
+  SIDEBAR_TOP.appendTo("#sidebar-content");
+  SIDEBAR_BOTTOM.appendTo("#sidebar-content");
+  SCROLL_BUTTONS.appendTo("body");
+  SIDEBAR_TOP.setActive(DATE);
 
   const copyPopup = new CopyPopup();
-  const scrollButtons = new ScrollButtons();
-
-  sidebarTop.appendTo("#sidebar-content");
-  sidebarBottom.appendTo("#sidebar-content");
-
   copyPopup.appendTo("body");
-  scrollButtons.appendTo("body");
-
-  sidebarTop.setActive(date);
-
   Task.onCopy((coordinate) => {
     copyPopup.show(coordinate);
   });
-
-  return { header, sidebarTop, sidebarBottom, scrollButtons };
 }
 
 async function createContents(list) {
-  if (taskList) await taskList.remove();
+  if (TASKLIST) await TASKLIST.remove();
 
-  $("#content").toggleClass("current-month", isCurrentMonth(date));
+  $("#content").toggleClass("current-month", isCurrentMonth(DATE));
 
-  taskList = new TaskList(list);
+  TASKLIST = new TaskList(list);
 
-  taskList.onChange((list) => save.set(date, list)); // 主要是刪除與更新事件
-  taskList.onSort((list) => save.set(date, list)); // 主要是新增與排序事件
-  taskList.onTransfer((list, info) => {
+  TASKLIST.onChange((list) => SAVE.set(DATE, list)); // 主要是刪除與更新事件
+  TASKLIST.onSort((list) => SAVE.set(DATE, list)); // 主要是新增與排序事件
+  TASKLIST.onTransfer((list, info) => {
     const currentList = list;
-    const targetList = save.get(getCurrentDate());
+    const targetList = SAVE.get(getCurrentDate());
 
     targetList.push(info);
 
-    save.set(date, currentList);
-    save.set(getCurrentDate(), targetList);
+    SAVE.set(DATE, currentList);
+    SAVE.set(getCurrentDate(), targetList);
   });
 
   await delay(350);
 
-  await taskList.show();
-  save.set(date, taskList.getList());
+  await TASKLIST.show();
+  SAVE.set(DATE, TASKLIST.getList());
 }
 
-$(async function () {
-  const { loadingIcon } = createBackground();
-
-  await login();
-
-  loadingIcon.show();
-
-  $("body").css("pointerEvents", "none");
-
-  //
-  // 載入存檔
-  //
-  date = initDate();
-  save = new Save();
-
-  const content = await loadFile(SAVEPATH);
-  const data = JSON.parse(base64ToString(content));
-
-  Object.keys(data).forEach((date) => save.set(date, data[date]));
-  save.update();
-
-  //
-  // 創建組件與事件監聽
-  //
-  const { header, sidebarTop, sidebarBottom, scrollButtons } =
-    createComponents();
-
-  header.onInput((e) => {
-    taskList.filterTasks(e);
+function bindEvents() {
+  HEADER.onInput((e) => {
+    TASKLIST.filterTasks(e);
   });
-  sidebarTop.onSelect(async (id) => {
-    $("body").css("pointerEvents", "none");
+  SIDEBAR_TOP.onSelect(async (id) => {
+    interact.disable();
 
-    date = id;
+    DATE = id;
+    SIDEBAR_TOP.setActive(DATE);
+    localStorage.setItem("date", DATE);
 
-    if (!["0000-00", "1111-11"].includes(date))
-      localStorage.setItem("date", date);
+    await HEADER.reset();
+    await createContents(SAVE.get(DATE));
+    SCROLL_BUTTONS.setScrollTarget(TASKLIST);
 
-    sidebarTop.setActive(date);
-    await header.reset();
-    await createContents(save.get(date));
-    scrollButtons.bindEvents(taskList.getList());
-
-    $("body").css("pointerEvents", "auto");
+    interact.enable();
   });
-  sidebarBottom.onSelect(async (type) => {
-    $("body").css("pointerEvents", "none");
+  SIDEBAR_BOTTOM.onSelect(async (type) => {
+    interact.disable();
 
     if (type === "save") {
       loadingIcon.show();
 
-      const data = save.get("0");
+      const data = SAVE.get("0");
       const str = JSON.stringify(data, null, 2);
       const file = stringToBase64(str);
       await uploadFile(file, SAVEPATH);
-      save.update();
+      SAVE.update();
 
       loadingIcon.hide();
     }
@@ -198,20 +182,31 @@ $(async function () {
 
       const content = await loadFile(SAVEPATH);
       const data = JSON.parse(base64ToString(content));
-      Object.keys(data).forEach((date) => save.set(date, data[date]));
-      save.update();
+      Object.keys(data).forEach((date) => SAVE.set(date, data[date]));
+      SAVE.update();
 
       loadingIcon.hide();
 
-      await createContents(save.get(date));
+      await createContents(SAVE.get(DATE));
     }
 
-    $("body").css("pointerEvents", "auto");
+    interact.enable();
   });
+}
 
-  //
-  // 開場動畫
-  //
+$(async function () {
+  const { loadingIcon } = createBackground();
+
+  await login();
+
+  loadingIcon.show();
+  interact.disable();
+
+  await loadSave();
+
+  createComponents();
+  bindEvents();
+
   loadingIcon.hide();
 
   const opening = gsap
@@ -225,9 +220,8 @@ $(async function () {
     });
 
   await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
-  await Promise.all([scrollButtons.show(), createContents(save.get(date))]);
+  await Promise.all([SCROLL_BUTTONS.show(), createContents(SAVE.get(DATE))]);
 
-  scrollButtons.bindEvents(taskList.getList());
-
-  $("body").css("pointerEvents", "auto");
+  SCROLL_BUTTONS.setScrollTarget(TASKLIST);
+  interact.enable();
 });
