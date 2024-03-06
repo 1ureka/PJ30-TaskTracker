@@ -1,24 +1,21 @@
 @import url("header-input.css");
 
 #header {
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: 10;
   /* init */
   opacity: 0;
   visibility: hidden;
   translate: 0px -110px;
 }
 
-#header > .filter-bar {
+#header {
   transform-origin: top right;
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 20px;
   height: 40px;
   padding: 10px 30px;
   padding-top: 13px;
+  z-index: 10;
   display: flex;
   align-items: flex-start;
   gap: 20px;

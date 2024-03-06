@@ -401,13 +401,11 @@ class Header extends component {
   _create() {
     this.element = $("#header");
 
-    const bar = $("<div>").addClass("filter-bar");
-
     const input = this._createSearchInput();
     const select = this._createCategorySelect();
-    bar.append(input, select);
+    this.element.append(input, select);
 
-    bar
+    this.element
       .on("mouseenter", (e) => {
         const except = $(e.target).filter(
           ".custom-select-options, .custom-select-option"
@@ -420,8 +418,6 @@ class Header extends component {
       .on("mouseleave", (e) => {
         select.css("pointerEvents", "none");
       });
-
-    this.element.append(bar);
 
     return this;
   }
