@@ -335,7 +335,7 @@ class Task {
 
     // 下半部
     $("<div>")
-      .addClass("task-p-container")
+      .addClass("task-p-container markdown-body")
       .html(marked.parse(config.text))
       .appendTo(container);
 
@@ -642,6 +642,7 @@ class Task {
 
     this.element.on("input", "textarea", (e) => {
       const currentHeight = textarea.height();
+      const scrollTop = $("#content").scrollTop();
 
       gsap.set(textarea, { height: "auto" });
       const targetHeight = textarea[0].scrollHeight;
@@ -649,7 +650,12 @@ class Task {
       gsap.fromTo(
         textarea,
         { height: currentHeight },
-        { ease: "set1", duration: 0.1, height: targetHeight }
+        {
+          ease: "set1",
+          duration: 0.1,
+          height: targetHeight,
+          onUpdate: () => $("#content").scrollTop(scrollTop),
+        }
       );
     });
   }
