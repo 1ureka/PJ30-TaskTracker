@@ -336,7 +336,7 @@ class Task {
     // 下半部
     $("<div>")
       .addClass("task-p-container")
-      .append($("<p>").text(config.text))
+      .html(marked.parse(config.text))
       .appendTo(container);
 
     // 文檔劉以外
@@ -580,7 +580,7 @@ class Task {
     let textarea;
 
     this.element.on("click", ".task-edit-button", async () => {
-      const p = this.element.find("p");
+      const p = this.element.find(".task-p-container");
       if (p.length === 0) return;
 
       await delay(100);
@@ -591,9 +591,10 @@ class Task {
 
       // 創建一個 textarea 元素
       textarea = $("<textarea></textarea>")
-        .val(p.text())
+        .val(this._info.text)
         .css("width", p.width())
         .css("height", p.height() + 10);
+      const currentHeight = textarea.height();
 
       // 取得最小寬度
       this.element.css("min-width", "40%");
@@ -601,11 +602,18 @@ class Task {
       this.element.css("min-width", "");
 
       // 替換 p 元素為 textarea
-      p.replaceWith(textarea);
+      p.children().remove();
+      p.append(textarea);
       textarea.focus();
 
       // 給足夠空間編輯
       textarea.css("width", minWidth);
+      const targetHeight = textarea[0].scrollHeight;
+      gsap.fromTo(
+        textarea,
+        { height: currentHeight },
+        { ease: "set1", duration: 0.1, height: targetHeight }
+      );
 
       this.element.trigger("task-edit-focus");
     });
@@ -622,7 +630,7 @@ class Task {
       this.element.trigger("task-change");
 
       // 替換 textarea 元素為 p
-      const p = $("<p></p>").text(this._info.text);
+      const p = marked.parse(this._info.text);
       textarea.replaceWith(p);
 
       // 恢復選單編輯行為

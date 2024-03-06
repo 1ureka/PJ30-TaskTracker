@@ -197,6 +197,16 @@
 /*  */
 /*  */
 
+.task-p-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 15px;
+}
+.task-p-container hr {
+  width: 100%;
+}
 .task-p-container * {
   margin: 0;
 }
