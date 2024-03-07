@@ -381,7 +381,7 @@ class Task {
       $("<button>")
         .addClass("task-transfer-button")
         .append(
-          $("<img>").attr("src", "icons/arrow.png"),
+          $("<img>").attr("src", "icons/transfer.png"),
           $("<span>").addClass("tip").text("轉移")
         ),
       $("<button>")
