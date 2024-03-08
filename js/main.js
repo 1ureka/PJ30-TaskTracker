@@ -138,9 +138,9 @@ async function createContents(list) {
     SAVE.set(DATE, currentList);
     SAVE.set(getCurrentDate(), targetList);
   });
+}
 
-  await delay(350);
-
+async function showContents() {
   await TASKLIST.show();
   SAVE.set(DATE, TASKLIST.getList());
   SCROLL_BUTTONS.setScrollTarget(TASKLIST);
@@ -159,6 +159,7 @@ function bindEvents() {
 
     await HEADER.reset();
     await createContents(SAVE.get(DATE));
+    await showContents();
 
     interact.enable();
   });
@@ -188,6 +189,7 @@ function bindEvents() {
       LOADICON.hide();
 
       await createContents(SAVE.get(DATE));
+      await showContents();
     }
 
     interact.enable();
@@ -207,6 +209,9 @@ $(async function () {
   createComponents();
   bindEvents();
 
+  await createContents(SAVE.get(DATE));
+  await delay(100);
+
   LOADICON.hide();
 
   const opening = gsap
@@ -216,11 +221,19 @@ $(async function () {
       y: 0,
       autoAlpha: 1,
       stagger: 0.35,
-      onComplete: () => $("#sidebar").css("transform", ""), // 避免子元素position:fixed不作用
-    });
+    })
+    .to(
+      "body",
+      {
+        onStart: async () => {
+          showContents();
+          SCROLL_BUTTONS.show();
+        },
+      },
+      "<+0.3"
+    );
 
   await new Promise((resolve) => opening.eventCallback("onComplete", resolve));
-  await Promise.all([SCROLL_BUTTONS.show(), createContents(SAVE.get(DATE))]);
 
   interact.enable();
 });
