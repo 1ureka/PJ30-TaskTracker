@@ -278,10 +278,8 @@ async function checkInfo() {
  * @param {string} [message="Upload file"] - 上傳的提交訊息。
  * @returns {Promise<void>} 當上傳完成時解析的 Promise。
  */
-async function uploadFile(file, path, message = "Upload file") {
-  const currentDate = new Date().toISOString().split("T")[0];
-  message += ` ${currentDate}`;
-
+async function uploadFile(file, path, message = "PJ30/upload") {
+  message += ` ${Date()}`;
   const detail = { file, path, message };
   window.dispatchEvent(new CustomEvent("uploadFile", { detail }));
 
