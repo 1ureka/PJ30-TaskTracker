@@ -493,7 +493,7 @@ class TaskList extends component {
     this.isShow = false;
 
     this.element = this._create(list);
-    gsap.set(this.element.children(), { autoAlpha: 0 });
+    gsap.set(this.element.children(), { filter: "blur(10px)", autoAlpha: 0 });
     this._bindEvents();
   }
   /**  @param {Array} list   */
@@ -542,6 +542,7 @@ class TaskList extends component {
     this._timelines.show = gsap
       .timeline({ defaults: { ease: "set1" }, paused: true })
       .to(this.element.children(), {
+        filter: "blur(0px)",
         autoAlpha: 1,
         stagger: { from: "random", amount: 0.5 },
       });
@@ -549,6 +550,7 @@ class TaskList extends component {
     this._timelines.hide = gsap
       .timeline({ defaults: { ease: "set1" }, paused: true })
       .to(this.element.children(), {
+        filter: "blur(10px)",
         autoAlpha: 0,
         stagger: { from: "random", amount: 0.5 },
       });

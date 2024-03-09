@@ -90,8 +90,7 @@ body {
   background: hsl(225, 10%, 10%);
 }
 
-.popup,
-#version-display {
+.popup {
   background-color: hsl(240, 5%, 10%);
 }
 
@@ -100,19 +99,10 @@ body {
   background-color: hsl(225, 7.5%, 5%);
 }
 
-.temp-list-scroller {
-  background-color: hsla(210, 0%, 10%, 0.7);
-  backdrop-filter: blur(10px);
-}
-
 button,
-.sidebar-top-nav-container,
 .sidebar-bottom-container,
 .search-input {
   background-color: hsl(240, 5%, 15%);
-}
-.popup button {
-  background-color: hsl(240, 5%, 10%);
 }
 
 input,

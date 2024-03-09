@@ -431,8 +431,6 @@
   height: 15px;
   cursor: grab;
   position: relative;
-
-  transition: height 1s cubic-bezier(0.165, 0.84, 0.44, 1) 0.1s;
 }
 .separator::before {
   content: "";
