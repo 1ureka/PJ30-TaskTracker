@@ -220,6 +220,7 @@
   font-size: 19px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.1);
+  background: #161b2290;
   box-shadow: 0px 0px 0px #0e0e0e, 0px 0px 0px rgb(95 94 94 / 25%),
     inset 1.5px 1.5px 3px #0e0e0e, inset -1.5px -1.5px 3px #5f5e5e;
 }
