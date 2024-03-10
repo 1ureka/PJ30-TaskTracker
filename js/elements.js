@@ -597,94 +597,106 @@ class Task {
   }
   /** @private */
   _bindTextEvents() {
-    let textarea;
+    let TEXTAREA;
 
-    this.element.on("click", ".task-edit-button", async () => {
-      const p = this.element.find(".task-p-container");
-      if (p.length === 0) return;
+    const getMinWidth = () => {
+      this.element.css("min-width", "40%");
+      const width = this.element.find(".task-p-container").width();
+      this.element.css("min-width", "");
+      return width;
+    };
 
-      await delay(100);
+    const getMinHeight = () => {
+      TEXTAREA.css("height", "auto");
+      const height = TEXTAREA[0].scrollHeight;
+      return height;
+    };
 
-      // 停止選單編輯行為
+    const stopOtherFunction = () => {
       $(":root").css("--is-task-list-hovable", "0");
       $(":root").css("--is-task-menu-usable", "none");
       this.element.toggleClass("task-editing", true);
+    };
 
-      // 創建一個 textarea 元素
-      textarea = $("<textarea></textarea>")
-        .val(this._info.text)
-        .css("width", p.innerWidth())
-        .css("height", p.height() + 10);
-      const currentHeight = textarea.height();
-
-      // 取得最小寬度
-      this.element.css("min-width", "40%");
-      const minWidth = p.width();
-      this.element.css("min-width", "");
-
-      // 替換 p 元素為 textarea
-      p.children().remove();
-      p.append(textarea);
-      textarea.focus();
-
-      // 給足夠空間編輯
-      textarea.css("width", minWidth);
-      const targetHeight = textarea[0].scrollHeight;
-      gsap.fromTo(
-        textarea,
-        { height: currentHeight },
-        { ease: "set1", duration: 0.1, height: targetHeight }
-      );
-
-      this.element.trigger("task-edit-focus");
-    });
-
-    this.element.on("keyup", "textarea", (e) => {
-      this._info.text = textarea.val();
-      this.element.data("info", JSON.stringify(this._info));
-      this.element.trigger("task-change");
-    });
-
-    this.element.on("blur", "textarea", (e) => {
-      this._info.text = textarea.val();
-      this.element.data("info", JSON.stringify(this._info));
-      this.element.trigger("task-change");
-
-      // 替換 textarea 元素為 p
-      const p = marked.parse(this._info.text);
-      textarea.replaceWith(p);
-
-      // 恢復選單編輯行為
+    const restartOtherFunction = () => {
       $(":root").css("--is-task-list-hovable", "1");
       $(":root").css("--is-task-menu-usable", "auto");
       this.element.toggleClass("task-editing", false);
+    };
 
+    const updateInfo = () => {
+      this._info.text = TEXTAREA.val();
+      this.element.data("info", JSON.stringify(this._info));
+      this.element.trigger("task-change");
+    };
+
+    const startEdit = () => {
+      const article = this.element.find(".task-p-container");
+      if (article.find("textarea").length > 0) return;
+
+      // 停止選單其他行為
+      stopOtherFunction();
+
+      // 創建一個 textarea 元素
+      TEXTAREA = $("<textarea></textarea>").val(this._info.text);
+      TEXTAREA.css("width", getMinWidth());
+
+      // 替換 article 元素為 textarea
+      article.children().remove();
+      article.append(TEXTAREA);
+      TEXTAREA.focus().select();
+
+      // 取得最小高度
+      gsap.to(TEXTAREA, {
+        ease: "set1",
+        duration: 0.1,
+        height: getMinHeight(),
+      });
+
+      this.element.trigger("task-edit-focus");
+    };
+
+    const stopEdit = () => {
+      if (!document.hasFocus()) return;
+      updateInfo();
+      // 替換 textarea 元素為 article
+      const article = marked.parse(this._info.text);
+      TEXTAREA.replaceWith(article);
+      // 恢復選單編輯行為
+      restartOtherFunction();
       this.element.trigger("task-edit-blur");
-    });
+    };
 
-    this.element.on("input", "textarea", (e) => {
-      const currentHeight = textarea[0].scrollHeight;
+    const changeHeight = () => {
+      const currentHeight = TEXTAREA[0].scrollHeight;
       const scrollTop = $("#content").scrollTop();
+      const targetHeight = getMinHeight();
 
-      gsap.set(textarea, { height: "auto" });
-      const targetHeight = textarea[0].scrollHeight;
-
-      if (currentHeight !== targetHeight) {
-        gsap.fromTo(
-          textarea,
-          { height: currentHeight },
-          {
-            ease: "set1",
-            duration: 0.1,
-            height: targetHeight,
-            onUpdate: () => $("#content").scrollTop(scrollTop),
-          }
-        );
+      if (currentHeight >= targetHeight) {
+        gsap.set(TEXTAREA, {
+          height: currentHeight,
+          onUpdate: () => $("#content").scrollTop(scrollTop),
+        });
+        gsap.to(TEXTAREA, {
+          ease: "set1",
+          duration: 0.1,
+          height: targetHeight,
+          onUpdate: () => $("#content").scrollTop(scrollTop),
+        });
       } else {
-        gsap.set(textarea, { height: currentHeight });
-        $("#content").scrollTop(scrollTop);
+        gsap.set(TEXTAREA, {
+          height: targetHeight,
+          onUpdate: () => $("#content").scrollTop(scrollTop),
+        });
       }
-    });
+    };
+
+    this.element.on("dblclick", startEdit);
+    this.element.on("click", ".task-edit-button", startEdit);
+    this.element.on("keyup", "textarea", updateInfo);
+    this.element.on("focus", "textarea", updateInfo);
+    this.element.on("blur", "textarea", stopEdit);
+    this.element.on("input", "textarea", changeHeight);
   }
   /** @private */
   _bindCopyEvents() {
